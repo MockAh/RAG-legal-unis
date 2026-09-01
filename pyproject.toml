@@ -1,0 +1,25 @@
+[project]
+name = "legisuni"
+version = "0.1.0"
+description = "LegisUni"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx",
+    "pydantic>=2",
+    "pydantic-settings",
+    "typer",
+    "selectolax",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-httpx",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["legisuni*"]
