@@ -1,3 +1,5 @@
+import logging
+
 from legisuni.descargador.ratelimit import RateLimiter
 
 
@@ -76,3 +78,30 @@ def test_rutas_distintas_del_mismo_host_comparten_el_limite() -> None:
 
     assert espera == 1.0
     assert dormir.llamadas == [1.0]
+
+
+def test_espera_real_emite_log_info_con_host_y_segundos(caplog) -> None:
+    reloj = RelojFalso()
+    dormir = DormirFalso()
+    limitador = RateLimiter(min_intervalo_s=1.0, reloj=reloj, dormir=dormir)
+
+    with caplog.at_level(logging.INFO):
+        limitador.esperar("https://a.mx/x")
+        limitador.esperar("https://a.mx/y")
+
+    registros_info = [r for r in caplog.records if r.levelno == logging.INFO]
+    assert len(registros_info) == 1
+    assert "a.mx" in registros_info[0].message
+    assert "1.000" in registros_info[0].message
+
+
+def test_peticion_sin_espera_no_emite_log_info(caplog) -> None:
+    reloj = RelojFalso()
+    dormir = DormirFalso()
+    limitador = RateLimiter(min_intervalo_s=1.0, reloj=reloj, dormir=dormir)
+
+    with caplog.at_level(logging.INFO):
+        limitador.esperar("https://a.mx/x")
+
+    registros_info = [r for r in caplog.records if r.levelno == logging.INFO]
+    assert registros_info == []
