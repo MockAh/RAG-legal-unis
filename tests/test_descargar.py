@@ -6,9 +6,10 @@ import pytest
 from pytest_httpx import HTTPXMock
 
 from legisuni.config import Settings
-from legisuni.contracts import CatalogEntry
+from legisuni.contracts import CatalogEntry, DownloadResult
 from legisuni.descargador.descargar import descargar
 from legisuni.descargador.fetch import Fetcher
+from legisuni.descargador.store import Store
 
 _PDF_BYTES = b"%PDF-1.7\n%\xe2\xe3\xcf\xd3\n1 0 obj\n<< /Type /Catalog >>\n"
 _PDF_BYTES_V2 = b"%PDF-1.7\n%\xe2\xe3\xcf\xd3\n2 0 obj\n<< /Type /Catalog /V2 true >>\n"
@@ -210,3 +211,104 @@ def test_fallo_de_escritura_no_propaga_excepcion(
 
     assert resultado.exito is False
     assert resultado.motivo_fallo == "http_error"
+
+
+def test_reanudar_omite_entry_id_ya_registrado_con_exito(tmp_path: Path) -> None:
+    settings = _settings(tmp_path)
+    entrada = _entrada()
+    fetcher = FetcherContador()
+
+    with Store(tmp_path / "store.db") as store:
+        store.guardar(
+            DownloadResult(
+                entry_id=entrada.entry_id,
+                exito=True,
+                capturado_en=datetime(2026, 1, 1),
+                ruta_local=tmp_path / "reglamento-organico.pdf",
+                sha256="abc123",
+            )
+        )
+
+        resultado = descargar(
+            entrada, fetcher, RobotsPermiteTodo(), settings, store=store, omitir_si_registrado=True
+        )
+
+    assert resultado.exito is True
+    assert resultado.ruta_local == tmp_path / "reglamento-organico.pdf"
+    assert fetcher.llamadas == 0
+
+
+def test_reanudar_con_entry_id_no_registrado_descarga_normalmente(
+    tmp_path: Path, httpx_mock: HTTPXMock
+) -> None:
+    httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
+    settings = _settings(tmp_path)
+    entrada = _entrada()
+
+    with Store(tmp_path / "store.db") as store:
+        resultado = descargar(
+            entrada,
+            _fetcher(settings),
+            RobotsPermiteTodo(),
+            settings,
+            store=store,
+            omitir_si_registrado=True,
+        )
+
+    assert resultado.exito is True
+    assert resultado.ruta_local is not None
+    assert resultado.ruta_local.exists()
+
+
+def test_reanudar_con_entry_id_registrado_como_fallo_descarga_igual(
+    tmp_path: Path, httpx_mock: HTTPXMock
+) -> None:
+    httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
+    settings = _settings(tmp_path)
+    entrada = _entrada()
+
+    with Store(tmp_path / "store.db") as store:
+        store.guardar(
+            DownloadResult(
+                entry_id=entrada.entry_id,
+                exito=False,
+                motivo_fallo="timeout",
+                capturado_en=datetime(2026, 1, 1),
+            )
+        )
+
+        resultado = descargar(
+            entrada,
+            _fetcher(settings),
+            RobotsPermiteTodo(),
+            settings,
+            store=store,
+            omitir_si_registrado=True,
+        )
+
+    assert resultado.exito is True
+    assert resultado.ruta_local is not None
+    assert resultado.ruta_local.exists()
+
+
+def test_default_no_omite_y_llama_al_fetcher(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
+    settings = _settings(tmp_path)
+    entrada = _entrada()
+
+    with Store(tmp_path / "store.db") as store:
+        store.guardar(
+            DownloadResult(
+                entry_id=entrada.entry_id,
+                exito=True,
+                capturado_en=datetime(2026, 1, 1),
+                ruta_local=tmp_path / "reglamento-organico.pdf",
+                sha256="abc123",
+            )
+        )
+
+        resultado = descargar(entrada, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+
+    assert resultado.exito is True
+    assert resultado.ruta_local != tmp_path / "reglamento-organico.pdf"
+    assert len(httpx_mock.get_requests()) == 1

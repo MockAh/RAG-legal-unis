@@ -9,6 +9,7 @@ from legisuni.contracts import CatalogEntry, DownloadResult
 from legisuni.descargador import guard, paths, urlnorm
 from legisuni.descargador.fetch import Fetcher, RespuestaCruda
 from legisuni.descargador.robots import RobotsCache
+from legisuni.descargador.store import Store
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +20,23 @@ def descargar(
     robots: RobotsCache,
     settings: Settings,
     ahora: datetime | None = None,
+    store: Store | None = None,
+    omitir_si_registrado: bool = False,
 ) -> DownloadResult:
     capturado_en = ahora if ahora is not None else datetime.now()
+
+    if omitir_si_registrado and store is not None:
+        sha256_previo = store.hash_registrado(entrada.entry_id)
+        if sha256_previo is not None:
+            logger.info("omitido: %s ya registrado", entrada.entry_id)
+            return DownloadResult(
+                entry_id=entrada.entry_id,
+                exito=True,
+                capturado_en=capturado_en,
+                ruta_local=store.ruta_registrada(entrada.entry_id),
+                sha256=sha256_previo,
+            )
+
     # entrada.url_documento nunca se modifica: es proveniencia (D5)
     url = urlnorm.normalizar(entrada.url_documento, entrada.url_indice)
 

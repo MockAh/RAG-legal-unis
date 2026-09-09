@@ -83,6 +83,7 @@ def main(
     inst_id: str = typer.Option("uam", "--inst-id"),
     limite: int | None = typer.Option(None, "--limite", help="Procesar solo las primeras N entradas"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Solo muestra qué haría, no descarga nada"),
+    reanudar: bool = typer.Option(False, "--reanudar", help="Omite entradas ya registradas con éxito"),
 ) -> None:
     logging.basicConfig(
         level=logging.INFO,
@@ -118,11 +119,16 @@ def main(
 
     motivos_fallo: Counter[str] = Counter()
     exitosas = 0
+    omitidos = 0
 
     with Store(settings.db_path) as store:
         for entrada in entradas:
             logger.info("pidiendo %s (%s)", entrada.entry_id, entrada.url_documento)
-            resultado = descargar(entrada, fetcher, robots, settings)
+            if reanudar and store.hash_registrado(entrada.entry_id) is not None:
+                omitidos += 1
+            resultado = descargar(
+                entrada, fetcher, robots, settings, store=store, omitir_si_registrado=reanudar
+            )
             store.guardar(resultado)
             if resultado.exito:
                 exitosas += 1
@@ -136,6 +142,7 @@ def main(
     typer.echo("--- resumen ---")
     typer.echo(f"total: {len(entradas)}")
     typer.echo(f"exitosas: {exitosas}")
+    typer.echo(f"omitidos: {omitidos}")
     for motivo, cuenta in motivos_fallo.items():
         typer.echo(f"  {motivo}: {cuenta}")
 
