@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     modelo_llm: str = ""
     user_agent: str
     data_dir: Path = Path("data/norm")
+    data_root: Path = Path("data")
     db_path: Path = Path("legisuni.db")
     timeout_s: int = 30
     max_bytes: int = 100 * 1024 * 1024

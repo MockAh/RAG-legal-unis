@@ -23,11 +23,14 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
 - `config.py` gana `data_root` en `Settings`.
 - Nuevo `tests/test_traduccion_juridica.py`.
 - Criterios 11 y 12 de `docs/05`. La ruta resultante es `data/norm/uam/...`.
+- Nota: el `entry_id` de tres segmentos de `01` v2.0 aún no está
+  implementado en `cosecha.py`; se hace en M23.
 - Commit: `M16: traducción jurídica a Encargo y data_root`
 
 ## M17 · paths.py sin CatalogEntry
 - La ruta se arma desde `cajon` + `etiqueta` + extensión de los bytes.
 - Validación anti-traversal.
+- Unificar `data_root` y `data_dir` en uno solo.
 - Criterio: `grep -rn CatalogEntry legisuni/descargador/` vacío.
 - Commit: `M17: rutas desde cajón y etiqueta, con validación`
 
