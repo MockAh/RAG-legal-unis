@@ -2,27 +2,12 @@
 
 import re
 import unicodedata
-from datetime import date, datetime
 from pathlib import Path
-
-from legisuni.contracts import CatalogEntry
 
 _CARACTERES_NO_SEGUROS = re.compile(r"[^a-z0-9._-]+")
 _GUIONES_REPETIDOS = re.compile(r"-{2,}")
-
-
-def doc_slug_de(entry_id: str) -> str:
-    if ":" not in entry_id:
-        raise ValueError(f"entry_id malformado, falta ':': {entry_id!r}")
-    return entry_id.split(":", 1)[1]
-
-
-def fecha_de_version(entrada: CatalogEntry, capturado_en: datetime) -> date:
-    if entrada.fecha_ultima_reforma is not None:
-        return entrada.fecha_ultima_reforma
-    if entrada.fecha_publicacion is not None:
-        return entrada.fecha_publicacion
-    return capturado_en.date()
+_ETIQUETA_SEGURA = re.compile(r"^[a-z0-9._-]+$")
+_CAJON_SEGURO = re.compile(r"^[a-z0-9._/-]+$")
 
 
 def sanear(texto: str) -> str:
@@ -33,15 +18,25 @@ def sanear(texto: str) -> str:
     return colapsado or "sin-nombre"
 
 
+def _validar_cajon(cajon: str) -> None:
+    if cajon.startswith("/") or ".." in cajon.split("/") or not _CAJON_SEGURO.match(cajon):
+        raise ValueError(f"cajon inseguro: {cajon!r}")
+
+
+def _validar_etiqueta(etiqueta: str) -> None:
+    if ".." in etiqueta or not _ETIQUETA_SEGURA.match(etiqueta):
+        raise ValueError(f"etiqueta insegura: {etiqueta!r}")
+
+
 def ruta_documento(
-    data_dir: Path,
-    inst_id: str,
-    entry_id: str,
-    fecha_version: date,
+    data_root: Path,
+    cajon: str,
+    etiqueta: str,
     extension: str,
     sha256: str | None = None,
 ) -> Path:
-    doc_slug = doc_slug_de(entry_id)
+    _validar_cajon(cajon)
+    _validar_etiqueta(etiqueta)
     sufijo = "" if sha256 is None else f"__{sha256[:8]}"
-    nombre = f"{sanear(doc_slug)}__{fecha_version:%Y-%m-%d}{sufijo}{extension}"
-    return data_dir / sanear(inst_id) / nombre
+    nombre = f"{etiqueta}{sufijo}{extension}"
+    return data_root / cajon / nombre
