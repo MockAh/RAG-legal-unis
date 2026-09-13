@@ -1,12 +1,25 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Literal
 
 from pydantic import BaseModel
+
+from legisuni.contracts.vocabularios import Modo, MotivoFallo
+
+
+class IntentoPuerta(BaseModel):    # v2.0
+    orden: int                     # posición de la puerta en Encargo.puertas (desde 0)
+    url: str                       # la cruda de la Puerta
+    url_pedida: str | None         # tras normalizar
+    url_final: str | None          # tras redirecciones y, si hubo, tras cruzar el vestíbulo
+    enlace_vestibulo: str | None   # enlace seguido dentro del vestíbulo (literal en la página, D3)
+    http_status: int | None
+    exito: bool
+    motivo_fallo: MotivoFallo | None
 
 
 class DownloadResult(BaseModel):
     entry_id: str
+    modo: Modo
     exito: bool
     ruta_local: Path | None = None
     sha256: str | None = None
@@ -15,7 +28,7 @@ class DownloadResult(BaseModel):
     http_status: int | None = None
     capturado_en: datetime
     url_final: str | None = None
-    motivo_fallo: Literal[
-        "http_error", "no_es_pdf", "timeout", "robots_prohibido",
-        "url_muerta", "demasiado_grande", "visor_de_terceros",
-    ] | None = None
+    motivo_fallo: MotivoFallo | None = None
+    puerta_usada: int | None = None
+    intentos: list[IntentoPuerta]
+    duplicado_de: str | None = None

@@ -521,3 +521,31 @@ el UA se pone una sola vez, en un solo sitio, y ningún llamador puede olvidarlo
 **v3 agrava el riesgo:** el enlace del vestíbulo es un llamador más de robots y fetch. Si la
 solución no llega antes de implementar `vestibulo.py`, ese módulo **debe** usar el mismo
 `httpx.Client` configurado, nunca uno propio.
+
+---
+
+### CD-05-3 · `DownloadResult` da defaults que N5 no declara
+
+**Anotado en:** M15 (contratos de la v2.4) · 2026-09-13
+**Estado:** aceptado a sabiendas, sin resolver.
+
+N5 declara `ruta_local`, `sha256`, `bytes`, `content_type`, `http_status` y `url_final`
+como `X | None` **sin** `= None`, lo que en Pydantic v2 los hace obligatorios. Desde M2, el
+código les da `= None`. La divergencia se detectó en M15, al construir `Puerta`.
+
+**Se conserva.** Endurecerlo obligaría a pasar seis campos en cada construcción de un
+resultado fallido, donde todos valen `None` por definición, y rompería los 102 tests sin
+ganar nada medible.
+
+**Las clases nuevas sí siguen `01` al pie** (`Puerta`, `Encargo`, `IntentoPuerta`): no tienen
+convención previa que romper, y el campo obligatorio fuerza a cada llamador a decidir. En
+`Puerta.url_base` eso importa: si se pudiera omitir, una puerta con URL relativa fallaría en
+silencio contra `None` en vez de resolverse contra su base.
+
+**Gatillo de revisión:** un `DownloadResult` construido sin un campo que sí debía llevar —una
+descarga exitosa sin `sha256`, o un fallo de red sin `http_status`— que pase sin error y
+llegue a la base. Basta con un caso.
+
+**Solución cuando se dispare:** quitar los defaults de N5 y ajustar los llamadores, o añadir
+un validador de modelo que exija los campos de proveniencia cuando `exito=True`. Lo segundo
+es más barato y atrapa el caso real; lo primero es más fiel al contrato.

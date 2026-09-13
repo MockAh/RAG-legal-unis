@@ -9,6 +9,7 @@ from legisuni.descargador.store import Store
 def _resultado_exitoso(**overrides) -> DownloadResult:
     datos = dict(
         entry_id="uam:reglamento-organico",
+        modo="juridico",
         exito=True,
         ruta_local=Path("/datos/uam/reglamento-organico__2026-01-01.pdf"),
         sha256="a" * 64,
@@ -17,6 +18,7 @@ def _resultado_exitoso(**overrides) -> DownloadResult:
         http_status=200,
         capturado_en=datetime(2026, 1, 1, 12, 0, 0),
         url_final="http://example.org/doc.pdf",
+        intentos=[],
     )
     datos.update(overrides)
     return DownloadResult(**datos)
@@ -102,9 +104,11 @@ def test_guardar_resultado_fallido_sin_excepcion(tmp_path: Path) -> None:
     with Store(tmp_path / "test.db") as store:
         resultado = DownloadResult(
             entry_id="uam:url-muerta",
+            modo="juridico",
             exito=False,
             motivo_fallo="url_muerta",
             capturado_en=datetime(2026, 1, 1),
+            intentos=[],
         )
         store.guardar(resultado)
         assert store.contar() == 1

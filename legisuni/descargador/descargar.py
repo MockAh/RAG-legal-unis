@@ -31,10 +31,12 @@ def descargar(
             logger.info("omitido: %s ya registrado", entrada.entry_id)
             return DownloadResult(
                 entry_id=entrada.entry_id,
+                modo="juridico",
                 exito=True,
                 capturado_en=capturado_en,
                 ruta_local=store.ruta_registrada(entrada.entry_id),
                 sha256=sha256_previo,
+                intentos=[],
             )
 
     # entrada.url_documento nunca se modifica: es proveniencia (D5)
@@ -87,6 +89,7 @@ def descargar(
 
     return DownloadResult(
         entry_id=entrada.entry_id,
+        modo="juridico",
         exito=True,
         capturado_en=capturado_en,
         ruta_local=ruta,
@@ -95,6 +98,7 @@ def descargar(
         content_type=respuesta.content_type,
         http_status=respuesta.status,
         url_final=respuesta.url_final,
+        intentos=[],
     )
 
 
@@ -106,9 +110,11 @@ def _fallo(
 ) -> DownloadResult:
     return DownloadResult(
         entry_id=entry_id,
+        modo="juridico",
         exito=False,
         motivo_fallo=motivo,
         capturado_en=capturado_en,
         http_status=respuesta.status if respuesta is not None else None,
         url_final=respuesta.url_final if respuesta is not None else None,
+        intentos=[],
     )

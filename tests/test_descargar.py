@@ -222,10 +222,12 @@ def test_reanudar_omite_entry_id_ya_registrado_con_exito(tmp_path: Path) -> None
         store.guardar(
             DownloadResult(
                 entry_id=entrada.entry_id,
+                modo="juridico",
                 exito=True,
                 capturado_en=datetime(2026, 1, 1),
                 ruta_local=tmp_path / "reglamento-organico.pdf",
                 sha256="abc123",
+                intentos=[],
             )
         )
 
@@ -271,9 +273,11 @@ def test_reanudar_con_entry_id_registrado_como_fallo_descarga_igual(
         store.guardar(
             DownloadResult(
                 entry_id=entrada.entry_id,
+                modo="juridico",
                 exito=False,
                 motivo_fallo="timeout",
                 capturado_en=datetime(2026, 1, 1),
+                intentos=[],
             )
         )
 
@@ -300,10 +304,12 @@ def test_default_no_omite_y_llama_al_fetcher(tmp_path: Path, httpx_mock: HTTPXMo
         store.guardar(
             DownloadResult(
                 entry_id=entrada.entry_id,
+                modo="juridico",
                 exito=True,
                 capturado_en=datetime(2026, 1, 1),
                 ruta_local=tmp_path / "reglamento-organico.pdf",
                 sha256="abc123",
+                intentos=[],
             )
         )
 
