@@ -10,8 +10,10 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   `tests/test_descargar.py`, `tests/test_contracts.py`.
 - La columna de SQLite NO se toca en esta tarea; `store.py` mapea
   `resultado.encargo_id` a la columna existente.
-- Criterio: `grep -rn "entry_id" legisuni/descargador/ legisuni/contracts/descarga.py`
-  no devuelve nada. `pytest -q` = 102 verdes.
+- Criterio: `grep -n "entry_id" legisuni/contracts/descarga.py` vacío, y
+  `grep -rn "entry_id=" legisuni/descargador/ tests/` sin construcciones de
+  DownloadResult. `paths.py` queda fuera a propósito: su `entry_id` es N2, no
+  N5, y M17 lo elimina de ahí.
 - Ninguna aserción de comportamiento cambia. Si alguna tiene que cambiar, DETENTE.
 - Commit: `M15.1: renombre de entry_id a encargo_id en DownloadResult`
 
