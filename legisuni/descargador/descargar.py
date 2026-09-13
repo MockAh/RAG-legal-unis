@@ -30,7 +30,7 @@ def descargar(
         if sha256_previo is not None:
             logger.info("omitido: %s ya registrado", entrada.entry_id)
             return DownloadResult(
-                entry_id=entrada.entry_id,
+                encargo_id=entrada.entry_id,
                 modo="juridico",
                 exito=True,
                 capturado_en=capturado_en,
@@ -88,7 +88,7 @@ def descargar(
         return _fallo(entrada.entry_id, capturado_en, "http_error", respuesta)
 
     return DownloadResult(
-        entry_id=entrada.entry_id,
+        encargo_id=entrada.entry_id,
         modo="juridico",
         exito=True,
         capturado_en=capturado_en,
@@ -103,13 +103,13 @@ def descargar(
 
 
 def _fallo(
-    entry_id: str,
+    encargo_id: str,
     capturado_en: datetime,
     motivo: str,
     respuesta: RespuestaCruda | None = None,
 ) -> DownloadResult:
     return DownloadResult(
-        entry_id=entry_id,
+        encargo_id=encargo_id,
         modo="juridico",
         exito=False,
         motivo_fallo=motivo,

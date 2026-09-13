@@ -8,7 +8,7 @@ from legisuni.descargador.store import Store
 
 def _resultado_exitoso(**overrides) -> DownloadResult:
     datos = dict(
-        entry_id="uam:reglamento-organico",
+        encargo_id="uam:reglamento-organico",
         modo="juridico",
         exito=True,
         ruta_local=Path("/datos/uam/reglamento-organico__2026-01-01.pdf"),
@@ -35,7 +35,7 @@ def test_guardar_exitoso_y_recuperar_hash(tmp_path: Path) -> None:
     with Store(tmp_path / "test.db") as store:
         resultado = _resultado_exitoso()
         store.guardar(resultado)
-        assert store.hash_registrado(resultado.entry_id) == resultado.sha256
+        assert store.hash_registrado(resultado.encargo_id) == resultado.sha256
 
 
 def test_guardar_dos_veces_mismo_entry_id_no_duplica(tmp_path: Path) -> None:
@@ -53,7 +53,7 @@ def test_guardar_mismo_entry_id_con_datos_distintos_actualiza(tmp_path: Path) ->
         actualizado = resultado.model_copy(update={"sha256": "b" * 64})
         store.guardar(actualizado)
         assert store.contar() == 1
-        assert store.hash_registrado(resultado.entry_id) == "b" * 64
+        assert store.hash_registrado(resultado.encargo_id) == "b" * 64
 
 
 def test_hash_registrado_entry_id_inexistente_devuelve_none(tmp_path: Path) -> None:
@@ -65,14 +65,14 @@ def test_hash_registrado_con_exito_falso_devuelve_none(tmp_path: Path) -> None:
     with Store(tmp_path / "test.db") as store:
         resultado = _resultado_exitoso(exito=False, sha256="c" * 64)
         store.guardar(resultado)
-        assert store.hash_registrado(resultado.entry_id) is None
+        assert store.hash_registrado(resultado.encargo_id) is None
 
 
 def test_ruta_registrada_vuelve_como_path(tmp_path: Path) -> None:
     with Store(tmp_path / "test.db") as store:
         resultado = _resultado_exitoso()
         store.guardar(resultado)
-        ruta = store.ruta_registrada(resultado.entry_id)
+        ruta = store.ruta_registrada(resultado.encargo_id)
         assert isinstance(ruta, Path)
         assert ruta == resultado.ruta_local
 
@@ -95,7 +95,7 @@ def test_tipos_en_disco_son_texto_no_blob(tmp_path: Path) -> None:
 def test_utf8_se_conserva_intacto(tmp_path: Path) -> None:
     entry_id = "uñam:reglamento-académico"
     with Store(tmp_path / "test.db") as store:
-        resultado = _resultado_exitoso(entry_id=entry_id)
+        resultado = _resultado_exitoso(encargo_id=entry_id)
         store.guardar(resultado)
         assert store.hash_registrado(entry_id) == resultado.sha256
 
@@ -103,7 +103,7 @@ def test_utf8_se_conserva_intacto(tmp_path: Path) -> None:
 def test_guardar_resultado_fallido_sin_excepcion(tmp_path: Path) -> None:
     with Store(tmp_path / "test.db") as store:
         resultado = DownloadResult(
-            entry_id="uam:url-muerta",
+            encargo_id="uam:url-muerta",
             modo="juridico",
             exito=False,
             motivo_fallo="url_muerta",

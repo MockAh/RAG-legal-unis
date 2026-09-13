@@ -49,7 +49,7 @@ class Store:
                 url_final = excluded.url_final
             """,
             {
-                "entry_id": resultado.entry_id,
+                "entry_id": resultado.encargo_id,
                 "exito": int(resultado.exito),
                 "ruta_local": str(resultado.ruta_local) if resultado.ruta_local is not None else None,
                 "sha256": resultado.sha256,

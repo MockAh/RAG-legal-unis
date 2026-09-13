@@ -18,7 +18,7 @@ class IntentoPuerta(BaseModel):    # v2.0
 
 
 class DownloadResult(BaseModel):
-    entry_id: str
+    encargo_id: str
     modo: Modo
     exito: bool
     ruta_local: Path | None = None

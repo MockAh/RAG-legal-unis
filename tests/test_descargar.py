@@ -221,7 +221,7 @@ def test_reanudar_omite_entry_id_ya_registrado_con_exito(tmp_path: Path) -> None
     with Store(tmp_path / "store.db") as store:
         store.guardar(
             DownloadResult(
-                entry_id=entrada.entry_id,
+                encargo_id=entrada.entry_id,
                 modo="juridico",
                 exito=True,
                 capturado_en=datetime(2026, 1, 1),
@@ -272,7 +272,7 @@ def test_reanudar_con_entry_id_registrado_como_fallo_descarga_igual(
     with Store(tmp_path / "store.db") as store:
         store.guardar(
             DownloadResult(
-                entry_id=entrada.entry_id,
+                encargo_id=entrada.entry_id,
                 modo="juridico",
                 exito=False,
                 motivo_fallo="timeout",
@@ -303,7 +303,7 @@ def test_default_no_omite_y_llama_al_fetcher(tmp_path: Path, httpx_mock: HTTPXMo
     with Store(tmp_path / "store.db") as store:
         store.guardar(
             DownloadResult(
-                entry_id=entrada.entry_id,
+                encargo_id=entrada.entry_id,
                 modo="juridico",
                 exito=True,
                 capturado_en=datetime(2026, 1, 1),
