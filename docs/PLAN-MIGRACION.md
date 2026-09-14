@@ -65,3 +65,33 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   `Encargo` como `descargador/paths.py` (cinturón y tirantes de M17) la
   importan de ahí.
 - Commit: `M18: Encargo rechaza cajones y etiquetas peligrosos`
+
+## M20 · Tablas descargas e intentos
+- `descargas`: espejo de N5, PK `(encargo_id, sha256)`, índice por `grupo_alias`.
+- `intentos`: espejo de `IntentoPuerta`, FK `encargo_id`, una fila por puerta pedida.
+- Base **limpia**: `legisuni.db` (v1) no se toca ni se migra; la v2 se crea nueva.
+- `documentos` no se borra: `docs/07` la divide, no la elimina.
+- `grupo_alias` viene del `Encargo`, no de `DownloadResult`. No cambiar N5.
+- Criterio 16 de `docs/07`. Verificación: `.schema` sobre base nueva.
+- Commit: `M20: tablas descargas e intentos`
+
+## M21 · Idempotencia de red por defecto
+- Regla 5 de `docs/05`: no se vuelve a pedir lo ya registrado, sin `--reanudar`.
+- Criterios 4 y 11. Test con `httpx_mock` sin respuestas registradas.
+- Commit: `M21: idempotencia de red por defecto`
+
+## M22 · Test de frontera de modos
+- `tests/test_frontera_modos.py`: inspección de imports. Criterio 12.
+- Commit: `M22: test de frontera entre modos`
+
+## M23 · cosecha.py arma Encargos
+- `scripts/cosecha.py` construye `Encargo` vía `juridico/traduccion.py`.
+- Arregla el filtro de extensión (los 4 enlaces con salto de línea, E13 de `08`).
+- Implementa el `entry_id` de tres segmentos (`inst_id:doc_slug:url_id`) de `01` v2.0.
+- Verificación: `--dry-run` → UAM 47, UJAT 109.
+- Commit: `M23: cosecha arma Encargos y no pierde enlaces`
+
+## M24 · Corrida real (puerta de control) — la ejecuta el humano
+- Prerrequisito: `.env` con `DATA_ROOT`, base v2 limpia.
+- UAM + UJAT: 47 + 109 = 156/156, dos `entry_id` distintos para el RES.
+- Si no da 156, no se sigue a M25.
