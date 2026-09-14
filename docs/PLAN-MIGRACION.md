@@ -93,6 +93,26 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
 - `tests/test_frontera_modos.py`: inspección de imports. Criterio 12.
 - Commit: `M22: test de frontera entre modos`
 
+## M23a · entry_id de tres segmentos (juridico/)
+- Nuevo `legisuni/juridico/identificadores.py`: `entry_id(inst_id, doc_slug,
+  url_documento, url_indice) -> str`, formato `f"{inst_id}:{doc_slug}:{url_id}"`
+  (`01` N2, nota sobre `entry_id`).
+- `url_id(url, base)` vive en `descargador/urlnorm.py`, no en `juridico/`: es
+  el criterio de una sola normalización de `docs/05` v3 (línea 89) — dos
+  normalizaciones distintas darían dos `url_id` para la misma dirección y
+  romperían C20 en silencio. `juridico/identificadores.py` la importa, no la
+  reimplementa.
+- `doc_slug` sigue sin derivarse de la URL: llega como parámetro; su
+  mecanismo (por sitio) no se toca aquí.
+- Sin compatibilidad con los `entry_id` de v1: el cambio de formato es
+  intencional (M24 corre contra base v2 limpia).
+- No toca `scripts/` ni `descargar.py` (eso es M23c).
+- Tests: dos históricos de la UAM (mismo `doc_slug`, URLs distintas) →
+  `entry_id` distintos (C20 de `docs/08`, E11.6); "acuerdos rect 2.pdf" y
+  "acuerdos%20rect%202.pdf" (mismo `url_indice`) → mismo `entry_id`/`url_id`
+  (E12.2).
+- Commit: `M23a: entry_id de tres segmentos en juridico/`
+
 ## M23 · cosecha.py arma Encargos
 - `scripts/cosecha.py` construye `Encargo` vía `juridico/traduccion.py`.
 - Arregla el filtro de extensión (los 4 enlaces con salto de línea, E13 de `08`).
