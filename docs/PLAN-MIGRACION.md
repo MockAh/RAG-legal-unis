@@ -59,4 +59,9 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
 ## M18 · Encargo valida cajon y etiqueta
 - `ValueError` al construir con `..`, `/`, ruta absoluta o caracteres fuera
   del conjunto. Criterio 17 de `docs/05`.
+- Los patrones y `validar_cajon`/`validar_etiqueta` se movieron a
+  `contracts/rutas.py`: módulo auxiliar, no un contrato nuevo (no añade ni
+  cambia campos de N10). Es la única definición en el paquete; tanto
+  `Encargo` como `descargador/paths.py` (cinturón y tirantes de M17) la
+  importan de ahí.
 - Commit: `M18: Encargo rechaza cajones y etiquetas peligrosos`

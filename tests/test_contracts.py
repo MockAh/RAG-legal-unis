@@ -187,6 +187,34 @@ def test_download_result_sin_intentos_lanza_validation_error() -> None:
         )
 
 
+def test_encargo_acepta_los_valores_reales_de_la_traduccion_juridica() -> None:
+    encargo = _encargo_minimo(
+        modo="juridico",
+        cajon="norm/uam",
+        etiqueta="reglamento-organico__2026-03-16",
+        cruzar_vestibulos=False,
+    )
+    assert encargo.cajon == "norm/uam"
+    assert encargo.etiqueta == "reglamento-organico__2026-03-16"
+
+
+@pytest.mark.parametrize("etiqueta", ["..", "sub/dir", "ANEXO1", "anexo%201"])
+def test_encargo_rechaza_etiqueta_peligrosa(etiqueta: str) -> None:
+    with pytest.raises(ValidationError):
+        _encargo_minimo(etiqueta=etiqueta)
+
+
+@pytest.mark.parametrize("cajon", ["/etc", "norm/../../etc"])
+def test_encargo_rechaza_cajon_peligroso(cajon: str) -> None:
+    with pytest.raises(ValidationError):
+        _encargo_minimo(cajon=cajon)
+
+
+def test_encargo_acepta_cajon_con_barra() -> None:
+    encargo = _encargo_minimo(cajon="norm/uam")
+    assert encargo.cajon == "norm/uam"
+
+
 def test_guard_motivos_validos_contiene_los_diez_motivos() -> None:
     assert guard._MOTIVOS_VALIDOS == {
         "http_error", "no_es_pdf", "timeout", "robots_prohibido",

@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
+from legisuni.contracts.rutas import validar_cajon, validar_etiqueta
 from legisuni.contracts.vocabularios import Modo, TipoPuerta
 
 
@@ -23,3 +24,9 @@ class Encargo(BaseModel):
     cruzar_vestibulos: bool   # jurídico: False · académico: True (ver Parámetros)
     grupo_alias: str          # v2.1 · ámbito del alias por hash. Jurídico: f"{inst_id}:{doc_slug}" · académico: articulo_id
     creado_en: datetime
+
+    @model_validator(mode="after")
+    def _validar_rutas(self) -> "Encargo":
+        validar_cajon(self.cajon)
+        validar_etiqueta(self.etiqueta)
+        return self
