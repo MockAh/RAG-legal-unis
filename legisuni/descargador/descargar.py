@@ -21,11 +21,10 @@ def descargar(
     settings: Settings,
     ahora: datetime | None = None,
     store: Store | None = None,
-    omitir_si_registrado: bool = False,
 ) -> DownloadResult:
     capturado_en = ahora if ahora is not None else datetime.now()
 
-    if omitir_si_registrado and store is not None:
+    if store is not None:
         sha256_previo = store.hash_registrado(encargo.encargo_id)
         if sha256_previo is not None:
             logger.info("omitido: %s ya registrado", encargo.encargo_id)

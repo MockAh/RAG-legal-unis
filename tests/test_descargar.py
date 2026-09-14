@@ -225,7 +225,7 @@ def test_fallo_de_escritura_no_propaga_excepcion(
     assert resultado.motivo_fallo == "http_error"
 
 
-def test_reanudar_omite_encargo_id_ya_registrado_con_exito(tmp_path: Path) -> None:
+def test_omite_encargo_id_ya_registrado_con_exito(tmp_path: Path) -> None:
     settings = _settings(tmp_path)
     encargo = _encargo()
     fetcher = FetcherContador()
@@ -243,16 +243,14 @@ def test_reanudar_omite_encargo_id_ya_registrado_con_exito(tmp_path: Path) -> No
             )
         )
 
-        resultado = descargar(
-            encargo, fetcher, RobotsPermiteTodo(), settings, store=store, omitir_si_registrado=True
-        )
+        resultado = descargar(encargo, fetcher, RobotsPermiteTodo(), settings, store=store)
 
     assert resultado.exito is True
     assert resultado.ruta_local == tmp_path / "reglamento-organico.pdf"
     assert fetcher.llamadas == 0
 
 
-def test_reanudar_con_encargo_id_no_registrado_descarga_normalmente(
+def test_encargo_id_no_registrado_descarga_normalmente(
     tmp_path: Path, httpx_mock: HTTPXMock
 ) -> None:
     httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
@@ -260,21 +258,14 @@ def test_reanudar_con_encargo_id_no_registrado_descarga_normalmente(
     encargo = _encargo()
 
     with Store(tmp_path / "store.db") as store:
-        resultado = descargar(
-            encargo,
-            _fetcher(settings),
-            RobotsPermiteTodo(),
-            settings,
-            store=store,
-            omitir_si_registrado=True,
-        )
+        resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
 
     assert resultado.exito is True
     assert resultado.ruta_local is not None
     assert resultado.ruta_local.exists()
 
 
-def test_reanudar_con_encargo_id_registrado_como_fallo_descarga_igual(
+def test_encargo_id_registrado_como_fallo_descarga_igual(
     tmp_path: Path, httpx_mock: HTTPXMock
 ) -> None:
     httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
@@ -293,22 +284,21 @@ def test_reanudar_con_encargo_id_registrado_como_fallo_descarga_igual(
             )
         )
 
-        resultado = descargar(
-            encargo,
-            _fetcher(settings),
-            RobotsPermiteTodo(),
-            settings,
-            store=store,
-            omitir_si_registrado=True,
-        )
+        resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
 
     assert resultado.exito is True
     assert resultado.ruta_local is not None
     assert resultado.ruta_local.exists()
 
 
-def test_default_no_omite_y_llama_al_fetcher(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
-    httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
+# M21, excepción al criterio 11 autorizada por el criterio 4 de docs/05: hasta
+# aquí, sin bandera, lo ya registrado SÍ pedía la red (test_default_no_omite_y_
+# llama_al_fetcher). Regla 5 invierte ese default a propósito. No se registra
+# ninguna respuesta en httpx_mock: si descargar() llegara a pedir la red,
+# pytest-httpx hace fallar el test solo.
+def test_ya_registrado_no_toca_la_red_sin_ninguna_respuesta_mockeada(
+    tmp_path: Path, httpx_mock: HTTPXMock
+) -> None:
     settings = _settings(tmp_path)
     encargo = _encargo()
 
@@ -328,5 +318,4 @@ def test_default_no_omite_y_llama_al_fetcher(tmp_path: Path, httpx_mock: HTTPXMo
         resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
 
     assert resultado.exito is True
-    assert resultado.ruta_local != tmp_path / "reglamento-organico.pdf"
-    assert len(httpx_mock.get_requests()) == 1
+    assert resultado.ruta_local == tmp_path / "reglamento-organico.pdf"

@@ -78,6 +78,15 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
 ## M21 · Idempotencia de red por defecto
 - Regla 5 de `docs/05`: no se vuelve a pedir lo ya registrado, sin `--reanudar`.
 - Criterios 4 y 11. Test con `httpx_mock` sin respuestas registradas.
+- Lee lo ya registrado contra `documentos` (`Store.hash_registrado`/`ruta_registrada`,
+  sin cambios): es lo que nombra el criterio 4 literalmente, y `descargas` (M20)
+  todavía no tiene lectura ni escritor.
+- **Excepción explícita al criterio 11, autorizada por el criterio 4 del mismo
+  `docs/05`:** `test_default_no_omite_y_llama_al_fetcher` probaba justo el
+  comportamiento que la Regla 5 invierte (sin bandera, se pedía la red). Se
+  reemplaza por el test decisivo (misma base, `httpx_mock` sin respuestas
+  registradas); no es un renombre cosmético, es la aserción cambiando a
+  propósito.
 - Commit: `M21: idempotencia de red por defecto`
 
 ## M22 · Test de frontera de modos
@@ -88,6 +97,10 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
 - `scripts/cosecha.py` construye `Encargo` vía `juridico/traduccion.py`.
 - Arregla el filtro de extensión (los 4 enlaces con salto de línea, E13 de `08`).
 - Implementa el `entry_id` de tres segmentos (`inst_id:doc_slug:url_id`) de `01` v2.0.
+- **Aviso de M21:** `cosecha.py` debe escribir en ambas tablas (`guardar` y
+  `guardar_descarga`), o la idempotencia de M21 —que lee `documentos`— dejará
+  de funcionar y M24 volvería a descargar los 156 en cada corrida.
+  Alternativa a decidir en M23: mudar también la lectura a `descargas`.
 - Verificación: `--dry-run` → UAM 47, UJAT 109.
 - Commit: `M23: cosecha arma Encargos y no pierde enlaces`
 

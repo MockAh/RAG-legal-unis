@@ -83,7 +83,6 @@ def main(
     inst_id: str = typer.Option("uam", "--inst-id"),
     limite: int | None = typer.Option(None, "--limite", help="Procesar solo las primeras N entradas"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Solo muestra qué haría, no descarga nada"),
-    reanudar: bool = typer.Option(False, "--reanudar", help="Omite entradas ya registradas con éxito"),
 ) -> None:
     logging.basicConfig(
         level=logging.INFO,
@@ -124,11 +123,9 @@ def main(
     with Store(settings.db_path) as store:
         for entrada in entradas:
             logger.info("pidiendo %s (%s)", entrada.entry_id, entrada.url_documento)
-            if reanudar and store.hash_registrado(entrada.entry_id) is not None:
+            if store.hash_registrado(entrada.entry_id) is not None:
                 omitidos += 1
-            resultado = descargar(
-                entrada, fetcher, robots, settings, store=store, omitir_si_registrado=reanudar
-            )
+            resultado = descargar(entrada, fetcher, robots, settings, store=store)
             store.guardar(resultado)
             if resultado.exito:
                 exitosas += 1
