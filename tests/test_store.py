@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 
-from legisuni.contracts import DownloadResult
+from legisuni.contracts import DownloadResult, IntentoPuerta
 from legisuni.descargador.store import Store
 
 
@@ -112,6 +112,98 @@ def test_guardar_resultado_fallido_sin_excepcion(tmp_path: Path) -> None:
         )
         store.guardar(resultado)
         assert store.contar() == 1
+
+
+def test_base_nueva_tiene_las_tablas_descargas_e_intentos(tmp_path: Path) -> None:
+    db_path = tmp_path / "test.db"
+    with Store(db_path):
+        pass
+
+    conn = sqlite3.connect(str(db_path))
+    tablas = {
+        fila[0]
+        for fila in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'"
+        ).fetchall()
+    }
+    conn.close()
+    assert {"documentos", "descargas", "intentos"} <= tablas
+
+
+def test_guardar_descarga_escribe_en_descargas_y_registra_grupo_alias(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        resultado = _resultado_exitoso()
+        store.guardar_descarga(resultado, grupo_alias="uam:reglamento-organico")
+
+        conn = store._conn
+        fila = conn.execute(
+            "SELECT grupo_alias, sha256 FROM descargas WHERE encargo_id = ?",
+            (resultado.encargo_id,),
+        ).fetchone()
+        assert fila["grupo_alias"] == "uam:reglamento-organico"
+        assert fila["sha256"] == resultado.sha256
+
+
+def test_guardar_descarga_con_hash_nuevo_conserva_ambas_filas(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        resultado = _resultado_exitoso()
+        store.guardar_descarga(resultado, grupo_alias="g1")
+
+        version_nueva = resultado.model_copy(update={"sha256": "b" * 64})
+        store.guardar_descarga(version_nueva, grupo_alias="g1")
+
+        filas = store._conn.execute(
+            "SELECT sha256 FROM descargas WHERE encargo_id = ? ORDER BY sha256",
+            (resultado.encargo_id,),
+        ).fetchall()
+        assert {fila["sha256"] for fila in filas} == {resultado.sha256, "b" * 64}
+
+
+def test_guardar_descarga_misma_clave_actualiza_sin_duplicar(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        resultado = _resultado_exitoso()
+        store.guardar_descarga(resultado, grupo_alias="g1")
+        store.guardar_descarga(resultado, grupo_alias="g1")
+
+        filas = store._conn.execute(
+            "SELECT COUNT(*) AS n FROM descargas WHERE encargo_id = ?",
+            (resultado.encargo_id,),
+        ).fetchone()
+        assert filas["n"] == 1
+
+
+def test_guardar_descarga_escribe_un_intento_por_puerta_pedida(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        resultado = _resultado_exitoso(
+            intentos=[
+                IntentoPuerta(
+                    orden=0,
+                    url="http://example.org/doc.pdf",
+                    url_pedida="http://example.org/doc.pdf",
+                    url_final="http://example.org/doc.pdf",
+                    enlace_vestibulo=None,
+                    http_status=200,
+                    exito=True,
+                    motivo_fallo=None,
+                )
+            ]
+        )
+        store.guardar_descarga(resultado, grupo_alias="g1")
+
+        filas = store._conn.execute(
+            "SELECT encargo_id, orden, http_status FROM intentos WHERE encargo_id = ?",
+            (resultado.encargo_id,),
+        ).fetchall()
+        assert len(filas) == 1
+        assert filas[0]["orden"] == 0
+        assert filas[0]["http_status"] == 200
+
+
+def test_guardar_descarga_no_afecta_la_tabla_documentos(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        resultado = _resultado_exitoso()
+        store.guardar_descarga(resultado, grupo_alias="g1")
+        assert store.contar() == 0
 
 
 def test_cerrar_y_reabrir_conserva_filas(tmp_path: Path) -> None:
