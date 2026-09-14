@@ -6,7 +6,7 @@ import pytest
 from pytest_httpx import HTTPXMock
 
 from legisuni.config import Settings
-from legisuni.contracts import CatalogEntry, DownloadResult
+from legisuni.contracts import DownloadResult, Encargo, Puerta
 from legisuni.descargador.descargar import descargar
 from legisuni.descargador.fetch import Fetcher
 from legisuni.descargador.store import Store
@@ -47,7 +47,7 @@ class FetcherContador:
 
 
 def _settings(tmp_path: Path, **overrides) -> Settings:
-    valores = dict(user_agent="LegisUni-test/1.0", data_dir=tmp_path)
+    valores = dict(user_agent="LegisUni-test/1.0", data_root=tmp_path)
     valores.update(overrides)
     return Settings(**valores)
 
@@ -58,28 +58,40 @@ def _fetcher(settings: Settings) -> Fetcher:
     )
 
 
-def _entrada(**overrides) -> CatalogEntry:
+def _encargo(
+    url_documento: str = "https://a.mx/x.pdf",
+    url_indice: str = "https://a.mx/indice",
+    **overrides,
+) -> Encargo:
     datos = dict(
-        entry_id="uam:reglamento-organico",
-        inst_id="uam",
-        titulo="Reglamento Orgánico",
-        tipo_norma="reglamento",
-        url_documento="https://a.mx/x.pdf",
-        origen="sitio_institucional",
-        url_indice="https://a.mx/indice",
-        extraido_en=datetime(2026, 1, 1),
+        encargo_id="uam:reglamento-organico",
+        modo="juridico",
+        solicitante="uam",
+        puertas=[
+            Puerta(
+                url=url_documento,
+                tipo="enlace_indice",
+                url_base=url_indice,
+                evidencia=url_indice,
+            )
+        ],
+        cajon="norm/uam",
+        etiqueta="reglamento-organico__2026-03-16",
+        cruzar_vestibulos=False,
+        grupo_alias="uam:reglamento-organico",
+        creado_en=datetime(2026, 1, 1),
     )
     datos.update(overrides)
-    return CatalogEntry(**datos)
+    return Encargo(**datos)
 
 
 def test_pdf_valido_se_escribe_y_hash_coincide(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
     settings = _settings(tmp_path)
-    entrada = _entrada()
+    encargo = _encargo()
 
     resultado = descargar(
-        entrada, _fetcher(settings), RobotsPermiteTodo(), settings, ahora=datetime(2026, 3, 16)
+        encargo, _fetcher(settings), RobotsPermiteTodo(), settings, ahora=datetime(2026, 3, 16)
     )
 
     assert resultado.exito is True
@@ -91,10 +103,10 @@ def test_pdf_valido_se_escribe_y_hash_coincide(tmp_path: Path, httpx_mock: HTTPX
 
 def test_robots_prohibe_no_llama_al_fetcher(tmp_path: Path) -> None:
     settings = _settings(tmp_path)
-    entrada = _entrada()
+    encargo = _encargo()
     fetcher = FetcherContador()
 
-    resultado = descargar(entrada, fetcher, RobotsProhibeTodo(), settings)
+    resultado = descargar(encargo, fetcher, RobotsProhibeTodo(), settings)
 
     assert resultado.exito is False
     assert resultado.motivo_fallo == "robots_prohibido"
@@ -104,9 +116,9 @@ def test_robots_prohibe_no_llama_al_fetcher(tmp_path: Path) -> None:
 def test_landing_page_no_es_pdf_no_escribe_nada(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(status_code=200, content=_HTML_BYTES)
     settings = _settings(tmp_path)
-    entrada = _entrada()
+    encargo = _encargo()
 
-    resultado = descargar(entrada, _fetcher(settings), RobotsPermiteTodo(), settings)
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
 
     assert resultado.exito is False
     assert resultado.motivo_fallo == "no_es_pdf"
@@ -117,9 +129,9 @@ def test_visor_de_terceros_no_escribe_nada(tmp_path: Path, httpx_mock: HTTPXMock
     url = "https://drive.google.com/file/d/1AbC_xyz/view"
     httpx_mock.add_response(url=url, status_code=200, content=_HTML_BYTES)
     settings = _settings(tmp_path)
-    entrada = _entrada(url_documento=url, url_indice="https://drive.google.com/")
+    encargo = _encargo(url_documento=url, url_indice="https://drive.google.com/")
 
-    resultado = descargar(entrada, _fetcher(settings), RobotsPermiteTodo(), settings)
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
 
     assert resultado.motivo_fallo == "visor_de_terceros"
     assert list(tmp_path.rglob("*")) == []
@@ -128,9 +140,9 @@ def test_visor_de_terceros_no_escribe_nada(tmp_path: Path, httpx_mock: HTTPXMock
 def test_404_no_escribe_nada(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(status_code=404)
     settings = _settings(tmp_path)
-    entrada = _entrada()
+    encargo = _encargo()
 
-    resultado = descargar(entrada, _fetcher(settings), RobotsPermiteTodo(), settings)
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
 
     assert resultado.motivo_fallo == "url_muerta"
     assert list(tmp_path.rglob("*")) == []
@@ -142,11 +154,11 @@ def test_idempotencia_misma_respuesta_deja_un_solo_archivo(
     httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
     httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
     settings = _settings(tmp_path)
-    entrada = _entrada()
+    encargo = _encargo()
     fecha = datetime(2026, 3, 16)
 
-    resultado1 = descargar(entrada, _fetcher(settings), RobotsPermiteTodo(), settings, ahora=fecha)
-    resultado2 = descargar(entrada, _fetcher(settings), RobotsPermiteTodo(), settings, ahora=fecha)
+    resultado1 = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, ahora=fecha)
+    resultado2 = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, ahora=fecha)
 
     archivos = list(tmp_path.rglob("*.pdf"))
     assert len(archivos) == 1
@@ -159,11 +171,11 @@ def test_version_nueva_con_bytes_distintos_deja_dos_archivos(
     httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
     httpx_mock.add_response(status_code=200, content=_PDF_BYTES_V2)
     settings = _settings(tmp_path)
-    entrada = _entrada()
+    encargo = _encargo()
     fecha = datetime(2026, 3, 16)
 
-    resultado1 = descargar(entrada, _fetcher(settings), RobotsPermiteTodo(), settings, ahora=fecha)
-    resultado2 = descargar(entrada, _fetcher(settings), RobotsPermiteTodo(), settings, ahora=fecha)
+    resultado1 = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, ahora=fecha)
+    resultado2 = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, ahora=fecha)
 
     archivos = list(tmp_path.rglob("*.pdf"))
     assert len(archivos) == 2
@@ -176,19 +188,19 @@ def test_url_cruda_no_se_modifica(tmp_path: Path, httpx_mock: HTTPXMock) -> None
     cruda = "/2015/abogado general/nuevos/A_DISTANCIA.pdf"
     httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
     settings = _settings(tmp_path)
-    entrada = _entrada(url_documento=cruda, url_indice="https://www.ujat.mx/abogado/15763")
+    encargo = _encargo(url_documento=cruda, url_indice="https://www.ujat.mx/abogado/15763")
 
-    descargar(entrada, _fetcher(settings), RobotsPermiteTodo(), settings)
+    descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
 
-    assert entrada.url_documento == cruda
+    assert encargo.puertas[0].url == cruda
 
 
 def test_docx_se_guarda_con_extension_docx(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(status_code=200, content=_DOCX_BYTES)
     settings = _settings(tmp_path)
-    entrada = _entrada(url_documento="https://a.mx/x.docx")
+    encargo = _encargo(url_documento="https://a.mx/x.docx")
 
-    resultado = descargar(entrada, _fetcher(settings), RobotsPermiteTodo(), settings)
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
 
     assert resultado.exito is True
     assert resultado.ruta_local is not None
@@ -200,28 +212,28 @@ def test_fallo_de_escritura_no_propaga_excepcion(
 ) -> None:
     httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
     settings = _settings(tmp_path)
-    entrada = _entrada()
+    encargo = _encargo()
 
     def _falla(self, data):
         raise OSError("disco lleno")
 
     monkeypatch.setattr(Path, "write_bytes", _falla)
 
-    resultado = descargar(entrada, _fetcher(settings), RobotsPermiteTodo(), settings)
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
 
     assert resultado.exito is False
     assert resultado.motivo_fallo == "http_error"
 
 
-def test_reanudar_omite_entry_id_ya_registrado_con_exito(tmp_path: Path) -> None:
+def test_reanudar_omite_encargo_id_ya_registrado_con_exito(tmp_path: Path) -> None:
     settings = _settings(tmp_path)
-    entrada = _entrada()
+    encargo = _encargo()
     fetcher = FetcherContador()
 
     with Store(tmp_path / "store.db") as store:
         store.guardar(
             DownloadResult(
-                encargo_id=entrada.entry_id,
+                encargo_id=encargo.encargo_id,
                 modo="juridico",
                 exito=True,
                 capturado_en=datetime(2026, 1, 1),
@@ -232,7 +244,7 @@ def test_reanudar_omite_entry_id_ya_registrado_con_exito(tmp_path: Path) -> None
         )
 
         resultado = descargar(
-            entrada, fetcher, RobotsPermiteTodo(), settings, store=store, omitir_si_registrado=True
+            encargo, fetcher, RobotsPermiteTodo(), settings, store=store, omitir_si_registrado=True
         )
 
     assert resultado.exito is True
@@ -240,16 +252,16 @@ def test_reanudar_omite_entry_id_ya_registrado_con_exito(tmp_path: Path) -> None
     assert fetcher.llamadas == 0
 
 
-def test_reanudar_con_entry_id_no_registrado_descarga_normalmente(
+def test_reanudar_con_encargo_id_no_registrado_descarga_normalmente(
     tmp_path: Path, httpx_mock: HTTPXMock
 ) -> None:
     httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
     settings = _settings(tmp_path)
-    entrada = _entrada()
+    encargo = _encargo()
 
     with Store(tmp_path / "store.db") as store:
         resultado = descargar(
-            entrada,
+            encargo,
             _fetcher(settings),
             RobotsPermiteTodo(),
             settings,
@@ -262,17 +274,17 @@ def test_reanudar_con_entry_id_no_registrado_descarga_normalmente(
     assert resultado.ruta_local.exists()
 
 
-def test_reanudar_con_entry_id_registrado_como_fallo_descarga_igual(
+def test_reanudar_con_encargo_id_registrado_como_fallo_descarga_igual(
     tmp_path: Path, httpx_mock: HTTPXMock
 ) -> None:
     httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
     settings = _settings(tmp_path)
-    entrada = _entrada()
+    encargo = _encargo()
 
     with Store(tmp_path / "store.db") as store:
         store.guardar(
             DownloadResult(
-                encargo_id=entrada.entry_id,
+                encargo_id=encargo.encargo_id,
                 modo="juridico",
                 exito=False,
                 motivo_fallo="timeout",
@@ -282,7 +294,7 @@ def test_reanudar_con_entry_id_registrado_como_fallo_descarga_igual(
         )
 
         resultado = descargar(
-            entrada,
+            encargo,
             _fetcher(settings),
             RobotsPermiteTodo(),
             settings,
@@ -298,12 +310,12 @@ def test_reanudar_con_entry_id_registrado_como_fallo_descarga_igual(
 def test_default_no_omite_y_llama_al_fetcher(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
     settings = _settings(tmp_path)
-    entrada = _entrada()
+    encargo = _encargo()
 
     with Store(tmp_path / "store.db") as store:
         store.guardar(
             DownloadResult(
-                encargo_id=entrada.entry_id,
+                encargo_id=encargo.encargo_id,
                 modo="juridico",
                 exito=True,
                 capturado_en=datetime(2026, 1, 1),
@@ -313,7 +325,7 @@ def test_default_no_omite_y_llama_al_fetcher(tmp_path: Path, httpx_mock: HTTPXMo
             )
         )
 
-        resultado = descargar(entrada, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+        resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
 
     assert resultado.exito is True
     assert resultado.ruta_local != tmp_path / "reglamento-organico.pdf"
