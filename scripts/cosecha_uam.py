@@ -22,6 +22,7 @@ from legisuni.descargador.fetch import Fetcher
 from legisuni.descargador.ratelimit import RateLimiter
 from legisuni.descargador.robots import RobotsCache
 from legisuni.descargador.store import Store
+from legisuni.juridico import identificadores
 
 logger = logging.getLogger(__name__)
 
@@ -35,12 +36,12 @@ def entradas_desde_html(ruta_html: Path, url_indice: str, inst_id: str) -> list[
 
     for enlace in arbol.css("a[href]"):
         href = enlace.attributes.get("href")
-        if href is None or not href.lower().endswith(_EXTENSIONES):
+        if href is None or not href.strip().lower().endswith(_EXTENSIONES):
             continue
 
         titulo = enlace.text(strip=True)
         doc_slug = _doc_slug_desde_href(href, titulo)
-        entry_id = f"{inst_id}:{doc_slug}"
+        entry_id = identificadores.entry_id(inst_id, doc_slug, href, url_indice)
         if entry_id in vistos:
             continue
         vistos.add(entry_id)

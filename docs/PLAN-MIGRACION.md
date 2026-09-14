@@ -113,10 +113,36 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   (E12.2).
 - Commit: `M23a: entry_id de tres segmentos en juridico/`
 
+## M23b · Ningún enlace publicado se pierde en la extracción
+- Dos defectos distintos (`01` v2.4, changelog): filtro por extensión que
+  ignora 4 enlaces de la UJAT con salto de línea en el `href`; heurística de
+  slug que pierde 2 documentos en la UAM por colisión de `entry_id` de dos
+  segmentos (uno de ellos, el ancla vacía de E1.5 de `docs/08`).
+- Filtro: se recorta el `href` antes de comprobar la extensión, en
+  `entradas_desde_html` de `cosecha.py` y `cosecha_uam.py`. `url_documento`
+  sigue guardándose crudo (D5); solo cambia la comprobación.
+- Colisión de slug: no se toca `_doc_slug_desde_href`. Se ensambla `entry_id`
+  con `identificadores.entry_id` de M23a (tres segmentos) en vez de
+  `f"{inst_id}:{doc_slug}"`: el `url_id` distingue por construcción los pares
+  que compartían slug (`"2026"` y `"rjd"`). Aplicado en `cosecha_uam.py` y
+  también en `cosecha.py` (UJAT no lo necesitaba para llegar a 109, pero dos
+  formatos de `encargo_id` en la misma base v2 ensuciarían el criterio 11).
+- Verificado que el salto de línea no cambia el `url_id` (`normalizar`
+  recorta antes de hashear): los 4 enlaces de la UJAT dan el mismo `url_id`
+  con o sin `\n`.
+- No toca `main()` de ningún script (descarga/escritura), ni ejecuta nada
+  contra la red.
+- Tests sobre las fixtures reales (`fixtures/uam-index.html`,
+  `fixtures/ujat-*.html`): UAM → 47, UJAT → 109, los 156 `entry_id`
+  combinados son únicos.
+- Commit: `M23b: ningún enlace publicado se pierde en la extracción`
+
 ## M23 · cosecha.py arma Encargos
 - `scripts/cosecha.py` construye `Encargo` vía `juridico/traduccion.py`.
-- Arregla el filtro de extensión (los 4 enlaces con salto de línea, E13 de `08`).
-- Implementa el `entry_id` de tres segmentos (`inst_id:doc_slug:url_id`) de `01` v2.0.
+- ~~Arregla el filtro de extensión (los 4 enlaces con salto de línea, E13 de `08`).~~
+  **Hecho en M23b.**
+- ~~Implementa el `entry_id` de tres segmentos (`inst_id:doc_slug:url_id`) de `01` v2.0.~~
+  **Hecho en M23a/M23b.**
 - **Aviso de M21:** `cosecha.py` debe escribir en ambas tablas (`guardar` y
   `guardar_descarga`), o la idempotencia de M21 —que lee `documentos`— dejará
   de funcionar y M24 volvería a descargar los 156 en cada corrida.
