@@ -151,6 +151,27 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
 - Commit: `M23: cosecha arma Encargos y no pierde enlaces`
 
 ## M24 · Corrida real (puerta de control) — la ejecuta el humano
-- Prerrequisito: `.env` con `DATA_ROOT`, base v2 limpia.
+- **La ejecuta el humano, no Claude Code.**
+- Prerrequisito: `.env` con `DATA_ROOT`, base v2 limpia. Antes de correrla,
+  `data/` debe estar vacío y `legisuni_v2.db` no debe existir todavía
+  (E13.6 de `docs/08`).
+- Comandos exactos, con las mismas `--url-indice` que usa
+  `tests/test_extraccion_indices.py`:
+
+  ```bash
+  .venv/bin/python scripts/cosecha_uam.py --html fixtures/uam-index.html \
+    --url-indice https://www.uam.mx/legislacion/index.html
+
+  .venv/bin/python scripts/cosecha.py --inst-id ujat \
+    --html fixtures/ujat-15763.html --url-indice https://www.ujat.mx/abogado/15763 \
+    --html fixtures/ujat-16443.html --url-indice https://www.ujat.mx/abogado/16443 \
+    --html fixtures/ujat-17669.html --url-indice https://www.ujat.mx/abogado/17669 \
+    --html fixtures/ujat-33794.html --url-indice https://www.ujat.mx/abogado/33794 \
+    --html fixtures/ujat-4232.html --url-indice https://www.ujat.mx/abogado/4232
+  ```
+
+  **Los `url_id` dependen de estas URLs exactas:** cambiar una base cambia
+  los identificadores resultantes y rompe la correspondencia con lo que
+  fija `tests/test_extraccion_indices.py`.
 - UAM + UJAT: 47 + 109 = 156/156, dos `entry_id` distintos para el RES.
 - Si no da 156, no se sigue a M25.
