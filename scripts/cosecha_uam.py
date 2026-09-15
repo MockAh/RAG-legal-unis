@@ -22,7 +22,7 @@ from legisuni.descargador.fetch import Fetcher
 from legisuni.descargador.ratelimit import RateLimiter
 from legisuni.descargador.robots import RobotsCache
 from legisuni.descargador.store import Store
-from legisuni.juridico import identificadores
+from legisuni.juridico import identificadores, traduccion
 
 logger = logging.getLogger(__name__)
 
@@ -95,10 +95,15 @@ def main(
     if limite is not None:
         entradas = entradas[:limite]
 
+    encargos = [
+        traduccion.traducir(entrada, _doc_slug_desde_href(entrada.url_documento, entrada.titulo))
+        for entrada in entradas
+    ]
+
     if dry_run:
         typer.echo(f"[dry-run] {len(entradas)} entradas encontradas, no se pide nada:")
-        for entrada in entradas:
-            typer.echo(f"  {entrada.entry_id}  <-  {entrada.url_documento}")
+        for entrada, encargo in zip(entradas, encargos, strict=True):
+            typer.echo(f"  {encargo.encargo_id}  {encargo.cajon}/{encargo.etiqueta}  <-  {entrada.url_documento}")
         return
 
     settings = Settings()
@@ -122,19 +127,20 @@ def main(
     omitidos = 0
 
     with Store(settings.db_path) as store:
-        for entrada in entradas:
-            logger.info("pidiendo %s (%s)", entrada.entry_id, entrada.url_documento)
-            if store.hash_registrado(entrada.entry_id) is not None:
+        for entrada, encargo in zip(entradas, encargos, strict=True):
+            logger.info("pidiendo %s (%s)", encargo.encargo_id, entrada.url_documento)
+            if store.hash_registrado(encargo.encargo_id) is not None:
                 omitidos += 1
-            resultado = descargar(entrada, fetcher, robots, settings, store=store)
+            resultado = descargar(encargo, fetcher, robots, settings, store=store)
             store.guardar(resultado)
+            store.guardar_descarga(resultado, encargo.grupo_alias)
             if resultado.exito:
                 exitosas += 1
             else:
                 assert resultado.motivo_fallo is not None
                 motivos_fallo[resultado.motivo_fallo] += 1
             logger.info(
-                "resultado %s: exito=%s motivo=%s", entrada.entry_id, resultado.exito, resultado.motivo_fallo
+                "resultado %s: exito=%s motivo=%s", encargo.encargo_id, resultado.exito, resultado.motivo_fallo
             )
 
     typer.echo("--- resumen ---")

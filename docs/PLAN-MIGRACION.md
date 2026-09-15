@@ -150,6 +150,19 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
 - Verificación: `--dry-run` → UAM 47, UJAT 109.
 - Commit: `M23: cosecha arma Encargos y no pierde enlaces`
 
+## M23c · main() de cosecha.py y cosecha_uam.py contra Encargo
+- Decisión tomada (aviso de M21 arriba): se escribe en **ambas** tablas,
+  `store.guardar(resultado)` y `store.guardar_descarga(resultado,
+  encargo.grupo_alias)`. Es transitorio.
+- **Deuda para después de M24:** la idempotencia de M21 sigue leyendo
+  `documentos` (`hash_registrado`/`ruta_registrada`); mudar esa lectura a
+  `descargas` no se hizo aquí y queda pendiente.
+- `--dry-run` construye el `Encargo` de cada entrada (`traducir` es pura) y
+  muestra `encargo_id`, `cajon/etiqueta` y la URL — así las 156 entradas
+  pasan por la validación de M18 (criterio 17 de `docs/05`) antes de M24,
+  sin tocar la red. Sigue terminando antes de construir el `Fetcher`.
+- Commit: `M23c: main() de cosecha.py y cosecha_uam.py contra Encargo`
+
 ## M24 · Corrida real (puerta de control) — la ejecuta el humano
 - **La ejecuta el humano, no Claude Code.**
 - Prerrequisito: `.env` con `DATA_ROOT`, base v2 limpia. Antes de correrla,
