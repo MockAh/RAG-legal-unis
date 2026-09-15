@@ -74,7 +74,7 @@ def _leer_html(ruta_html: Path) -> str:
 def _doc_slug_desde_href(href: str, titulo: str) -> str:
     nombre_archivo = Path(urlsplit(href).path).stem
     if "-" in nombre_archivo:
-        return nombre_archivo.rsplit("-", 1)[-1]
+        return paths.sanear(nombre_archivo.rsplit("-", 1)[-1])
     return paths.sanear(titulo)
 
 

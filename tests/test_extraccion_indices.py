@@ -50,3 +50,14 @@ def test_los_156_entry_id_son_unicos() -> None:
     entry_ids = [e.entry_id for e in _entradas_uam()] + [e.entry_id for e in _entradas_ujat()]
     assert len(entry_ids) == 156
     assert len(set(entry_ids)) == 156
+
+
+def test_doc_slug_uam_anexos_saneado_a_minusculas() -> None:
+    casos = [
+        ("legislacion-uam-julio-24-2026/legislacion-uam-julio-24-2026-pavrg-ANEXO1.pdf", "anexo1"),
+        ("legislacion-uam-julio-24-2026/legislacion-uam-julio-24-2026-pavrg-ANEXO-3A.docx", "3a"),
+        ("legislacion-uam-julio-24-2026/legislacion-uam-julio-24-2026-pavrg-ANEXO-3B.docx", "3b"),
+        ("legislacion-uam-julio-24-2026/legislacion-uam-julio-24-2026-pavrg-ANEXO3C.pdf", "anexo3c"),
+    ]
+    for href, esperado in casos:
+        assert cosecha_uam._doc_slug_desde_href(href, "titulo irrelevante") == esperado

@@ -163,6 +163,22 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   sin tocar la red. Sigue terminando antes de construir el `Fetcher`.
 - Commit: `M23c: main() de cosecha.py y cosecha_uam.py contra Encargo`
 
+## M23d · _doc_slug_desde_href sanea en todas sus ramas
+- Causa del fallo dejado pendiente por M23c: `_doc_slug_desde_href` de
+  `cosecha_uam.py` tenía dos ramas y solo la de respaldo pasaba por
+  `paths.sanear`; la rama del sufijo del nombre de archivo devolvía texto
+  crudo (`ANEXO1`, `3A`, `3B`, `ANEXO3C`), que M18 rechaza por mayúsculas.
+- Auditado `cosecha.py`: una sola rama, siempre pasa por `paths.sanear`
+  (que ya hace `.lower()`). No tiene el mismo defecto, no se toca.
+- Fix en `cosecha_uam.py`: esa rama también pasa por `paths.sanear`. Da
+  `anexo1`, `3a`, `3b`, `anexo3c` — los nombres que v1 dejó en disco
+  (criterio 11) — sin mover ningún otro slug (45 únicos antes y después de
+  47 entradas UAM).
+- Test nuevo en `tests/test_extraccion_indices.py` con los 4 `href` reales.
+- Verificación: 47/109/156 sin cambios; `--dry-run` de la UAM ya no lanza
+  `ValidationError`.
+- Commit: `M23d: _doc_slug_desde_href sanea en todas sus ramas`
+
 ## M24 · Corrida real (puerta de control) — la ejecuta el humano
 - **La ejecuta el humano, no Claude Code.**
 - Prerrequisito: `.env` con `DATA_ROOT`, base v2 limpia. Antes de correrla,
