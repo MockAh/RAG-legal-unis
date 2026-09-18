@@ -1150,6 +1150,20 @@ Los tres `.docx` están en la UAM y ninguno en la UJAT. El conteo coincide con l
 de E1.6 que ya habían pasado el guardián de dos firmas en E11.4; esta corrida cuenta archivos
 por extensión y no verifica cuáles son.
 
+### E14.7 · Unicidad de `encargo_id`, medida
+
+```
+sqlite3 -readonly legisuni_v2.db "select count(*), count(distinct encargo_id) from descargas;"
+156|156
+```
+
+156 filas y 156 `encargo_id` distintos en `descargas`: **ningún identificador se repite** en
+la base limpia. Es una consulta de solo lectura, hecha después de las de E14.2 a E14.6.
+
+**Lo que esto no mide:** los pares de la UAM con slug idéntico (`2026`, `rjd`) que se separan
+solo por `url_id` **no** están respaldados por ninguna medición sobre la base. Su respaldo es
+`tests/test_extraccion_indices.py` y M23b del plan (`docs/PLAN-MIGRACION.md`).
+
 ---
 
 | Versión | Fecha | Cambio |
