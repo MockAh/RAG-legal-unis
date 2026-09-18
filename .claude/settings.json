@@ -9,6 +9,8 @@
       "Read(./data/**)",
       "Edit(./data/**)",
       "Edit(./legisuni.db)",
+      "Edit(./legisuni_v2.db)",
+      "Bash(sqlite3 legisuni_v2.db:*)",
       "Edit(./fixtures/**)",
       "Edit(./docs/01-CONTRATOS-DE-DATOS.md)"
     ],
