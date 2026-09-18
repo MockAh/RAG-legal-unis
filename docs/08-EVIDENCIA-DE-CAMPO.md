@@ -335,7 +335,7 @@ marco jurídico — señal aprovechable por el Localizador.
 | **C22** | Los escaneos son **documentos firmados** (acuerdos rectorales, contrato colectivo) (E12.5) | El patrón es predecible, no aleatorio: se escanea lo que lleva firma. Permite anticipar qué tipos de norma necesitarán OCR antes de abrirlos |
 | **C23** | La UJAT publica **105 documentos**, no ~60 (E12.1) | E4 subestimaba casi al doble. Los conteos hechos a ojo sobre un índice paginado **no son fiables**; hay que contar enlaces únicos con herramienta |
 | **C24** | **La idempotencia se cumple dentro de una corrida, no entre corridas de días distintos** (E13). Los 45 documentos de la UAM están **dos veces en disco**, con los mismos bytes y distinto nombre | La fecha de captura entra en el nombre cuando el índice no declara fecha de versión, así que **otro día es otro nombre**. No se sobrescribió nada: la regla funcionó y el diseño falló. **Primera evidencia medida a favor del alias por hash** (D15 de `00`, `01` v2.1): comparar el SHA-256 dentro del `grupo_alias` habría reconocido los 45 pares |
-| **C20** | Dos versiones históricas del mismo instrumento colisionan en `entry_id` (E11.6) | **Hueco de `01`**, no del sitio: `CatalogEntry.entry_id` no lleva versión, `doc_id` (N7) sí. **Cerrada en E14:** `url_id` de `01` v2.0 separa los históricos; medido 2026-09-18 |
+| **C20** | Dos versiones históricas del mismo instrumento colisionan en `entry_id` (E11.6) | **Hueco de `01`**, no del sitio: `CatalogEntry.entry_id` no lleva versión, `doc_id` (N7) sí. **Cerrada.** En M23b se midió que dos pares de la UAM con slug idéntico (`2026`, `rjd`) se separan solo por `url_id`; eran los 2 documentos que v1 perdía. E14 confirma 156 identificadores únicos en base limpia (2026-09-18) |
 
 ---
 
