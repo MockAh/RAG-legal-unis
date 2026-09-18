@@ -205,7 +205,7 @@ del estado publicado contra el estado en disco. Ese cotejo es también el detect
 3. **Propagación de `01` v2.0 ← SIGUIENTE.** `00` ✔ (este documento); faltan `03`, `05`, `06`,
    `07` y el README, según la tabla de propagación de `01`.
 4. **Migración del Descargador a `Encargo`** (`05`). Criterios en `01`: suite verde con cambios
-   mecánicos, 150/150 en base limpia, motivos jurídicos idénticos, C20 resuelto en datos.
+   mecánicos, 156/156 en base limpia (medido en E14 de `08`), motivos jurídicos idénticos, C20 resuelto en datos.
 5. **Primer modo completo: el académico** (§8, pregunta 10, resuelta). Las dos rutas, en ese orden:
    - **Jurídica (después):** Lector de índice (`03`) → Verificador documental (`06`) → Corroborador (`04`)
      → Localizador (`02`).
