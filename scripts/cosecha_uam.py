@@ -10,7 +10,6 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
-import httpx
 import typer
 from selectolax.parser import HTMLParser
 
@@ -18,7 +17,7 @@ from legisuni.config import Settings
 from legisuni.contracts import CatalogEntry
 from legisuni.descargador import paths
 from legisuni.descargador.descargar import descargar
-from legisuni.descargador.fetch import Fetcher
+from legisuni.descargador.fetch import Fetcher, construir_cliente
 from legisuni.descargador.ratelimit import RateLimiter
 from legisuni.descargador.robots import RobotsCache
 from legisuni.descargador.store import Store
@@ -108,18 +107,8 @@ def main(
 
     settings = Settings()
     limitador = RateLimiter(settings.rate_limit_s)
-    cliente_http = httpx.Client()
-
-    def _fetcher_robots(url: str) -> tuple[int, str]:
-        r = httpx.get(
-            url,
-            timeout=settings.timeout_s,
-            headers={"User-Agent": settings.user_agent},
-            follow_redirects=True,
-        )
-        return r.status_code, r.text
-
-    robots = RobotsCache(settings.user_agent, _fetcher_robots)
+    cliente_http = construir_cliente(settings)
+    robots = RobotsCache(settings.user_agent, cliente_http)
     fetcher = Fetcher(settings, limitador, robots, cliente=cliente_http)
 
     motivos_fallo: Counter[str] = Counter()

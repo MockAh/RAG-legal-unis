@@ -36,6 +36,7 @@ def _fetcher(**overrides) -> tuple[Fetcher, DormirFalso, LimitadorContador]:
         settings=_settings(**overrides),
         limitador=limitador,
         robots=None,
+        cliente=httpx.Client(),
         dormir=dormir,
     )
     return fetcher, dormir, limitador

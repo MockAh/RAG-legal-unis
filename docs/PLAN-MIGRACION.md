@@ -204,3 +204,34 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   fija `tests/test_extraccion_indices.py`.
 - UAM + UJAT: 47 + 109 = 156/156, dos `entry_id` distintos para el RES.
 - Si no da 156, no se sigue a M25.
+## M25 · Cliente HTTP único
+- Referencia: `docs/07` §Cliente HTTP único y su criterio 15; cierra CD-05-2
+  de `docs/05`.
+- La orquestación construye **un solo** `httpx.Client` (`construir_cliente`,
+  en `descargador/fetch.py`): User-Agent, timeout y TLS estricto desde
+  `Settings`. Se inyecta a `Fetcher` y a `RobotsCache`. Ningún módulo crea
+  su propio cliente ni recibe una función para pedir.
+- `RobotsCache(user_agent, cliente)` reemplaza a `RobotsCache(user_agent,
+  fetcher)`; `_fetcher_robots` desaparece de ambos scripts.
+- `Fetcher.cliente` pasa a **obligatorio**: se quita el respaldo
+  `httpx.Client()`. Los helpers de `test_fetch.py` y `test_descargar.py`
+  solo cambian en el montaje.
+- **El fail-open de robots no cambia** (E11.1 de `docs/08`: la UAM responde
+  403 a `/robots.txt` y 200 a sus PDF). Se añade un test de 403 que antes
+  no existía; `tests/test_robots.py` cambia solo en el montaje, ninguna
+  aserción existente se toca.
+- Tests: `tests/test_cliente_http.py`. Criterio 15 — Fetcher y RobotsCache
+  reciben el mismo objeto y la petición a `/robots.txt` lleva el User-Agent
+  configurado. Un test corre `main` de ambos scripts (con `--limite 0`, sin
+  red) y comprueba la identidad del cliente en el cableado real, porque el
+  `--dry-run` termina antes de construir nada. El cruce de vestíbulo
+  llega en M28: añadirlo al test de identidad es una línea.
+- **Deudas detectadas, NO se arreglan en M25:**
+  1. `user_agent` duplicado: `RobotsCache` lo recibe como parámetro (para
+     `can_fetch`) y el cliente lo lleva en su cabecera. Dos fuentes que
+     podrían divergir.
+  2. `Fetcher` sigue mandando `User-Agent` y `timeout` en cada petición,
+     redundantes con los del cliente.
+- Verificación: `--dry-run` → UAM 47, UJAT 109. El `--dry-run` no ejercita
+  el cableado; lo cubre el test de `main`.
+- Commit: `M25: cliente HTTP único`

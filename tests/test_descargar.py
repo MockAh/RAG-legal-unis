@@ -2,6 +2,7 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 
+import httpx
 import pytest
 from pytest_httpx import HTTPXMock
 
@@ -54,7 +55,11 @@ def _settings(tmp_path: Path, **overrides) -> Settings:
 
 def _fetcher(settings: Settings) -> Fetcher:
     return Fetcher(
-        settings=settings, limitador=LimitadorSinEspera(), robots=None, dormir=DormirFalso()
+        settings=settings,
+        limitador=LimitadorSinEspera(),
+        robots=None,
+        cliente=httpx.Client(),
+        dormir=DormirFalso(),
     )
 
 
