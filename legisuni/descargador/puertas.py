@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from legisuni.config import Settings
 from legisuni.contracts import Encargo, IntentoPuerta, MotivoFallo, Puerta
-from legisuni.descargador import guard, urlnorm
+from legisuni.descargador import guard, muros, urlnorm
 from legisuni.descargador.fetch import Fetcher, RespuestaCruda
 from legisuni.descargador.robots import RobotsCache
 
@@ -35,6 +35,13 @@ def probar_puertas(
             continue
 
         respuesta = fetcher.pedir(url)
+
+        if muros.es_muro_de_pago(respuesta.status, respuesta.url_final):
+            ultimo_motivo = "muro_de_pago"
+            intentos.append(
+                construir_intento(orden, puerta, url, respuesta, exito=False, motivo=ultimo_motivo)
+            )
+            continue
 
         if respuesta.motivo_red is not None:
             ultimo_motivo = respuesta.motivo_red

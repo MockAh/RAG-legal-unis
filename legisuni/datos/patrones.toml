@@ -1,0 +1,22 @@
+# datos/patrones.toml — patrones de autenticación reconocidos como muro_de_pago
+# (docs/05 v3, sección "Muros", criterio 15).
+#
+# SIN EVIDENCIA MEDIDA: el criterio 18 (primera corrida académica real)
+# todavía no se ha corrido. Los dos patrones de abajo son convenciones de
+# protocolo de identidad federada -no un hallazgo de campo ni una editorial
+# observada-, elegidas porque son estándares abiertos que casi cualquier
+# universidad despliega en su propio dominio. Revisar y ampliar con
+# evidencia real cuando el criterio 18 dé datos.
+#
+# docs/01 línea 155: "en la duda, el motivo es vestibulo_sin_pdf" -por eso
+# esta lista se mantiene mínima a propósito: cada patrón añadido sin
+# evidencia es un muro_de_pago potencialmente mal diagnosticado.
+
+[[patrones]]
+nombre = "Shibboleth SSO"
+ruta_regex = "^/Shibboleth\\.sso/"
+# sin "host": el IdP vive en el dominio de cada institución, el path es fijo
+
+[[patrones]]
+nombre = "CAS (Central Authentication Service)"
+ruta_regex = "^/cas/login"

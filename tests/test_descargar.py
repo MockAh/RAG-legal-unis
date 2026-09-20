@@ -357,6 +357,57 @@ def test_todas_las_puertas_fallan_da_puertas_agotadas(tmp_path: Path, httpx_mock
     assert all(intento.motivo_fallo == "url_muerta" for intento in resultado.intentos)
 
 
+# M27, criterio 15: muros. El reconocimiento no distingue modo (docs/01 989-991),
+# así que muro_de_pago puede salir en un Encargo jurídico igual que en uno académico.
+
+
+def test_401_da_muro_de_pago(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    httpx_mock.add_response(status_code=401)
+    settings = _settings(tmp_path)
+    encargo = _encargo()
+
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "muro_de_pago"
+
+
+def test_402_da_muro_de_pago(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    httpx_mock.add_response(status_code=402)
+    settings = _settings(tmp_path)
+    encargo = _encargo()
+
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "muro_de_pago"
+
+
+def test_403_no_es_muro_sigue_siendo_http_error(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    httpx_mock.add_response(status_code=403)
+    settings = _settings(tmp_path)
+    encargo = _encargo()
+
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "http_error"
+
+
+def test_redireccion_a_shibboleth_da_muro_de_pago(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    url_documento = "https://a.mx/articulo.pdf"
+    url_login = "https://a.mx/Shibboleth.sso/Login?target=articulo.pdf"
+    httpx_mock.add_response(url=url_documento, status_code=302, headers={"Location": url_login})
+    httpx_mock.add_response(url=url_login, status_code=200, content=_HTML_BYTES)
+    settings = _settings(tmp_path)
+    encargo = _encargo(url_documento=url_documento)
+
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "muro_de_pago"
+
+
 # M21, excepción al criterio 11 autorizada por el criterio 4 de docs/05: hasta
 # aquí, sin bandera, lo ya registrado SÍ pedía la red (test_default_no_omite_y_
 # llama_al_fetcher). Regla 5 invierte ese default a propósito. No se registra

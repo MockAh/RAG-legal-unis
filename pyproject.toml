@@ -23,3 +23,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["legisuni*"]
+
+[tool.setuptools.package-data]
+legisuni = ["descargador/*.json", "datos/*.toml"]

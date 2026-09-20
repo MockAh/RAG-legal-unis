@@ -292,3 +292,57 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
 - Criterio de cierre: `.venv/bin/python -m pytest -q` en verde, incluidos
   los tests nuevos.
 - Commit: `M26: bucle de puertas en puertas.py`
+
+## M27 · Reconocimiento de muros (`muros.py` + `datos/patrones.toml`)
+- Referencia: `docs/05` v3, sección "Muros" y criterio 15; `docs/01` línea
+  989-991 (muro_de_pago sí puede aparecer en jurídico, D8 no distingue modo)
+  y línea 155 (nota: "en la duda, el motivo es `vestibulo_sin_pdf`", no
+  `http_error` ni `muro_de_pago`).
+- Nuevo `legisuni/descargador/muros.py`: `es_muro_de_pago(status, url_final)`.
+  `401`/`402` → `True`. Si no, compara `url_final` contra los patrones de
+  `legisuni/datos/patrones.toml` (path hermano de `descargador/`, según el
+  árbol de `docs/05`; `visores.json` se queda donde está, `docs/05` dice que
+  se respeta su ubicación actual). `403` **nunca** es muro: cae al
+  `http_error` que ya produce `Fetcher`, sin cambio ahí.
+- **No distingue modo:** no mira `encargo.modo`. `muro_de_pago` puede salir
+  en un `Encargo` jurídico igual que en uno académico (docs/01 989-991).
+- **Los casos dudosos no cambian en M27.** `muros.py` documenta en su
+  docstring la nota de `docs/01` línea 155: ante la duda el motivo correcto
+  es `vestibulo_sin_pdf`, no `http_error` ni `muro_de_pago` mal
+  diagnosticado. Hoy no hay vestíbulo, así que un HTML dudoso (que no matchee
+  ningún patrón) sigue el camino de siempre: `guard.evaluar` → `no_es_pdf`.
+  **Anotado para M28:** el orden final de una puerta será visor → petición →
+  guardián → vestíbulo (un salto) → guardián; los HTML dudosos que hoy caen
+  en `no_es_pdf` pasarán a intentar el vestíbulo primero, y solo si ese
+  cruce falla el motivo será `vestibulo_sin_pdf`.
+- **Patrones — sin evidencia medida, mínimos a propósito** (criterio 18, la
+  primera corrida académica real, no se ha corrido todavía). Dos
+  convenciones de protocolo de identidad federada, no editoriales
+  observadas: `Shibboleth SSO` (`^/Shibboleth\.sso/`, sin `host` porque el
+  IdP vive en el dominio de cada institución) y `CAS` (`^/cas/login`).
+  Deliberadamente sin `accounts.google.com` / `login.microsoftonline.com` /
+  Okta: serían proveedores adivinados sin evidencia de que una editorial
+  redirija ahí.
+- Integración en `puertas.py`: justo tras `fetcher.pedir(url)`, antes de
+  mirar `motivo_red`. Es puerta fallida más — el bucle de M26 sigue a la
+  siguiente sin cambiar su estructura.
+- `datos/patrones.toml` es dato de paquete: se carga una sola vez
+  (`lru_cache`, igual que `guard._cargar_visores`), no por petición.
+- **Empaquetado — gap preexistente detectado y corregido de paso:**
+  `pyproject.toml` no tenía `[tool.setuptools.package-data]` ni
+  `MANIFEST.in`; `visores.json` solo "funciona" hoy porque el venv está en
+  modo editable. Se añade `[tool.setuptools.package-data]` cubriendo
+  `descargador/*.json` **y** `datos/*.toml`, para que ambos sobrevivan una
+  instalación real, no solo la editable.
+- Tests nuevos en `tests/test_descargar.py` (ninguna aserción existente
+  cambia): `401` → `muro_de_pago`; `402` → `muro_de_pago`; `403` →
+  `http_error` (control negativo); redirección a `/Shibboleth.sso/Login` →
+  `muro_de_pago` aunque el destino final responda `200`; el `_encargo()`
+  jurídico de siempre con una puerta `401` → `muro_de_pago` sin
+  restricción de modo.
+- Test nuevo en `tests/test_muros.py`: carga el `patrones.toml` **real** (no
+  un fixture) vía `muros._cargar_patrones()` y confirma que compila sin
+  excepción — un `ruta_regex` mal escrito debe romper aquí, no en una
+  corrida real.
+- Criterio de cierre: `.venv/bin/python -m pytest -q` en verde.
+- Commit: `M27: reconocimiento de muros`
