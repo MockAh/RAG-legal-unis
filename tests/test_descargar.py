@@ -63,6 +63,10 @@ def _fetcher(settings: Settings) -> Fetcher:
     )
 
 
+def _puerta(url: str, url_base: str | None = None) -> Puerta:
+    return Puerta(url=url, tipo="enlace_indice", url_base=url_base, evidencia="test")
+
+
 def _encargo(
     url_documento: str = "https://a.mx/x.pdf",
     url_indice: str = "https://a.mx/indice",
@@ -294,6 +298,63 @@ def test_encargo_id_registrado_como_fallo_descarga_igual(
     assert resultado.exito is True
     assert resultado.ruta_local is not None
     assert resultado.ruta_local.exists()
+
+
+# M26, criterio 13: puertas múltiples. Con una sola puerta (todos los tests de
+# arriba) el comportamiento es idéntico al de v2 — es lo que exige el criterio 11.
+
+
+def test_tres_puertas_la_segunda_entrega_pdf(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    url_404 = "https://a.mx/no-existe.pdf"
+    url_ok = "https://a.mx/ok.pdf"
+    url_nunca = "https://a.mx/nunca-pedida.pdf"
+    httpx_mock.add_response(url=url_404, status_code=404)
+    httpx_mock.add_response(url=url_ok, status_code=200, content=_PDF_BYTES)
+    # url_nunca no se registra: si el bucle la pidiera, pytest-httpx hace fallar el test solo.
+    settings = _settings(tmp_path)
+    encargo = _encargo(puertas=[_puerta(url_404), _puerta(url_ok), _puerta(url_nunca)])
+
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is True
+    assert resultado.puerta_usada == 1
+    assert len(resultado.intentos) == 2
+    assert resultado.intentos[0].exito is False
+    assert resultado.intentos[1].exito is True
+
+
+def test_primera_puerta_da_html_segunda_da_pdf(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    # Un 200 que el guardián rechaza (HTML) es puerta fallida, no error de red: el
+    # bucle sigue a la siguiente puerta. (En M28, con cruzar_vestibulos=True, esta
+    # misma puerta intentará el cruce de vestíbulo antes de darse por fallida.)
+    url_html = "https://a.mx/landing.pdf"
+    url_ok = "https://a.mx/ok.pdf"
+    httpx_mock.add_response(url=url_html, status_code=200, content=_HTML_BYTES)
+    httpx_mock.add_response(url=url_ok, status_code=200, content=_PDF_BYTES)
+    settings = _settings(tmp_path)
+    encargo = _encargo(puertas=[_puerta(url_html), _puerta(url_ok)])
+
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is True
+    assert resultado.puerta_usada == 1
+    assert len(resultado.intentos) == 2
+    assert resultado.intentos[0].motivo_fallo == "no_es_pdf"
+
+
+def test_todas_las_puertas_fallan_da_puertas_agotadas(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    urls = ["https://a.mx/1.pdf", "https://a.mx/2.pdf", "https://a.mx/3.pdf"]
+    for url in urls:
+        httpx_mock.add_response(url=url, status_code=404)
+    settings = _settings(tmp_path)
+    encargo = _encargo(puertas=[_puerta(url) for url in urls])
+
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "puertas_agotadas"
+    assert len(resultado.intentos) == 3
+    assert all(intento.motivo_fallo == "url_muerta" for intento in resultado.intentos)
 
 
 # M21, excepción al criterio 11 autorizada por el criterio 4 de docs/05: hasta

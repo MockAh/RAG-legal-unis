@@ -235,3 +235,60 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
 - Verificación: `--dry-run` → UAM 47, UJAT 109. El `--dry-run` no ejercita
   el cableado; lo cubre el test de `main`.
 - Commit: `M25: cliente HTTP único`
+
+## M26 · Bucle de puertas (`puertas.py`)
+- Referencia: `docs/05` v3, criterio 13 y la sección "Puertas múltiples"
+  (línea 136: "sin éxito: motivo = el de la única puerta, o
+  `puertas_agotadas` si hubo más de una"); `docs/01` línea 159 (nota sobre
+  `puertas_agotadas`).
+- Nuevo `legisuni/descargador/puertas.py`, función `probar_puertas(encargo,
+  fetcher, robots, settings)`:
+  - Recorre `encargo.puertas` en orden (`orden` = índice).
+  - Por puerta: normaliza su URL, chequea `robots.permitido(url)` (si
+    prohíbe → intento fallido `robots_prohibido`, sigue), pide con
+    `fetcher.pedir(url)` (que ya aplica rate limit y reintentos **por
+    llamada**, así que queda "por puerta" sin código nuevo), evalúa con
+    `guard.evaluar(...)`.
+  - **Un 200 cuyo cuerpo el guardián rechaza (HTML, tamaño) es puerta
+    fallida, no error de red:** se registra su intento con el motivo que
+    dé `guard.evaluar` (`no_es_pdf`, `demasiado_grande`, etc.) y el bucle
+    sigue a la siguiente puerta.
+  - Se detiene en la primera puerta que entrega bytes aceptados. Las
+    siguientes **no se piden**.
+  - Devuelve un `ResultadoPuertas` (dataclass): `exito`, `puerta_usada`,
+    `respuesta` cruda, `extension`, `motivo_fallo`, `intentos:
+    list[IntentoPuerta]` — uno por cada puerta *pedida*, robots-bloqueadas
+    incluidas.
+  - Sin éxito: motivo = el de esa única puerta si `len(puertas) == 1`, o
+    `"puertas_agotadas"` si hubo más de una. Con una sola puerta,
+    `puertas_agotadas` **nunca** aparece (protege criterio 11).
+- `descargar.py` se simplifica: conserva la lectura de idempotencia de red
+  (antes del bucle) y la escritura a disco + alias por hash (después),
+  delegando el bucle entero a `puertas.probar_puertas`. El caso ya
+  existente de fallo de escritura (`test_fallo_de_escritura_no_propaga_
+  excepcion`) reconstruye el intento de la puerta que tuvo éxito en pedir
+  pero falló al escribir, marcándolo `exito=False,
+  motivo_fallo="http_error"` — igual que hoy.
+- **Fuera de alcance, anotado para M28:** una puerta que da HTML rechazado
+  por el guardián y que además tenga `Encargo.cruzar_vestibulos=True`
+  debería intentar el cruce de vestíbulo antes de darse por fallida. M26
+  no lo hace — la trata como puerta fallida sin más, incluso en modo
+  académico. M28 (vestíbulo) inserta ese paso dentro de esta misma puerta,
+  antes de registrar el motivo.
+- Vestíbulo y muros no entran aquí: quedan para milestones futuros
+  (`vestibulo.py`, `muros.py`), tal como los separa el diseño de `docs/05`.
+- **Ninguna aserción de `test_descargar.py` cambia** (criterio 11) — solo
+  se añaden tests nuevos, ahí mismo:
+  - `test_tres_puertas_la_segunda_entrega_pdf`: tres puertas (404, PDF, una
+    tercera sin respuesta registrada en `httpx_mock` — si se pide, el test
+    falla solo). Verifica `puerta_usada == 1` y `len(intentos) == 2`.
+  - `test_primera_puerta_da_html_segunda_da_pdf`: primera puerta 200 con
+    HTML (el guardián la rechaza con `no_es_pdf`), segunda con PDF.
+    Verifica `puerta_usada == 1` y `len(intentos) == 2` — un 200 rechazado
+    por el guardián cuenta como puerta fallida, no corta el bucle.
+  - `test_todas_las_puertas_fallan_da_puertas_agotadas`: tres puertas, las
+    tres 404. Verifica `motivo_fallo == "puertas_agotadas"`,
+    `len(intentos) == 3`, cada una con su propio motivo.
+- Criterio de cierre: `.venv/bin/python -m pytest -q` en verde, incluidos
+  los tests nuevos.
+- Commit: `M26: bucle de puertas en puertas.py`
