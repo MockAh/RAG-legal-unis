@@ -405,3 +405,44 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   tarea aparte.
 - Criterio de cierre: `.venv/bin/python -m pytest -q` en verde.
 - Commit: `M28: cruce de vestíbulo`
+
+## M29 · Alias por hash
+- Referencia: `docs/05` criterio 16 (línea 402) e Idempotencia regla 4;
+  `docs/01` línea 940 ("Alias por hash") y línea 417 (nota sobre
+  `duplicado_de`); evidencia C24 y E13.4 de `docs/08`.
+- **Qué cambia y qué no, en modo jurídico.** C24/E13 midió que dos corridas
+  de la UAM en días distintos dejaron los 45 documentos dos veces en disco.
+  **Ese caso ya lo cerró M21:** el `encargo_id` (`inst_id:doc_slug:url_id`)
+  no depende de la fecha, y tanto los scripts como `descargar()` se saltan
+  lo ya registrado, así que la segunda corrida con la misma base no pide
+  ni escribe nada. Lo que M29 cambia es otro caso: **un `encargo_id` nuevo
+  con bytes idénticos dentro del mismo `grupo_alias`** (una reconsolidación:
+  URLs nuevas, mismos bytes). En v1 escribía un segundo archivo; ahora no
+  escribe nada y lleva `duplicado_de`. Es excepción al criterio 11,
+  autorizada por el criterio 16. Sigue sin medirse en campo (E13.4).
+- `Store.alias_por_hash(grupo_alias, sha256, excluir_encargo_id) ->
+  (encargo_id, ruta) | None`: lee `descargas` (índice por `grupo_alias` de
+  M20). Solo `exito = 1`, solo filas dueñas de su archivo (`duplicado_de IS
+  NULL`: un alias nunca apunta a otro alias), nunca el propio `encargo_id`.
+  Varias coincidencias → la más antigua (`capturado_en`, `rowid`).
+- `descargar.py`: tras calcular el SHA-256 y **antes** de resolver ruta o
+  escribir, si hay `store`, consulta `alias_por_hash(encargo.grupo_alias,
+  …)`. El grupo se recibe del `Encargo`, nunca se deduce del `encargo_id`
+  (v2.1). Con alias: `exito=True`, `ruta_local` = la del original,
+  `duplicado_de` = su `encargo_id`, sin escribir archivo; `sha256`,
+  `bytes`, `url_final`, `puerta_usada` e `intentos` son los de esta
+  descarga (D5). Sin `store`, nada cambia.
+- **Si el archivo original falta en disco o su hash ya no coincide, no hay
+  alias** y se escribe el propio (`docs/01` línea 417: `ruta_local` apunta
+  al archivo que ya existía). Un error al leerlo tampoco hay alias, nunca
+  excepción.
+- Scripts sin cambios: ya persisten con `guardar_descarga(resultado,
+  encargo.grupo_alias)`, que guarda `duplicado_de`.
+- **Ninguna aserción existente cambia:** los tests que usan `Store` en
+  `test_descargar.py` solo escriben `documentos`, nunca `descargas`.
+- Tests nuevos: en `tests/test_descargar.py`, las dos mitades del criterio
+  16 (mismo grupo → un solo archivo y `duplicado_de` al primero; otro
+  grupo → archivo propio) más el original ausente en disco; en
+  `tests/test_store.py`, `alias_por_hash` con otro grupo, fallida, uno
+  mismo y alias de alias.
+- Commit: `M29: alias por hash`

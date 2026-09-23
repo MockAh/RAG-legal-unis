@@ -182,6 +182,29 @@ class Store:
             return None
         return Path(fila["ruta_local"])
 
+    def alias_por_hash(
+        self, grupo_alias: str, sha256: str, excluir_encargo_id: str
+    ) -> tuple[str, Path] | None:
+        """El original registrado con estos bytes en el grupo (docs/05 criterio 16, docs/01 línea 940).
+
+        Solo descargas exitosas que son dueñas de su archivo (`duplicado_de IS NULL`), así
+        que un alias nunca apunta a otro alias. Un encargo no es alias de sí mismo.
+        """
+        fila = self._conn.execute(
+            """
+            SELECT encargo_id, ruta_local FROM descargas
+            WHERE grupo_alias = ? AND sha256 = ? AND exito = 1
+              AND duplicado_de IS NULL AND encargo_id != ?
+              AND ruta_local IS NOT NULL
+            ORDER BY capturado_en, rowid
+            LIMIT 1
+            """,
+            (grupo_alias, sha256, excluir_encargo_id),
+        ).fetchone()
+        if fila is None:
+            return None
+        return fila["encargo_id"], Path(fila["ruta_local"])
+
     def contar(self) -> int:
         fila = self._conn.execute("SELECT COUNT(*) AS n FROM documentos").fetchone()
         return fila["n"]

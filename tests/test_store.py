@@ -214,3 +214,51 @@ def test_cerrar_y_reabrir_conserva_filas(tmp_path: Path) -> None:
 
     with Store(db_path) as reabierto:
         assert reabierto.contar() == 1
+
+
+# M29: alias_por_hash (docs/05 criterio 16). Solo descargas exitosas, dueñas de su
+# archivo (duplicado_de IS NULL), del mismo grupo_alias y de otro encargo_id.
+
+_GRUPO = "uam:reglamento-organico"
+
+
+def test_alias_por_hash_encuentra_el_original_del_mismo_grupo(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        original = _resultado_exitoso(encargo_id="uam:ro:aaaaaaaaaaaa")
+        store.guardar_descarga(original, _GRUPO)
+
+        assert store.alias_por_hash(_GRUPO, "a" * 64, "uam:ro:bbbbbbbbbbbb") == (
+            "uam:ro:aaaaaaaaaaaa",
+            original.ruta_local,
+        )
+
+
+def test_alias_por_hash_no_cruza_grupos(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(_resultado_exitoso(encargo_id="uam:ro:aaaaaaaaaaaa"), _GRUPO)
+
+        assert store.alias_por_hash("uam:otro-reglamento", "a" * 64, "uam:ro:bbbbbbbbbbbb") is None
+
+
+def test_alias_por_hash_ignora_descargas_fallidas(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        fallida = _resultado_exitoso(encargo_id="uam:ro:aaaaaaaaaaaa", exito=False, motivo_fallo="http_error")
+        store.guardar_descarga(fallida, _GRUPO)
+
+        assert store.alias_por_hash(_GRUPO, "a" * 64, "uam:ro:bbbbbbbbbbbb") is None
+
+
+def test_alias_por_hash_no_es_alias_de_si_mismo(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(_resultado_exitoso(encargo_id="uam:ro:aaaaaaaaaaaa"), _GRUPO)
+
+        assert store.alias_por_hash(_GRUPO, "a" * 64, "uam:ro:aaaaaaaaaaaa") is None
+
+
+def test_alias_por_hash_nunca_elige_un_alias_como_original(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        # solo queda registrado un alias (su original es de otro grupo o ya no está en la base)
+        alias = _resultado_exitoso(encargo_id="uam:ro:bbbbbbbbbbbb", duplicado_de="uam:ro:aaaaaaaaaaaa")
+        store.guardar_descarga(alias, _GRUPO)
+
+        assert store.alias_por_hash(_GRUPO, "a" * 64, "uam:ro:cccccccccccc") is None
