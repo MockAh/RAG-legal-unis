@@ -346,3 +346,62 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   corrida real.
 - Criterio de cierre: `.venv/bin/python -m pytest -q` en verde.
 - Commit: `M27: reconocimiento de muros`
+
+## M28 · Cruce de vestíbulo (`vestibulo.py`)
+- Referencia: `docs/05` v3, sección "Cruce de vestíbulo" y criterio 14 (sus
+  cinco casos); `docs/01` línea 937 (orden: visor → petición → guardián →
+  vestíbulo → guardián); D3 y D4 de `docs/00`.
+- Nuevo `legisuni/descargador/vestibulo.py`, **puro, sin red** (no importa
+  `httpx`): `es_html(primeros_bytes, content_type)` y
+  `extraer_enlace(cuerpo) -> str | None`. Parsea con `selectolax` (no
+  ejecuta scripts) y solo lee un atributo (D4). Prioridad:
+  `<meta name="citation_pdf_url">` → `<link rel="alternate"
+  type="application/pdf">` → un **único** `<a href>` cuya ruta termine en
+  `.pdf` (literal de `docs/05`; `.docx` no entra). Devuelve el valor
+  **literal** de la página (D3): no normaliza ni construye nada.
+- **Dos o más `<a>` a `.pdf` sin meta ni link → no se elige**, y se cuentan
+  **etiquetas**, no destinos únicos: dos `<a>` al mismo PDF también dan
+  `vestibulo_sin_pdf`. Contar destinos únicos se revisará con la evidencia
+  real de M31 (pregunta 10 de `docs/05`).
+- Integración en `puertas.py`, dentro de la misma puerta: solo si
+  `guard.evaluar` da `no_es_pdf`, `encargo.cruzar_vestibulos=True` y la
+  respuesta es HTML (bytes o `content-type`). Un solo salto:
+  - sin enlace → `vestibulo_sin_pdf`;
+  - enlace relativo → se resuelve contra la `url_final` del vestíbulo con
+    `urlnorm.normalizar`;
+  - el enlace pasa por lo mismo que una puerta: robots → `fetcher.pedir`
+    (rate limit, reintentos, tope) → muros → red → tamaño → guardián. Se
+    extrajo `_evaluar_respuesta` para que puerta y salto compartan ese
+    camino sin duplicarlo;
+  - salto que devuelve HTML otra vez → `vestibulo_sin_pdf`, sin recursión
+    ni más peticiones;
+  - **cualquier otro fallo del salto conserva su motivo propio**
+    (`url_muerta`, `robots_prohibido`, `muro_de_pago`, `no_es_pdf`…).
+- `IntentoPuerta.enlace_vestibulo` lleva el literal de la página;
+  `url_final` y `http_status` son los del archivo; `url_pedida` sigue
+  siendo la de la puerta. `construir_intento` gana `enlace_vestibulo=None`;
+  la rama de fallo de escritura de `descargar.py` lo conserva.
+- **Sin cliente propio.** El vestíbulo no es un receptor de `httpx.Client`:
+  el salto solo sale por el `Fetcher`. En `tests/test_cliente_http.py` se
+  corrigen los comentarios de M25 que anunciaban una clase `Vestibulo`, y
+  en su lugar: `test_el_salto_del_vestibulo_sale_por_el_fetcher` (ambas
+  peticiones pasan por `fetcher.pedir` y llevan el UA configurado) y
+  `test_vestibulo_no_importa_httpx` (inspección con `ast`). Los scripts no
+  cambian.
+- Modo jurídico: `cruzar_vestibulos=False`, no entra en la rama nueva.
+  Todos los tests previos usan `False`; **ninguna aserción cambia**
+  (criterio 11).
+- Tests nuevos: en `tests/test_descargar.py`, los cinco casos del criterio
+  14 (con dos PDF distintos en el de los dos `<a>`), más enlace relativo,
+  fallo del salto con su motivo (`url_muerta`) y robots que prohíbe el
+  enlace; `tests/test_vestibulo.py` con la extracción (prioridad, meta
+  vacía, dos `<a>` al mismo PDF, D4: `<a>` dentro de `<script>` y texto
+  con "instrucciones" no cuentan).
+- **Deuda anotada, NO se arregla en M28:** `docs/01` línea 937 dice
+  "visor → petición", pero el visor se comprueba **después** de pedir,
+  dentro de `guard.evaluar` sobre `url_final`. Pasa igual en las puertas
+  (desde v1) y en el salto (que reutiliza el mismo camino a propósito,
+  para no tener dos criterios). Adelantar el chequeo antes de pedir es
+  tarea aparte.
+- Criterio de cierre: `.venv/bin/python -m pytest -q` en verde.
+- Commit: `M28: cruce de vestíbulo`

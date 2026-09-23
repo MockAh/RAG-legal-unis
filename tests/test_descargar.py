@@ -436,3 +436,168 @@ def test_ya_registrado_no_toca_la_red_sin_ninguna_respuesta_mockeada(
 
     assert resultado.exito is True
     assert resultado.ruta_local == tmp_path / "reglamento-organico.pdf"
+
+
+# M28, criterio 14: cruce de vestíbulo. Solo con cruzar_vestibulos=True y respuesta
+# HTML; un solo salto. httpx_mock sin respuestas de sobra: una petición no
+# registrada hace fallar el test solo, y además se cuentan las peticiones.
+
+_URL_VESTIBULO = "https://repo.example.org/articulo/123"
+_URL_ARCHIVO = "https://repo.example.org/descarga/123.pdf"
+
+
+def _html(cuerpo_head: str = "", cuerpo_body: str = "") -> bytes:
+    return (
+        f"<!DOCTYPE html>\n<html><head><title>Articulo</title>{cuerpo_head}</head>"
+        f"<body>{cuerpo_body}</body></html>"
+    ).encode("utf-8")
+
+
+_HTML_CON_META = _html(f'<meta name="citation_pdf_url" content="{_URL_ARCHIVO}">')
+
+
+def _encargo_academico(url: str = _URL_VESTIBULO, **overrides) -> Encargo:
+    datos = dict(
+        encargo_id="doi:10.1126/science.215.4539.1501",
+        modo="academico",
+        solicitante="geologia-dois-3f9a0c1b",
+        puertas=[Puerta(url=url, tipo="copia_libre", url_base=None, evidencia="lista:test#1")],
+        cajon="papers",
+        etiqueta="raup-1982__3f9a0c1b",
+        cruzar_vestibulos=True,
+        grupo_alias="doi:10.1126/science.215.4539.1501",
+        creado_en=datetime(2026, 1, 1),
+    )
+    datos.update(overrides)
+    return Encargo(**datos)
+
+
+def test_vestibulo_con_citation_pdf_url_cruza_y_guarda(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    httpx_mock.add_response(url=_URL_VESTIBULO, status_code=200, content=_HTML_CON_META)
+    httpx_mock.add_response(url=_URL_ARCHIVO, status_code=200, content=_PDF_BYTES)
+    settings = _settings(tmp_path)
+
+    resultado = descargar(_encargo_academico(), _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is True
+    assert resultado.ruta_local is not None
+    assert resultado.ruta_local.read_bytes() == _PDF_BYTES
+    assert resultado.url_final == _URL_ARCHIVO
+    assert len(resultado.intentos) == 1
+    intento = resultado.intentos[0]
+    assert intento.enlace_vestibulo == _URL_ARCHIVO
+    assert intento.url_final == _URL_ARCHIVO
+    assert intento.url_pedida == _URL_VESTIBULO
+    assert len(httpx_mock.get_requests()) == 2
+
+
+def test_vestibulo_sin_enlace_da_vestibulo_sin_pdf(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    httpx_mock.add_response(
+        url=_URL_VESTIBULO, status_code=200, content=_html(cuerpo_body="<p>Sin archivo</p>")
+    )
+    settings = _settings(tmp_path)
+
+    resultado = descargar(_encargo_academico(), _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "vestibulo_sin_pdf"
+    assert resultado.intentos[0].enlace_vestibulo is None
+    assert len(httpx_mock.get_requests()) == 1
+    assert list(tmp_path.rglob("*")) == []
+
+
+def test_enlace_que_devuelve_html_da_vestibulo_sin_pdf_sin_segundo_salto(
+    tmp_path: Path, httpx_mock: HTTPXMock
+) -> None:
+    # el segundo HTML también trae meta: si hubiera recursión, habría una tercera petición
+    url_otra = "https://repo.example.org/descarga/otra.pdf"
+    httpx_mock.add_response(url=_URL_VESTIBULO, status_code=200, content=_HTML_CON_META)
+    httpx_mock.add_response(
+        url=_URL_ARCHIVO,
+        status_code=200,
+        content=_html(f'<meta name="citation_pdf_url" content="{url_otra}">'),
+    )
+    settings = _settings(tmp_path)
+
+    resultado = descargar(_encargo_academico(), _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "vestibulo_sin_pdf"
+    assert resultado.intentos[0].enlace_vestibulo == _URL_ARCHIVO
+    assert [str(p.url) for p in httpx_mock.get_requests()] == [_URL_VESTIBULO, _URL_ARCHIVO]
+    assert list(tmp_path.rglob("*")) == []
+
+
+def test_dos_enlaces_a_pdf_distintos_sin_meta_da_vestibulo_sin_pdf(
+    tmp_path: Path, httpx_mock: HTTPXMock
+) -> None:
+    html = _html(
+        cuerpo_body='<a href="/descarga/123.pdf">Artículo</a>'
+        '<a href="/descarga/123-suplementario.pdf">Material suplementario</a>'
+    )
+    httpx_mock.add_response(url=_URL_VESTIBULO, status_code=200, content=html)
+    settings = _settings(tmp_path)
+
+    resultado = descargar(_encargo_academico(), _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "vestibulo_sin_pdf"
+    assert len(httpx_mock.get_requests()) == 1
+
+
+def test_mismo_html_sin_cruzar_vestibulos_da_no_es_pdf(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    httpx_mock.add_response(url=_URL_VESTIBULO, status_code=200, content=_HTML_CON_META)
+    settings = _settings(tmp_path)
+    encargo = _encargo_academico(cruzar_vestibulos=False)
+
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "no_es_pdf"
+    assert resultado.intentos[0].enlace_vestibulo is None
+    assert len(httpx_mock.get_requests()) == 1
+
+
+def test_enlace_relativo_se_resuelve_contra_url_final_del_vestibulo(
+    tmp_path: Path, httpx_mock: HTTPXMock
+) -> None:
+    html = _html(cuerpo_body='<a href="../descarga/123.pdf">PDF</a>')
+    httpx_mock.add_response(url=_URL_VESTIBULO, status_code=200, content=html)
+    httpx_mock.add_response(url=_URL_ARCHIVO, status_code=200, content=_PDF_BYTES)
+    settings = _settings(tmp_path)
+
+    resultado = descargar(_encargo_academico(), _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is True
+    # se registra el literal de la página (D3), no la URL resuelta
+    assert resultado.intentos[0].enlace_vestibulo == "../descarga/123.pdf"
+    assert resultado.url_final == _URL_ARCHIVO
+
+
+def test_fallo_del_salto_conserva_su_propio_motivo(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    httpx_mock.add_response(url=_URL_VESTIBULO, status_code=200, content=_HTML_CON_META)
+    httpx_mock.add_response(url=_URL_ARCHIVO, status_code=404)
+    settings = _settings(tmp_path)
+
+    resultado = descargar(_encargo_academico(), _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "url_muerta"
+    assert resultado.intentos[0].enlace_vestibulo == _URL_ARCHIVO
+    assert resultado.intentos[0].http_status == 404
+
+
+def test_robots_que_prohibe_el_enlace_no_lo_pide(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    class RobotsProhibeEnlace:
+        def permitido(self, url: str) -> bool:
+            return url != _URL_ARCHIVO
+
+    httpx_mock.add_response(url=_URL_VESTIBULO, status_code=200, content=_HTML_CON_META)
+    settings = _settings(tmp_path)
+
+    resultado = descargar(_encargo_academico(), _fetcher(settings), RobotsProhibeEnlace(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "robots_prohibido"
+    assert resultado.intentos[0].enlace_vestibulo == _URL_ARCHIVO
+    assert len(httpx_mock.get_requests()) == 1

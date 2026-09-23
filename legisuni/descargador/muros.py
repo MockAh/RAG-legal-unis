@@ -8,10 +8,9 @@ anti-bots o servidores mal configurados.
 
 **Ante la duda, este módulo no decide nada** (`docs/01` línea 155: "en la duda, el
 motivo es `vestibulo_sin_pdf`", no `http_error` ni `muro_de_pago` mal diagnosticado).
-Hoy (M27) no existe cruce de vestíbulo todavía, así que un HTML que no matchea ningún
-patrón sigue el camino de siempre: `guard.evaluar` lo marca `no_es_pdf`. Desde M28,
-con vestíbulo, ese mismo caso dudoso pasará primero por el cruce y solo si falla
-llegará a `vestibulo_sin_pdf`. M27 no adelanta ese cambio.
+Un HTML que no matchea ningún patrón sigue a `guard.evaluar` (`no_es_pdf`); si el
+`Encargo` permite cruzar vestíbulos, `puertas.py` intenta el cruce (M28) y solo si
+falla el motivo es `vestibulo_sin_pdf`.
 """
 
 import re

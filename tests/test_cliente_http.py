@@ -1,11 +1,17 @@
 """M25: cliente HTTP único (criterio 15 de docs/07, cierra CD-05-2 de docs/05).
 
 Fetcher y RobotsCache reciben el mismo objeto httpx.Client, y ese cliente es
-quien pone el User-Agent, incluso en la petición a /robots.txt. El cruce de
-vestíbulo llega en M28: añadirlo aquí es una línea en cada `receptores`.
+quien pone el User-Agent, incluso en la petición a /robots.txt.
+
+M28: el cruce de vestíbulo no tiene cliente propio ni es un receptor más. El
+salto solo puede pedir a través del mismo `Fetcher` (UA, rate limit, reintentos,
+tope de tamaño); lo prueban `test_el_salto_del_vestibulo_sale_por_el_fetcher` y
+`test_vestibulo_no_importa_httpx`.
 """
 
+import ast
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import httpx
@@ -13,6 +19,9 @@ import pytest
 from pytest_httpx import HTTPXMock
 
 from legisuni.config import Settings
+from legisuni.contracts import Encargo, Puerta
+from legisuni.descargador import vestibulo
+from legisuni.descargador.descargar import descargar
 from legisuni.descargador.fetch import Fetcher, construir_cliente
 from legisuni.descargador.ratelimit import RateLimiter
 from legisuni.descargador.robots import RobotsCache
@@ -48,7 +57,7 @@ def _armar(settings: Settings) -> tuple[httpx.Client, Fetcher, RobotsCache]:
 def test_fetcher_y_robots_reciben_el_mismo_cliente() -> None:
     cliente, fetcher, robots = _armar(Settings(user_agent=_USER_AGENT))
 
-    receptores = {"fetcher": fetcher, "robots": robots}  # M28: + "vestibulo": vestibulo
+    receptores = {"fetcher": fetcher, "robots": robots}
 
     for nombre, receptor in receptores.items():
         assert _cliente_de(receptor) is cliente, nombre
@@ -118,8 +127,56 @@ def test_main_de_los_scripts_cablea_un_solo_cliente(
     modulo.main(limite=0, dry_run=False, **argumentos)
 
     receptores = {"fetcher": capturas["Fetcher"], "robots": capturas["RobotsCache"]}
-    # M28: + "vestibulo": capturas["Vestibulo"], con su _espiar
     clientes = {nombre: _cliente_de(receptor) for nombre, receptor in receptores.items()}
     assert clientes["fetcher"] is clientes["robots"]
     assert clientes["robots"].headers["User-Agent"] == _USER_AGENT
     assert httpx_mock.get_requests() == []
+
+
+def test_el_salto_del_vestibulo_sale_por_el_fetcher(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, httpx_mock: HTTPXMock
+) -> None:
+    url_vestibulo = "https://repo.example.org/articulo/1"
+    url_archivo = "https://repo.example.org/descarga/1.pdf"
+    html = f'<!DOCTYPE html><html><head><meta name="citation_pdf_url" content="{url_archivo}"></head></html>'
+    httpx_mock.add_response(url="https://repo.example.org/robots.txt", status_code=404)
+    httpx_mock.add_response(url=url_vestibulo, status_code=200, content=html.encode())
+    httpx_mock.add_response(url=url_archivo, status_code=200, content=b"%PDF-1.7\n")
+    settings = Settings(user_agent=_USER_AGENT, data_root=tmp_path, rate_limit_s=0)
+    _, fetcher, robots = _armar(settings)
+    pedidas_por_fetcher: list[str] = []
+    pedir_original = fetcher.pedir
+
+    def pedir_espiado(url: str):
+        pedidas_por_fetcher.append(url)
+        return pedir_original(url)
+
+    monkeypatch.setattr(fetcher, "pedir", pedir_espiado)
+    encargo = Encargo(
+        encargo_id="doi:10.1/x",
+        modo="academico",
+        solicitante="lote-test",
+        puertas=[Puerta(url=url_vestibulo, tipo="copia_libre", url_base=None, evidencia="lista:t#1")],
+        cajon="papers",
+        etiqueta="autor-2020__00000000",
+        cruzar_vestibulos=True,
+        grupo_alias="doi:10.1/x",
+        creado_en=datetime(2026, 1, 1),
+    )
+
+    resultado = descargar(encargo, fetcher, robots, settings)
+
+    assert resultado.exito is True
+    assert resultado.intentos[0].enlace_vestibulo == url_archivo
+    assert pedidas_por_fetcher == [url_vestibulo, url_archivo]
+    peticiones = httpx_mock.get_requests()
+    assert all(p.headers["User-Agent"] == _USER_AGENT for p in peticiones)
+
+
+def test_vestibulo_no_importa_httpx() -> None:
+    arbol = ast.parse(Path(vestibulo.__file__).read_text(encoding="utf-8"))
+    modulos = [
+        alias.name for nodo in ast.walk(arbol) if isinstance(nodo, ast.Import) for alias in nodo.names
+    ] + [nodo.module or "" for nodo in ast.walk(arbol) if isinstance(nodo, ast.ImportFrom)]
+
+    assert not any(m == "httpx" or m.startswith("httpx.") for m in modulos)

@@ -79,7 +79,8 @@ def descargar(
     except Exception as exc:
         logger.error("fallo al escribir %s: %s", ruta, exc)
         intento_fallo = construir_intento(
-            resultado.puerta_usada, puerta, url_pedida, respuesta, exito=False, motivo="http_error"
+            resultado.puerta_usada, puerta, url_pedida, respuesta, exito=False, motivo="http_error",
+            enlace_vestibulo=resultado.intentos[-1].enlace_vestibulo,
         )
         return DownloadResult(
             encargo_id=encargo.encargo_id,
