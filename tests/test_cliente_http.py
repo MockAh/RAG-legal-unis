@@ -1,0 +1,182 @@
+"""M25: cliente HTTP único (criterio 15 de docs/07, cierra CD-05-2 de docs/05).
+
+Fetcher y RobotsCache reciben el mismo objeto httpx.Client, y ese cliente es
+quien pone el User-Agent, incluso en la petición a /robots.txt.
+
+M28: el cruce de vestíbulo no tiene cliente propio ni es un receptor más. El
+salto solo puede pedir a través del mismo `Fetcher` (UA, rate limit, reintentos,
+tope de tamaño); lo prueban `test_el_salto_del_vestibulo_sale_por_el_fetcher` y
+`test_vestibulo_no_importa_httpx`.
+"""
+
+import ast
+import sys
+from datetime import datetime
+from pathlib import Path
+
+import httpx
+import pytest
+from pytest_httpx import HTTPXMock
+
+from legisuni.config import Settings
+from legisuni.contracts import Encargo, Puerta
+from legisuni.descargador import vestibulo
+from legisuni.descargador.descargar import descargar
+from legisuni.descargador.fetch import Fetcher, construir_cliente
+from legisuni.descargador.ratelimit import RateLimiter
+from legisuni.descargador.robots import RobotsCache
+
+_RAIZ = Path(__file__).resolve().parent.parent
+_FIXTURES = _RAIZ / "fixtures"
+
+sys.path.insert(0, str(_RAIZ / "scripts"))
+
+import cosecha  # noqa: E402
+import cosecha_uam  # noqa: E402
+
+_USER_AGENT = "LegisUni-test/9.9 (+https://example.org)"
+
+
+@pytest.fixture(autouse=True)
+def _aislar_entorno(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    # sin esto, Settings() leería el .env real de la raíz del repo
+    monkeypatch.chdir(tmp_path)
+
+
+def _cliente_de(receptor: object) -> httpx.Client:
+    return receptor._cliente  # type: ignore[attr-defined]
+
+
+def _armar(settings: Settings) -> tuple[httpx.Client, Fetcher, RobotsCache]:
+    cliente = construir_cliente(settings)
+    robots = RobotsCache(settings.user_agent, cliente)
+    fetcher = Fetcher(settings, RateLimiter(settings.rate_limit_s), robots, cliente)
+    return cliente, fetcher, robots
+
+
+def test_fetcher_y_robots_reciben_el_mismo_cliente() -> None:
+    cliente, fetcher, robots = _armar(Settings(user_agent=_USER_AGENT))
+
+    receptores = {"fetcher": fetcher, "robots": robots}
+
+    for nombre, receptor in receptores.items():
+        assert _cliente_de(receptor) is cliente, nombre
+
+
+def test_peticion_a_robots_lleva_el_user_agent_configurado(httpx_mock: HTTPXMock) -> None:
+    httpx_mock.add_response(url="https://x.mx/robots.txt", status_code=404)
+    _, _, robots = _armar(Settings(user_agent=_USER_AGENT))
+
+    assert robots.permitido("https://x.mx/a.pdf") is True
+
+    peticiones = httpx_mock.get_requests()
+    assert [str(p.url) for p in peticiones] == ["https://x.mx/robots.txt"]
+    assert peticiones[0].headers["User-Agent"] == _USER_AGENT
+
+
+def test_cliente_lleva_el_timeout_de_settings() -> None:
+    cliente = construir_cliente(Settings(user_agent=_USER_AGENT, timeout_s=17))
+
+    assert cliente.timeout == httpx.Timeout(17)
+
+
+def _espiar(
+    monkeypatch: pytest.MonkeyPatch, modulo: object, nombre: str, capturas: dict[str, object]
+) -> None:
+    clase = getattr(modulo, nombre)
+
+    def fabrica(*args: object, **kwargs: object) -> object:
+        capturas[nombre] = clase(*args, **kwargs)
+        return capturas[nombre]
+
+    monkeypatch.setattr(modulo, nombre, fabrica)
+
+
+_UJAT = dict(
+    html=[_FIXTURES / "ujat-15763.html"],
+    url_indice=["https://www.ujat.mx/abogado/15763"],
+    inst_id="ujat",
+)
+_UAM = dict(
+    html=_FIXTURES / "uam-index.html",
+    url_indice="https://www.uam.mx/legislacion/index.html",
+    inst_id="uam",
+)
+
+
+@pytest.mark.parametrize(
+    ("modulo", "argumentos"),
+    [(cosecha, _UJAT), (cosecha_uam, _UAM)],
+    ids=["cosecha", "cosecha_uam"],
+)
+def test_main_de_los_scripts_cablea_un_solo_cliente(
+    modulo: object,
+    argumentos: dict,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    httpx_mock: HTTPXMock,  # sin respuestas registradas: cualquier petición real falla el test
+) -> None:
+    """El --dry-run termina antes de construir nada; esto corre el cableado real con --limite 0."""
+    monkeypatch.setenv("LEGISUNI_USER_AGENT", _USER_AGENT)
+    monkeypatch.setenv("LEGISUNI_DB_PATH", str(tmp_path / "prueba.db"))
+    monkeypatch.setenv("LEGISUNI_DATA_ROOT", str(tmp_path / "data"))
+    capturas: dict[str, object] = {}
+    _espiar(monkeypatch, modulo, "Fetcher", capturas)
+    _espiar(monkeypatch, modulo, "RobotsCache", capturas)
+
+    modulo.main(limite=0, dry_run=False, **argumentos)
+
+    receptores = {"fetcher": capturas["Fetcher"], "robots": capturas["RobotsCache"]}
+    clientes = {nombre: _cliente_de(receptor) for nombre, receptor in receptores.items()}
+    assert clientes["fetcher"] is clientes["robots"]
+    assert clientes["robots"].headers["User-Agent"] == _USER_AGENT
+    assert httpx_mock.get_requests() == []
+
+
+def test_el_salto_del_vestibulo_sale_por_el_fetcher(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, httpx_mock: HTTPXMock
+) -> None:
+    url_vestibulo = "https://repo.example.org/articulo/1"
+    url_archivo = "https://repo.example.org/descarga/1.pdf"
+    html = f'<!DOCTYPE html><html><head><meta name="citation_pdf_url" content="{url_archivo}"></head></html>'
+    httpx_mock.add_response(url="https://repo.example.org/robots.txt", status_code=404)
+    httpx_mock.add_response(url=url_vestibulo, status_code=200, content=html.encode())
+    httpx_mock.add_response(url=url_archivo, status_code=200, content=b"%PDF-1.7\n")
+    settings = Settings(user_agent=_USER_AGENT, data_root=tmp_path, rate_limit_s=0)
+    _, fetcher, robots = _armar(settings)
+    pedidas_por_fetcher: list[str] = []
+    pedir_original = fetcher.pedir
+
+    def pedir_espiado(url: str):
+        pedidas_por_fetcher.append(url)
+        return pedir_original(url)
+
+    monkeypatch.setattr(fetcher, "pedir", pedir_espiado)
+    encargo = Encargo(
+        encargo_id="doi:10.1/x",
+        modo="academico",
+        solicitante="lote-test",
+        puertas=[Puerta(url=url_vestibulo, tipo="copia_libre", url_base=None, evidencia="lista:t#1")],
+        cajon="papers",
+        etiqueta="autor-2020__00000000",
+        cruzar_vestibulos=True,
+        grupo_alias="doi:10.1/x",
+        creado_en=datetime(2026, 1, 1),
+    )
+
+    resultado = descargar(encargo, fetcher, robots, settings)
+
+    assert resultado.exito is True
+    assert resultado.intentos[0].enlace_vestibulo == url_archivo
+    assert pedidas_por_fetcher == [url_vestibulo, url_archivo]
+    peticiones = httpx_mock.get_requests()
+    assert all(p.headers["User-Agent"] == _USER_AGENT for p in peticiones)
+
+
+def test_vestibulo_no_importa_httpx() -> None:
+    arbol = ast.parse(Path(vestibulo.__file__).read_text(encoding="utf-8"))
+    modulos = [
+        alias.name for nodo in ast.walk(arbol) if isinstance(nodo, ast.Import) for alias in nodo.names
+    ] + [nodo.module or "" for nodo in ast.walk(arbol) if isinstance(nodo, ast.ImportFrom)]
+
+    assert not any(m == "httpx" or m.startswith("httpx.") for m in modulos)

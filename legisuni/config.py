@@ -16,8 +16,8 @@ class Settings(BaseSettings):
     anthropic_api_key: SecretStr | None = None
     modelo_llm: str = ""
     user_agent: str
-    data_dir: Path = Path("data/norm")
-    db_path: Path = Path("legisuni.db")
+    data_root: Path = Path("data")
+    db_path: Path = Path("legisuni_v2.db")
     timeout_s: int = 30
     max_bytes: int = 100 * 1024 * 1024
     rate_limit_s: float = 1.0

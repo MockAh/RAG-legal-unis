@@ -24,6 +24,8 @@
 - **Si para que un test pase hay que cambiar una aserción de
   comportamiento existente, DETENTE y explica.** El criterio 11 de
   `docs/05` exige que la migración no cambie ninguna.
+- Cuando presentes opciones al usuario, DETENTE. No elijas por él,
+  aunque una opción sea obviamente mejor. Esperar no es opcional.
 - No digas "todos los tests pasan": pega la línea final de pytest.
 
 ## Prohibido sin permiso explícito

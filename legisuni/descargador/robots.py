@@ -1,17 +1,18 @@
 """Cortesía de red: respeta robots.txt, cacheado por host y con fail-open."""
 
 import logging
-from collections.abc import Callable
 from urllib.parse import urlsplit
 from urllib.robotparser import RobotFileParser
+
+import httpx
 
 logger = logging.getLogger(__name__)
 
 
 class RobotsCache:
-    def __init__(self, user_agent: str, fetcher: Callable[[str], tuple[int, str]]) -> None:
+    def __init__(self, user_agent: str, cliente: httpx.Client) -> None:
         self._user_agent = user_agent
-        self._fetcher = fetcher
+        self._cliente = cliente
         self._cache: dict[str, RobotFileParser | None] = {}
 
     def permitido(self, url: str) -> bool:
@@ -27,13 +28,14 @@ class RobotsCache:
     def _cargar(self, esquema: str, host: str) -> RobotFileParser | None:
         robots_url = f"{esquema}://{host}/robots.txt"
         try:
-            status, texto = self._fetcher(robots_url)
+            respuesta = self._cliente.get(robots_url, follow_redirects=True)
         except Exception:
             logger.warning("fetcher falló al pedir %s; fail-open (permitido)", robots_url)
             return None
+        status = respuesta.status_code
         if status == 200:
             parser = RobotFileParser()
-            parser.parse(texto.splitlines())
+            parser.parse(respuesta.text.splitlines())
             return parser
         if status in (404, 410):
             return None

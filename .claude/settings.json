@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(rm -rf:*)",
+      "Bash(pip install:*)",
+      "Read(./.env)",
+      "Read(./data/**)",
+      "Edit(./data/**)",
+      "Edit(./legisuni.db)",
+      "Edit(./legisuni_v2.db)",
+      "Bash(sqlite3 legisuni_v2.db:*)",
+      "Edit(./fixtures/**)",
+      "Edit(./docs/01-CONTRATOS-DE-DATOS.md)"
+    ],
+    "allow": [
+      "Bash(.venv/bin/python -m pytest:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(grep:*)"
+    ]
+  }
+}

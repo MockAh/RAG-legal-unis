@@ -1,13 +1,14 @@
 # 08 · Evidencia de campo
 
 > Hallazgos **medidos**, no supuestos, obtenidos antes de escribir una línea de código.
-> Estado: vivo · **v8** · se amplía con cada universidad nueva que se explore.
+> Estado: vivo · **v9** · se amplía con cada universidad nueva que se explore.
 > Mediciones: UAM, UNAM-70I, UNAM-OAG, UJAT, **UACAM**.
 > **Medido en vivo el 2026-09-06: la UAM (E1) y la UACAM (E10).** Los conteos de UNAM-OAG (E3)
 > y UJAT (E4) son de la captura original y **no se han vuelto a comprobar**; trátalos como
 > aproximados hasta que se recapturen (E6.8).
 > **Descargas reales ejecutadas:** 45/45 documentos de la UAM el **2026-09-06** (E11) y
-> **105/105 de la UJAT el 2026-09-08** (E12). **150 de 150.** Es la evidencia que no viene de
+> **105/105 de la UJAT el 2026-09-08** (E12). **150 de 150.** Tras la migración a `Encargo`,
+> **156 de 156 (E14)**, medido el 2026-09-18. Es la evidencia que no viene de
 > mirar una página, sino de ejercitar código contra servidores reales. Con ella la spec `05`
 > queda cerrada.
 > **v8 (2026-09-10):** al auditar el disco antes de la migración apareció que la UAM se descargó
@@ -334,7 +335,7 @@ marco jurídico — señal aprovechable por el Localizador.
 | **C22** | Los escaneos son **documentos firmados** (acuerdos rectorales, contrato colectivo) (E12.5) | El patrón es predecible, no aleatorio: se escanea lo que lleva firma. Permite anticipar qué tipos de norma necesitarán OCR antes de abrirlos |
 | **C23** | La UJAT publica **105 documentos**, no ~60 (E12.1) | E4 subestimaba casi al doble. Los conteos hechos a ojo sobre un índice paginado **no son fiables**; hay que contar enlaces únicos con herramienta |
 | **C24** | **La idempotencia se cumple dentro de una corrida, no entre corridas de días distintos** (E13). Los 45 documentos de la UAM están **dos veces en disco**, con los mismos bytes y distinto nombre | La fecha de captura entra en el nombre cuando el índice no declara fecha de versión, así que **otro día es otro nombre**. No se sobrescribió nada: la regla funcionó y el diseño falló. **Primera evidencia medida a favor del alias por hash** (D15 de `00`, `01` v2.1): comparar el SHA-256 dentro del `grupo_alias` habría reconocido los 45 pares |
-| **C20** | Dos versiones históricas del mismo instrumento colisionan en `entry_id` (E11.6) | **Hueco de `01`**, no del sitio: `CatalogEntry.entry_id` no lleva versión, `doc_id` (N7) sí. Decisión pendiente en la conversación de la spec `03` |
+| **C20** | Dos versiones históricas del mismo instrumento colisionan en `entry_id` (E11.6) | **Hueco de `01`**, no del sitio: `CatalogEntry.entry_id` no lleva versión, `doc_id` (N7) sí. **Cerrada.** En M23b se midió que dos pares de la UAM con slug idéntico (`2026`, `rjd`) se separan solo por `url_id`; eran los 2 documentos que v1 perdía. E14 confirma 156 identificadores únicos en base limpia (2026-09-18) |
 
 ---
 
@@ -1014,7 +1015,7 @@ son desechables y que la base se rehace, no se migra (`01`, §Migración).
 ### E13.6 · Qué cambia para la migración
 
 1. **`data/` se vacía antes de la corrida de verificación**, no solo la base. Si no, el criterio
-   11 de `05` (150/150 en base limpia) mediría contra un disco que ya trae 195 archivos.
+   11 de `05` (156/156 en base limpia, `01` v2.4) mediría contra un disco que ya trae 195 archivos.
 2. **El criterio 4 de `05` necesita un segundo nivel:** dos corridas del mismo índice en días
    distintos producen los mismos 45 archivos, no 90. Se cubre con el alias por hash (criterio 16
    de `05` v3), que ahora tiene un caso real que reproducir.
@@ -1030,6 +1031,141 @@ sistema de archivos, y solo porque una fecha no cuadraba con otra.
 
 ---
 
+## E14 · Corrida de migración (2026-09-18)
+
+**Es la corrida de verificación que E13.6 pedía:** UAM y UJAT descargadas otra vez, ahora a
+través de `Encargo`, sobre disco y base vacíos. Todo lo que sigue sale de los comandos que se
+muestran; no hay otra medición.
+
+### E14.1 · Punto de partida: disco y base vacíos
+
+`data/` y la base se vaciaron **antes** de correr (E13.6, punto 1). La base consultada es
+`legisuni_v2.db`. Sin eso, el 156 se habría medido contra un disco que ya traía archivos, que es
+justo lo que E13.6 quería evitar. Consecuencia verificable abajo: **todos** los archivos llevan
+la fecha de esta corrida.
+
+### E14.2 · 156 archivos, 156 filas, cero fallos
+
+```
+find data/norm -type f | wc -l
+156
+find data/norm/uam -type f | wc -l; find data/norm/ujat -type f | wc -l
+47
+109
+find data/norm -type f -printf '%TF %h\n' | sort | uniq -c
+     47 2026-09-18 data/norm/uam
+    109 2026-09-18 data/norm/ujat
+
+sqlite3 legisuni_v2.db "select count(*) from descargas; select count(*) from documentos; select count(*) from intentos;"
+156
+156
+156
+
+sqlite3 legisuni_v2.db "select exito, motivo_fallo, count(*) from descargas group by 1,2;"
+1||156
+```
+
+Resúmenes que imprimieron los dos scripts:
+
+```
+Resultado para uam:    total: 47    exitosas: 47    omitidos: 0
+Resultado para ujat:   total: 109   exitosas: 109   omitidos: 0
+```
+
+El disco, `descargas`, `documentos` e `intentos` dan **156** cada uno. Los 156 archivos llevan
+una sola fecha, 2026-09-18. Las 156 filas de `descargas` tienen `exito=1` y `motivo_fallo`
+vacío: **cero fallos, cero omitidos.**
+
+156 es el denominador que fijó `01` v2.4 (UAM 47, UJAT 109), no el 150 de E11 y E12: aquella
+cifra la había recortado la heurística de slug de v1. Esta corrida es la primera que se mide
+contra el denominador correcto.
+
+### E14.3 · 156 hashes distintos
+
+```
+sqlite3 legisuni_v2.db "select count(distinct sha256) from descargas;"
+156
+```
+
+Ningún par de encargos produjo los mismos bytes. Es el contrapunto de E13.2, donde 45 hashes
+estaban repetidos y el corpus de la UAM eran 90 archivos en vez de 45.
+
+**Es una validación parcial:** una sola corrida, en un solo día, sobre base vacía. No ejercita
+lo que C24 pide —dos corridas en días distintos— ni el caso de URLs nuevas para los mismos
+bytes (E13.4). El alias por hash sigue sin caso real en campo.
+
+### E14.4 · El RES en tres identificadores distintos — C20 cerrado con datos
+
+```
+sqlite3 legisuni_v2.db "select encargo_id, ruta_local from descargas where encargo_id like 'uam:res:%';"
+uam:res:c4ab5a26a57f|data/norm/uam/res__2026-09-18.pdf
+
+sqlite3 legisuni_v2.db "select encargo_id, url from intentos where lower(url) like '%res%' or lower(url) like '%estudios-superiores%';"
+uam:res:c4ab5a26a57f|legislacion-uam-julio-24-2026/legislacion-uam-julio-24-2026-res.pdf
+uam:16.03.2026:3d4725469ba9|legis-uam-arch/legis-univ-uam-res-VIGENTE-HASTA-16.03.2026.pdf
+uam:04.11.2024:e21bc5a32f71|legis-uam-arch/leg-univ-uam-res-VIGENTE-HASTA-04.11.2024.pdf
+```
+
+*(El filtro `%res%` también atrapó 10 filas de la UJAT —«egresados», «representativos»,
+«presupuestarias»…—; se omiten aquí.)*
+
+El Reglamento de Estudios Superiores tiene **tres** publicaciones en el índice de la UAM: la
+vigente y los dos históricos que E11.6 señaló. Cada una tiene su propio `encargo_id`, y los tres
+difieren también en el tercer segmento (`c4ab5a26a57f`, `3d4725469ba9`, `e21bc5a32f71`). Los
+nombres `04.11.2024__2026-09-18.pdf` y `16.03.2026__2026-09-18.pdf`, que aparecen en el
+directorio de la UAM, coinciden con los slugs de los dos históricos.
+
+**C20 queda cerrado con datos.** Pasa de decisión de contrato (`01` v2.0, D15) a comportamiento
+medido en campo: los dos históricos que en E11.6 colisionaban ya no colisionan, y la corrida no
+perdió ninguno de los tres.
+
+### E14.5 · Siete slugs con forma de fecha en la UAM — E13.5 sigue abierta
+
+```
+sqlite3 legisuni_v2.db "select encargo_id from descargas where encargo_id like 'uam:%' order by 1;" | grep -c "^uam:[0-9][0-9]\."
+7
+
+ls data/norm/uam | head -3
+04.11.2024__2026-09-18.pdf
+16.03.2026__2026-09-18.pdf
+20.07.2026__2026-09-18.pdf
+```
+
+**Siete `encargo_id` de la UAM tienen como slug una fecha**; dos de ellos son los históricos del
+RES (E14.4). Es la heurística provisional que E11.6 señaló y E13.5 vio en disco, **y la
+migración no la tocó**: los slugs los produce el Lector de Índice, no el Descargador.
+**E13.5 sigue abierta y es del Lector.** El patrón cuenta solo los slugs que empiezan con dos
+dígitos y un punto; no cubre otras formas de fecha como el `2026__` que E13.5 también citó.
+
+### E14.6 · Tres `.docx`
+
+```
+ls data/norm/uam | grep -c docx
+3
+ls data/norm/ujat | grep -c docx
+0
+```
+
+Los tres `.docx` están en la UAM y ninguno en la UJAT. El conteo coincide con los tres anexos
+de E1.6 que ya habían pasado el guardián de dos firmas en E11.4; esta corrida cuenta archivos
+por extensión y no verifica cuáles son.
+
+### E14.7 · Unicidad de `encargo_id`, medida
+
+```
+sqlite3 -readonly legisuni_v2.db "select count(*), count(distinct encargo_id) from descargas;"
+156|156
+```
+
+156 filas y 156 `encargo_id` distintos en `descargas`: **ningún identificador se repite** en
+la base limpia. Es una consulta de solo lectura, hecha después de las de E14.2 a E14.6.
+
+**Lo que esto no mide:** los pares de la UAM con slug idéntico (`2026`, `rjd`) que se separan
+solo por `url_id` **no** están respaldados por ninguna medición sobre la base. Su respaldo es
+`tests/test_extraccion_indices.py` y M23b del plan (`docs/PLAN-MIGRACION.md`).
+
+---
+
 | Versión | Fecha | Cambio |
 |---|---|---|
 | v1 | — | Solo UAM y el fallo del 70-I de la UNAM. |
@@ -1038,5 +1174,6 @@ sistema de archivos, y solo porque una fecha no cuadraba con otra.
 | v4 | 2026-09-06 | Se añaden **E8** (validez externa: sesgo de la muestra, qué conclusiones aguantan, prueba de falsación) y **E9** (congelar la evidencia: qué capturar como fixture y por qué corre prisa). El registro de cambios se mueve al final, donde corresponde. |
 | v5 | 2026-09-06 | **Medición en vivo de la UACAM (E10)** — la estatal pequeña que E6.1 pedía. Éxito técnico, fracaso de contenido: índice HTML plano e impecable **caducado en diciembre de 2016**, declarado en una línea al pie (E10.1). Además: cuatro documentos vía Google Drive (E10.2), **segundo** enlace sin texto de ancla (E10.3), Ley Orgánica en cinco lugares con versiones divergentes (E10.4), falta el Estatuto Orgánico (E10.5), URLs sucias por segunda vez (E10.6). Cuatro conclusiones nuevas (C13–C16). **E6.1 y E6.9 cerradas**; E6.10 y E6.11 abiertas. E7 gana dos pasos de método; E8 recalibrada a cuatro instituciones y con el marcador honesto corregido a 3 de 4. |
 | **v6** | **2026-09-06** | **Primera evidencia obtenida ejecutando código, no mirando páginas.** Nueva sección **E11**: corrida real del Descargador sobre la UAM, 45/45 exitosas. Siete hallazgos: `robots.txt` con 403 mientras los PDF dan 200 (E11.1, valida fail-open), rutas retiradas vivas (E11.2, refuerza C10), índice en `iso-8859-1` (E11.3), guardián de dos firmas validado sobre `.docx` reales (E11.4), escala del corpus medida (E11.5), colisión de `entry_id` entre versiones históricas (E11.6, **hueco de `01`**), y los logs de `httpx` no miden el rate limit (E11.7). Cuatro conclusiones nuevas (**C17–C20**) y cinco deudas nuevas (E6.12–E6.16). **Correcciones:** C14 citaba el contrato equivocado (`visor_de_terceros` es de `DownloadResult.motivo_fallo`, no de `OrigenFuente`) y daba por abierto un problema que `01` v1.2 ya había resuelto; E6.3 seguía diciendo 3/3 en HTML plano; C7 llevaba denominador de tres; la tabla de este registro estaba partida por un separador suelto desde la v4. |
-| **v8** | **2026-09-10** | **Auditoría de disco previa a la migración (E13).** No es una corrida nueva: es lo que apareció al inventariar el repo. Cinco hallazgos: hubo **dos corridas de la UAM**, el 06 y el 08, y la segunda nunca se registró (E13.1); **los 45 documentos de la UAM están duplicados en disco**, 45 hashes repetidos, 90 archivos (E13.2); la causa es la fecha de captura en el nombre cuando el índice no declara versión, así que **la idempotencia no cruza días** (E13.3); es la **primera evidencia medida a favor del alias por hash** (E13.4); y los slugs con forma de fecha confirman en disco lo que E11.6 anticipó (E13.5). Una conclusión nueva (**C24**) y dos deudas nuevas (E6.20, E6.21). **Corrección:** la corrida de la UJAT fue el **2026-09-08**, no el 2026-09-06 como decía la v7 en la cabecera y en el título de E12. Consecuencia para la migración: `data/` se vacía antes de verificar el criterio 11 de `05` (E13.6). |
 | **v7** | **2026-09-06** | **Segunda descarga real: la UJAT, el caso sucio (E12).** 105/105 exitosas. Siete hallazgos: el índice está repartido en cinco páginas y son **105 documentos, no ~60** (E12.1); **`urlnorm` probado en campo** por primera vez, 17 URLs con espacios y una ya codificada (E12.2); los cinco `http` redirigen solos y **cierra la pregunta abierta 4 de `05`** a favor del TLS estricto (E12.3); las rutas de 2012 siguen vivas, **E6.7 cerrada** (E12.4); **24 de 105 documentos son escaneos sin texto**, 179 MB, contra 0 de 42 en la UAM (E12.5); la escala del corpus estaba mal estimada por 23× (E12.6); el percent-encoding se cuela en los slugs derivados (E12.7). **C19 corregida** — la extrapolación de 500 MB era falsa. Tres conclusiones nuevas (**C21–C23**) y tres deudas nuevas (E6.17–E6.19). Se corrige además una inferencia previa: el Reglamento de la Junta de Gobierno **no** era un escaneo; se dedujo del tamaño en vez de medirlo. **Con esto la spec `05` queda cerrada: diez de diez criterios de aceptación cumplidos, 150 documentos de dos universidades, 150/150.** |
+| **v8** | **2026-09-10** | **Auditoría de disco previa a la migración (E13).** No es una corrida nueva: es lo que apareció al inventariar el repo. Cinco hallazgos: hubo **dos corridas de la UAM**, el 06 y el 08, y la segunda nunca se registró (E13.1); **los 45 documentos de la UAM están duplicados en disco**, 45 hashes repetidos, 90 archivos (E13.2); la causa es la fecha de captura en el nombre cuando el índice no declara versión, así que **la idempotencia no cruza días** (E13.3); es la **primera evidencia medida a favor del alias por hash** (E13.4); y los slugs con forma de fecha confirman en disco lo que E11.6 anticipó (E13.5). Una conclusión nueva (**C24**) y dos deudas nuevas (E6.20, E6.21). **Corrección:** la corrida de la UJAT fue el **2026-09-08**, no el 2026-09-06 como decía la v7 en la cabecera y en el título de E12. Consecuencia para la migración: `data/` se vacía antes de verificar el criterio 11 de `05` (E13.6). |
+| **v9** | **2026-09-18** | **Corrida de migración (E14): UAM y UJAT a través de `Encargo`, sobre disco y base vacíos (E13.6).** **156/156**: 156 archivos con fecha 2026-09-18 (UAM 47, UJAT 109), 156 filas en `descargas`, `documentos` e `intentos`, cero fallos y cero omitidos (E14.2); 156 hashes distintos, aunque en una sola corrida, así que el alias por hash sigue sin caso real entre días (E14.3). **El Reglamento de Estudios Superiores aparece con tres `encargo_id` distintos: C20 cerrado con datos** (E14.4). **7 slugs con forma de fecha en la UAM: E13.5 sigue abierta, es del Lector** (E14.5). 3 `.docx`, todos en la UAM (E14.6). Ninguna conclusión ni deuda nueva. |

@@ -50,7 +50,7 @@ def test_tipo_norma_fuera_de_vocabulario_lanza_validation_error() -> None:
 
 def test_download_result_motivo_fallo_valido() -> None:
     resultado = DownloadResult(
-        entry_id="e1",
+        encargo_id="e1",
         modo="juridico",
         exito=False,
         motivo_fallo="visor_de_terceros",
@@ -63,7 +63,7 @@ def test_download_result_motivo_fallo_valido() -> None:
 def test_download_result_motivo_fallo_invalido_lanza_validation_error() -> None:
     with pytest.raises(ValidationError):
         DownloadResult(
-            entry_id="e1",
+            encargo_id="e1",
             modo="juridico",
             exito=False,
             motivo_fallo="basura",
@@ -157,7 +157,7 @@ def test_encargo_sin_cruzar_vestibulos_lanza_validation_error() -> None:
 )
 def test_motivos_fallo_nuevos_son_validos(motivo: str) -> None:
     resultado = DownloadResult(
-        entry_id="e1",
+        encargo_id="e1",
         modo="academico",
         exito=False,
         motivo_fallo=motivo,
@@ -170,7 +170,7 @@ def test_motivos_fallo_nuevos_son_validos(motivo: str) -> None:
 def test_download_result_sin_modo_lanza_validation_error() -> None:
     with pytest.raises(ValidationError):
         DownloadResult(
-            entry_id="e1",
+            encargo_id="e1",
             exito=False,
             capturado_en=datetime(2026, 1, 1),
             intentos=[],
@@ -180,11 +180,39 @@ def test_download_result_sin_modo_lanza_validation_error() -> None:
 def test_download_result_sin_intentos_lanza_validation_error() -> None:
     with pytest.raises(ValidationError):
         DownloadResult(
-            entry_id="e1",
+            encargo_id="e1",
             modo="juridico",
             exito=False,
             capturado_en=datetime(2026, 1, 1),
         )
+
+
+def test_encargo_acepta_los_valores_reales_de_la_traduccion_juridica() -> None:
+    encargo = _encargo_minimo(
+        modo="juridico",
+        cajon="norm/uam",
+        etiqueta="reglamento-organico__2026-03-16",
+        cruzar_vestibulos=False,
+    )
+    assert encargo.cajon == "norm/uam"
+    assert encargo.etiqueta == "reglamento-organico__2026-03-16"
+
+
+@pytest.mark.parametrize("etiqueta", ["..", "sub/dir", "ANEXO1", "anexo%201"])
+def test_encargo_rechaza_etiqueta_peligrosa(etiqueta: str) -> None:
+    with pytest.raises(ValidationError):
+        _encargo_minimo(etiqueta=etiqueta)
+
+
+@pytest.mark.parametrize("cajon", ["/etc", "norm/../../etc"])
+def test_encargo_rechaza_cajon_peligroso(cajon: str) -> None:
+    with pytest.raises(ValidationError):
+        _encargo_minimo(cajon=cajon)
+
+
+def test_encargo_acepta_cajon_con_barra() -> None:
+    encargo = _encargo_minimo(cajon="norm/uam")
+    assert encargo.cajon == "norm/uam"
 
 
 def test_guard_motivos_validos_contiene_los_diez_motivos() -> None:

@@ -2,13 +2,13 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 
-from legisuni.contracts import DownloadResult
+from legisuni.contracts import DownloadResult, IntentoPuerta
 from legisuni.descargador.store import Store
 
 
 def _resultado_exitoso(**overrides) -> DownloadResult:
     datos = dict(
-        entry_id="uam:reglamento-organico",
+        encargo_id="uam:reglamento-organico",
         modo="juridico",
         exito=True,
         ruta_local=Path("/datos/uam/reglamento-organico__2026-01-01.pdf"),
@@ -35,7 +35,7 @@ def test_guardar_exitoso_y_recuperar_hash(tmp_path: Path) -> None:
     with Store(tmp_path / "test.db") as store:
         resultado = _resultado_exitoso()
         store.guardar(resultado)
-        assert store.hash_registrado(resultado.entry_id) == resultado.sha256
+        assert store.hash_registrado(resultado.encargo_id) == resultado.sha256
 
 
 def test_guardar_dos_veces_mismo_entry_id_no_duplica(tmp_path: Path) -> None:
@@ -53,7 +53,7 @@ def test_guardar_mismo_entry_id_con_datos_distintos_actualiza(tmp_path: Path) ->
         actualizado = resultado.model_copy(update={"sha256": "b" * 64})
         store.guardar(actualizado)
         assert store.contar() == 1
-        assert store.hash_registrado(resultado.entry_id) == "b" * 64
+        assert store.hash_registrado(resultado.encargo_id) == "b" * 64
 
 
 def test_hash_registrado_entry_id_inexistente_devuelve_none(tmp_path: Path) -> None:
@@ -65,14 +65,14 @@ def test_hash_registrado_con_exito_falso_devuelve_none(tmp_path: Path) -> None:
     with Store(tmp_path / "test.db") as store:
         resultado = _resultado_exitoso(exito=False, sha256="c" * 64)
         store.guardar(resultado)
-        assert store.hash_registrado(resultado.entry_id) is None
+        assert store.hash_registrado(resultado.encargo_id) is None
 
 
 def test_ruta_registrada_vuelve_como_path(tmp_path: Path) -> None:
     with Store(tmp_path / "test.db") as store:
         resultado = _resultado_exitoso()
         store.guardar(resultado)
-        ruta = store.ruta_registrada(resultado.entry_id)
+        ruta = store.ruta_registrada(resultado.encargo_id)
         assert isinstance(ruta, Path)
         assert ruta == resultado.ruta_local
 
@@ -95,7 +95,7 @@ def test_tipos_en_disco_son_texto_no_blob(tmp_path: Path) -> None:
 def test_utf8_se_conserva_intacto(tmp_path: Path) -> None:
     entry_id = "uñam:reglamento-académico"
     with Store(tmp_path / "test.db") as store:
-        resultado = _resultado_exitoso(entry_id=entry_id)
+        resultado = _resultado_exitoso(encargo_id=entry_id)
         store.guardar(resultado)
         assert store.hash_registrado(entry_id) == resultado.sha256
 
@@ -103,7 +103,7 @@ def test_utf8_se_conserva_intacto(tmp_path: Path) -> None:
 def test_guardar_resultado_fallido_sin_excepcion(tmp_path: Path) -> None:
     with Store(tmp_path / "test.db") as store:
         resultado = DownloadResult(
-            entry_id="uam:url-muerta",
+            encargo_id="uam:url-muerta",
             modo="juridico",
             exito=False,
             motivo_fallo="url_muerta",
@@ -114,6 +114,98 @@ def test_guardar_resultado_fallido_sin_excepcion(tmp_path: Path) -> None:
         assert store.contar() == 1
 
 
+def test_base_nueva_tiene_las_tablas_descargas_e_intentos(tmp_path: Path) -> None:
+    db_path = tmp_path / "test.db"
+    with Store(db_path):
+        pass
+
+    conn = sqlite3.connect(str(db_path))
+    tablas = {
+        fila[0]
+        for fila in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'"
+        ).fetchall()
+    }
+    conn.close()
+    assert {"documentos", "descargas", "intentos"} <= tablas
+
+
+def test_guardar_descarga_escribe_en_descargas_y_registra_grupo_alias(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        resultado = _resultado_exitoso()
+        store.guardar_descarga(resultado, grupo_alias="uam:reglamento-organico")
+
+        conn = store._conn
+        fila = conn.execute(
+            "SELECT grupo_alias, sha256 FROM descargas WHERE encargo_id = ?",
+            (resultado.encargo_id,),
+        ).fetchone()
+        assert fila["grupo_alias"] == "uam:reglamento-organico"
+        assert fila["sha256"] == resultado.sha256
+
+
+def test_guardar_descarga_con_hash_nuevo_conserva_ambas_filas(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        resultado = _resultado_exitoso()
+        store.guardar_descarga(resultado, grupo_alias="g1")
+
+        version_nueva = resultado.model_copy(update={"sha256": "b" * 64})
+        store.guardar_descarga(version_nueva, grupo_alias="g1")
+
+        filas = store._conn.execute(
+            "SELECT sha256 FROM descargas WHERE encargo_id = ? ORDER BY sha256",
+            (resultado.encargo_id,),
+        ).fetchall()
+        assert {fila["sha256"] for fila in filas} == {resultado.sha256, "b" * 64}
+
+
+def test_guardar_descarga_misma_clave_actualiza_sin_duplicar(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        resultado = _resultado_exitoso()
+        store.guardar_descarga(resultado, grupo_alias="g1")
+        store.guardar_descarga(resultado, grupo_alias="g1")
+
+        filas = store._conn.execute(
+            "SELECT COUNT(*) AS n FROM descargas WHERE encargo_id = ?",
+            (resultado.encargo_id,),
+        ).fetchone()
+        assert filas["n"] == 1
+
+
+def test_guardar_descarga_escribe_un_intento_por_puerta_pedida(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        resultado = _resultado_exitoso(
+            intentos=[
+                IntentoPuerta(
+                    orden=0,
+                    url="http://example.org/doc.pdf",
+                    url_pedida="http://example.org/doc.pdf",
+                    url_final="http://example.org/doc.pdf",
+                    enlace_vestibulo=None,
+                    http_status=200,
+                    exito=True,
+                    motivo_fallo=None,
+                )
+            ]
+        )
+        store.guardar_descarga(resultado, grupo_alias="g1")
+
+        filas = store._conn.execute(
+            "SELECT encargo_id, orden, http_status FROM intentos WHERE encargo_id = ?",
+            (resultado.encargo_id,),
+        ).fetchall()
+        assert len(filas) == 1
+        assert filas[0]["orden"] == 0
+        assert filas[0]["http_status"] == 200
+
+
+def test_guardar_descarga_no_afecta_la_tabla_documentos(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        resultado = _resultado_exitoso()
+        store.guardar_descarga(resultado, grupo_alias="g1")
+        assert store.contar() == 0
+
+
 def test_cerrar_y_reabrir_conserva_filas(tmp_path: Path) -> None:
     db_path = tmp_path / "test.db"
     store = Store(db_path)
@@ -122,3 +214,51 @@ def test_cerrar_y_reabrir_conserva_filas(tmp_path: Path) -> None:
 
     with Store(db_path) as reabierto:
         assert reabierto.contar() == 1
+
+
+# M29: alias_por_hash (docs/05 criterio 16). Solo descargas exitosas, dueñas de su
+# archivo (duplicado_de IS NULL), del mismo grupo_alias y de otro encargo_id.
+
+_GRUPO = "uam:reglamento-organico"
+
+
+def test_alias_por_hash_encuentra_el_original_del_mismo_grupo(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        original = _resultado_exitoso(encargo_id="uam:ro:aaaaaaaaaaaa")
+        store.guardar_descarga(original, _GRUPO)
+
+        assert store.alias_por_hash(_GRUPO, "a" * 64, "uam:ro:bbbbbbbbbbbb") == (
+            "uam:ro:aaaaaaaaaaaa",
+            original.ruta_local,
+        )
+
+
+def test_alias_por_hash_no_cruza_grupos(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(_resultado_exitoso(encargo_id="uam:ro:aaaaaaaaaaaa"), _GRUPO)
+
+        assert store.alias_por_hash("uam:otro-reglamento", "a" * 64, "uam:ro:bbbbbbbbbbbb") is None
+
+
+def test_alias_por_hash_ignora_descargas_fallidas(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        fallida = _resultado_exitoso(encargo_id="uam:ro:aaaaaaaaaaaa", exito=False, motivo_fallo="http_error")
+        store.guardar_descarga(fallida, _GRUPO)
+
+        assert store.alias_por_hash(_GRUPO, "a" * 64, "uam:ro:bbbbbbbbbbbb") is None
+
+
+def test_alias_por_hash_no_es_alias_de_si_mismo(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(_resultado_exitoso(encargo_id="uam:ro:aaaaaaaaaaaa"), _GRUPO)
+
+        assert store.alias_por_hash(_GRUPO, "a" * 64, "uam:ro:aaaaaaaaaaaa") is None
+
+
+def test_alias_por_hash_nunca_elige_un_alias_como_original(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        # solo queda registrado un alias (su original es de otro grupo o ya no está en la base)
+        alias = _resultado_exitoso(encargo_id="uam:ro:bbbbbbbbbbbb", duplicado_de="uam:ro:aaaaaaaaaaaa")
+        store.guardar_descarga(alias, _GRUPO)
+
+        assert store.alias_por_hash(_GRUPO, "a" * 64, "uam:ro:cccccccccccc") is None

@@ -1,4 +1,4 @@
-from legisuni.descargador.urlnorm import normalizar
+from legisuni.descargador.urlnorm import normalizar, url_id
 
 
 def test_relativa_con_espacios_en_nombre_de_archivo() -> None:
@@ -72,3 +72,18 @@ def test_url_absoluta_y_limpia_no_cambia() -> None:
     resultado = normalizar(cruda, indice)
 
     assert resultado == cruda
+
+
+def test_url_id_son_12_caracteres_hexadecimales() -> None:
+    resultado = url_id("https://archivos.ujat.mx/2021/abogado_gral/reglamento.pdf", "https://www.ujat.mx/abogado/15763")
+
+    assert len(resultado) == 12
+    assert all(c in "0123456789abcdef" for c in resultado)
+
+
+def test_url_id_de_urls_equivalentes_tras_normalizar_coincide() -> None:
+    indice = "https://www.ujat.mx/abogado/15763"
+    sin_codificar = "https://archivos.ujat.mx/abogado_gral/Acuerdos/acuerdos rect 2.pdf"
+    codificada = "https://archivos.ujat.mx/abogado_gral/Acuerdos/acuerdos%20rect%202.pdf"
+
+    assert url_id(sin_codificar, indice) == url_id(codificada, indice)

@@ -10,7 +10,6 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
-import httpx
 import typer
 from selectolax.parser import HTMLParser
 
@@ -18,10 +17,11 @@ from legisuni.config import Settings
 from legisuni.contracts import CatalogEntry
 from legisuni.descargador import paths
 from legisuni.descargador.descargar import descargar
-from legisuni.descargador.fetch import Fetcher
+from legisuni.descargador.fetch import Fetcher, construir_cliente
 from legisuni.descargador.ratelimit import RateLimiter
 from legisuni.descargador.robots import RobotsCache
 from legisuni.descargador.store import Store
+from legisuni.juridico import identificadores, traduccion
 
 logger = logging.getLogger(__name__)
 
@@ -35,12 +35,12 @@ def entradas_desde_html(ruta_html: Path, url_indice: str, inst_id: str) -> list[
 
     for enlace in arbol.css("a[href]"):
         href = enlace.attributes.get("href")
-        if href is None or not href.lower().endswith(_EXTENSIONES):
+        if href is None or not href.strip().lower().endswith(_EXTENSIONES):
             continue
 
         titulo = enlace.text(strip=True)
         doc_slug = _doc_slug_desde_href(href, titulo)
-        entry_id = f"{inst_id}:{doc_slug}"
+        entry_id = identificadores.entry_id(inst_id, doc_slug, href, url_indice)
         if entry_id in vistos:
             continue
         vistos.add(entry_id)
@@ -73,7 +73,7 @@ def _leer_html(ruta_html: Path) -> str:
 def _doc_slug_desde_href(href: str, titulo: str) -> str:
     nombre_archivo = Path(urlsplit(href).path).stem
     if "-" in nombre_archivo:
-        return nombre_archivo.rsplit("-", 1)[-1]
+        return paths.sanear(nombre_archivo.rsplit("-", 1)[-1])
     return paths.sanear(titulo)
 
 
@@ -83,7 +83,6 @@ def main(
     inst_id: str = typer.Option("uam", "--inst-id"),
     limite: int | None = typer.Option(None, "--limite", help="Procesar solo las primeras N entradas"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Solo muestra qué haría, no descarga nada"),
-    reanudar: bool = typer.Option(False, "--reanudar", help="Omite entradas ya registradas con éxito"),
 ) -> None:
     logging.basicConfig(
         level=logging.INFO,
@@ -95,26 +94,21 @@ def main(
     if limite is not None:
         entradas = entradas[:limite]
 
+    encargos = [
+        traduccion.traducir(entrada, _doc_slug_desde_href(entrada.url_documento, entrada.titulo))
+        for entrada in entradas
+    ]
+
     if dry_run:
         typer.echo(f"[dry-run] {len(entradas)} entradas encontradas, no se pide nada:")
-        for entrada in entradas:
-            typer.echo(f"  {entrada.entry_id}  <-  {entrada.url_documento}")
+        for entrada, encargo in zip(entradas, encargos, strict=True):
+            typer.echo(f"  {encargo.encargo_id}  {encargo.cajon}/{encargo.etiqueta}  <-  {entrada.url_documento}")
         return
 
     settings = Settings()
     limitador = RateLimiter(settings.rate_limit_s)
-    cliente_http = httpx.Client()
-
-    def _fetcher_robots(url: str) -> tuple[int, str]:
-        r = httpx.get(
-            url,
-            timeout=settings.timeout_s,
-            headers={"User-Agent": settings.user_agent},
-            follow_redirects=True,
-        )
-        return r.status_code, r.text
-
-    robots = RobotsCache(settings.user_agent, _fetcher_robots)
+    cliente_http = construir_cliente(settings)
+    robots = RobotsCache(settings.user_agent, cliente_http)
     fetcher = Fetcher(settings, limitador, robots, cliente=cliente_http)
 
     motivos_fallo: Counter[str] = Counter()
@@ -122,21 +116,20 @@ def main(
     omitidos = 0
 
     with Store(settings.db_path) as store:
-        for entrada in entradas:
-            logger.info("pidiendo %s (%s)", entrada.entry_id, entrada.url_documento)
-            if reanudar and store.hash_registrado(entrada.entry_id) is not None:
+        for entrada, encargo in zip(entradas, encargos, strict=True):
+            logger.info("pidiendo %s (%s)", encargo.encargo_id, entrada.url_documento)
+            if store.hash_registrado(encargo.encargo_id) is not None:
                 omitidos += 1
-            resultado = descargar(
-                entrada, fetcher, robots, settings, store=store, omitir_si_registrado=reanudar
-            )
+            resultado = descargar(encargo, fetcher, robots, settings, store=store)
             store.guardar(resultado)
+            store.guardar_descarga(resultado, encargo.grupo_alias)
             if resultado.exito:
                 exitosas += 1
             else:
                 assert resultado.motivo_fallo is not None
                 motivos_fallo[resultado.motivo_fallo] += 1
             logger.info(
-                "resultado %s: exito=%s motivo=%s", entrada.entry_id, resultado.exito, resultado.motivo_fallo
+                "resultado %s: exito=%s motivo=%s", encargo.encargo_id, resultado.exito, resultado.motivo_fallo
             )
 
     typer.echo("--- resumen ---")

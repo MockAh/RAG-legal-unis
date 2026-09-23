@@ -16,6 +16,15 @@ MotivoRed = Literal["timeout", "http_error", "url_muerta"]
 _TAMANO_PRIMEROS_BYTES = 512
 
 
+def construir_cliente(settings: Settings) -> httpx.Client:
+    """El único `httpx.Client` de una corrida: UA, timeout y TLS estricto salen de `Settings`."""
+    return httpx.Client(
+        headers={"User-Agent": settings.user_agent},
+        timeout=settings.timeout_s,
+        verify=True,
+    )
+
+
 @dataclass
 class RespuestaCruda:
     status: int | None
@@ -35,13 +44,13 @@ class Fetcher:
         settings: Settings,
         limitador: RateLimiter,
         robots: RobotsCache,
-        cliente: httpx.Client | None = None,
+        cliente: httpx.Client,
         dormir: Callable[[float], None] = time.sleep,
     ) -> None:
         self._settings = settings
         self._limitador = limitador
         self._robots = robots
-        self._cliente = cliente if cliente is not None else httpx.Client()
+        self._cliente = cliente
         self._dormir = dormir
 
     def pedir(self, url: str) -> RespuestaCruda:

@@ -382,7 +382,7 @@ recién al *leer*. Ya pasó allá.
     - la suite completa pasa con solo cambios mecánicos (construir `Encargo` por la traducción
       jurídica; leer `encargo_id` en vez de `entry_id`) y **ninguna aserción de comportamiento
       cambia**;
-    - UAM y UJAT en base limpia: **150/150**, rutas jurídicas con la misma forma que en v2;
+    - UAM y UJAT en base limpia: **156/156 medido el 2026-09-18**, rutas jurídicas con la misma forma que en v2;
     - un `Encargo` jurídico que falla produce los mismos motivos que v2: nunca
       `puertas_agotadas`, nunca `vestibulo_sin_pdf`;
     - los dos históricos del Reglamento de Estudios Superiores de la UAM producen dos `entry_id`
