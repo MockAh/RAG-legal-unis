@@ -1,0 +1,251 @@
+{
+  "lote_id": "bloque-a-txt-71bdfaf1",
+  "archivo_origen": "bloque-a.txt",
+  "sha256_archivo": "71bdfaf1c879e21fd3e27f3cc6d45ba100bb739d1bdc86d394158a25810d5b55",
+  "encargos": [
+    {
+      "encargo_id": "doi:10.1126/science.215.4539.1501",
+      "modo": "academico",
+      "solicitante": "bloque-a-txt-71bdfaf1",
+      "puertas": [
+        {
+          "url": "https://coleoguy.github.io/reading.group/Raup_Sepkoski_1982.pdf",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.1",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.215.4539.1501",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.1",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "raup-1982__1fd5f147",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.215.4539.1501",
+      "creado_en": "2026-09-23T18:35:53.763072"
+    },
+    {
+      "encargo_id": "doi:10.1146/annurev.earth.33.092203.122654",
+      "modo": "academico",
+      "solicitante": "bloque-a-txt-71bdfaf1",
+      "puertas": [
+        {
+          "url": "https://www.annualreviews.org/content/journals/10.1146/annurev.earth.33.092203.122654",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.2",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1146/annurev.earth.33.092203.122654",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.2",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "bambach-2006__f2757cb6",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1146/annurev.earth.33.092203.122654",
+      "creado_en": "2026-09-23T18:35:53.763072"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.1156963",
+      "modo": "academico",
+      "solicitante": "bloque-a-txt-71bdfaf1",
+      "puertas": [
+        {
+          "url": "https://doi.org/10.1126/science.1156963",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.3",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "alroy-2008__3b7cb7c9",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.1156963",
+      "creado_en": "2026-09-23T18:35:53.763072"
+    },
+    {
+      "encargo_id": "ref:alroy-2008-617afec9",
+      "modo": "academico",
+      "solicitante": "bloque-a-txt-71bdfaf1",
+      "puertas": [
+        {
+          "url": "https://geosci.uchicago.edu/~foote/REPRINTS/SCI2008.SOM.pdf",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.3S",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "alroy-2008__6dd8a57c",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "ref:alroy-2008-617afec9",
+      "creado_en": "2026-09-23T18:35:53.763072"
+    },
+    {
+      "encargo_id": "doi:10.1016/j.palaeo.2016.11.005",
+      "modo": "academico",
+      "solicitante": "bloque-a-txt-71bdfaf1",
+      "puertas": [
+        {
+          "url": "https://hull-repository.worktribe.com/OutputFile/445196",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.4",
+          "construida": false
+        },
+        {
+          "url": "https://hull-repository.worktribe.com/output/445171/on-the-causes-of-mass-extinctions",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.4",
+          "construida": false
+        },
+        {
+          "url": "https://www.sciencedirect.com/science/article/pii/S0031018216306915",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.4",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1016/j.palaeo.2016.11.005",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.4",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "bond-2017__8a2005c5",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1016/j.palaeo.2016.11.005",
+      "creado_en": "2026-09-23T18:35:53.763072"
+    },
+    {
+      "encargo_id": "doi:10.1038/nature09678",
+      "modo": "academico",
+      "solicitante": "bloque-a-txt-71bdfaf1",
+      "puertas": [
+        {
+          "url": "https://www.nature.com/articles/nature09678",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.6",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1038/nature09678",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.6",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "barnosky-2011__b922f0fc",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1038/nature09678",
+      "creado_en": "2026-09-23T18:35:53.763072"
+    },
+    {
+      "encargo_id": "doi:10.1017/ext.2022.4",
+      "modo": "academico",
+      "solicitante": "bloque-a-txt-71bdfaf1",
+      "puertas": [
+        {
+          "url": "https://pdfs.semanticscholar.org/581f/3fc8f9e02530a387a1d0585c4963123cd3a3.pdf",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.7",
+          "construida": false
+        },
+        {
+          "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11895713/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.7",
+          "construida": false
+        },
+        {
+          "url": "https://www.cambridge.org/core/services/aop-cambridge-core/content/view/D8B7C1C298686D3622273320E778D22A/S2755095822000043a.pdf/forty-years-later-the-status-of-the-big-five-mass-extinctions.pdf",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.7",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1017/ext.2022.4",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-a-txt-71bdfaf1#A.7",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "marshall-2023__a830b299",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1017/ext.2022.4",
+      "creado_en": "2026-09-23T18:35:53.763072"
+    }
+  ],
+  "no_obtenidos": [
+    {
+      "articulo_id": "ref:hallam-1997-e4f00768",
+      "referencia_literal": "Hallam, Anthony; Wignall, Paul B. (1997). Mass Extinctions and Their Aftermath. Oxford: Oxford University Press.",
+      "motivo": "sin_puertas",
+      "intentos": 0,
+      "ruta_sugerida": "buscar por título o cita"
+    }
+  ],
+  "vinculos": [
+    {
+      "articulo_id": "ref:alroy-2008-617afec9",
+      "relacionado_con": "doi:10.1126/science.1156963",
+      "literal": "suplemento de A.3"
+    }
+  ],
+  "registros": [
+    {
+      "articulo_id": "doi:10.1126/science.215.4539.1501",
+      "posicion_en_lista": "A.1",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/17788674/"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.215.4539.1501",
+      "posicion_en_lista": "A.1",
+      "url": "https://ui.adsabs.harvard.edu/abs/1982Sci...215.1501R"
+    },
+    {
+      "articulo_id": "doi:10.1146/annurev.earth.33.092203.122654",
+      "posicion_en_lista": "A.2",
+      "url": "https://ui.adsabs.harvard.edu/abs/2006AREPS..34..127B/abstract"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.1156963",
+      "posicion_en_lista": "A.3",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/18599780/?dopt=Abstract"
+    },
+    {
+      "articulo_id": "doi:10.1038/nature09678",
+      "posicion_en_lista": "A.6",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21368823/"
+    },
+    {
+      "articulo_id": "doi:10.1017/ext.2022.4",
+      "posicion_en_lista": "A.7",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40078681/"
+    }
+  ]
+}

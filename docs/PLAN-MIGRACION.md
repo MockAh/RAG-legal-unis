@@ -446,3 +446,65 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   `tests/test_store.py`, `alias_por_hash` con otro grupo, fallida, uno
   mismo y alias de alias.
 - Commit: `M29: alias por hash`
+
+## M30 · Encargos del Bloque A desde un lote ya estructurado
+- **Cambio de fuente.** `Geologia_dois_.docx` (la lista contra la que se
+  diseñó `01` §Modo académico y el criterio 18 de `docs/05`) nunca llegó al
+  proyecto. La sustituye `datos/lotes/bloque-a.txt` (commit S10): 8 fichas
+  del Bloque A, ya estructuradas (campos `CLAVE : valor` y enlaces marcados
+  `[PDF]`, `[REG]`, `[DOI]`). `docs/01` y `docs/05` siguen citando la lista
+  de geología; no se tocan en esta tarea.
+- **No es el Lector de Lista** (`docs/00` §3, pieza Ⓐ, sin spec). El
+  conversor `scripts/convertir_bloque_a.py` es desechable, lo dice en su
+  encabezado y no tiene tests propios: solo se valida su salida
+  (`tests/test_encargos_bloque_a.py`).
+- Salida: `datos/encargos_bloque_a.json`, la entrada de la corrida. El `.txt`
+  no se vuelve a leer en tiempo de ejecución. Forma:
+  `lote_id` (N12: `slug(nombre_archivo)-sha256[:8]`), `archivo_origen`,
+  `sha256_archivo`, `encargos` (N10), `no_obtenidos` (forma de `Faltante`,
+  N14) y el bloque auxiliar (no es contrato): `vinculos` y `registros`.
+- Reglas, todas de `docs/01`:
+  - `articulo_id` (N11): `doi:{doi}` si hay DOI; si no,
+    `ref:{slug(primer_autor)}-{anio}-{h8}`, con `h8` del título normalizado
+    (sin acentos, minúsculas, blancos colapsados). Los `A.n` del archivo son
+    `posicion_en_lista`, nunca identidad: viajan en
+    `Puerta.evidencia = "lista:{lote_id}#A.n"`.
+  - Traducción académica (N10): `cajon="papers"`, `cruzar_vestibulos=True`,
+    `grupo_alias=articulo_id`, `etiqueta` según `01` l.668.
+  - **A.5 no tiene ninguna puerta** (monografía, sin URL ni DOI): no genera
+    `Encargo` (`01` l.745). Van **7**, no 8; A.5 queda en `no_obtenidos` con
+    motivo `sin_puertas`, 0 intentos y ruta «buscar por título o cita».
+  - **Orden de puertas por tipo, no por marca** (`01` l.776): `copia_libre`
+    primero (en el orden de la lista), luego `oficial`, al final
+    `resolutor_doi`. En A.7 eso pone Semantic Scholar antes que Cambridge.
+  - Puerta DOI: `tipo="resolutor_doi"`, **`construida=False`**. Los seis DOI
+    del lote traen su enlace `doi.org` literal: no se construye ninguno. La
+    excepción a D3 (`construida=True`) solo aplicaría a una ficha con DOI y
+    sin `[DOI]`; el conversor la implementa, pero este lote no la ejercita.
+  - Tipo por host: `[PDF]` → `copia_libre`, salvo el de `cambridge.org` en
+    A.7, que es el PDF de la editorial → `oficial`. PMC y `hull-repository`
+    → `copia_libre` (`01` l.128); editoriales (annualreviews, sciencedirect,
+    nature) → `oficial`.
+  - **PubMed y ADS no son puerta.** Son registros bibliográficos: ningún
+    `TipoPuerta` los describe, y etiquetarlos `oficial` falsearía el tipo y
+    la evidencia de M31. Quedan en `registros` del JSON (6: A.1 ×2, A.2,
+    A.3, A.6, A.7). A.3 se queda solo con el resolutor DOI, coherente con
+    su nota («sin PDF de acceso libre»). Si M31 muestra que los registros
+    llevan a PDF, se propondrá un tipo `registro` en una v2.5, con evidencia.
+- **Hallazgo para el Lector de Lista:** A.3S es un **suplemento** (material
+  suplementario de A.3). No es extra ni corrección, y `Relacion` no lo
+  prevé porque la lista de geología no lo traía. A.3S va **sin** `relacion`;
+  el vínculo con A.3 vive solo en `vinculos` del JSON. El vocabulario no se
+  toca: decidir si «suplemento» entra en `Relacion` es tarea de la spec del
+  Lector de Lista.
+- **Hallazgo para M31:** la razón que da `01` (l.779) para poner la oficial
+  después de las copias libres —«la oficial suele ser un vestíbulo con
+  muro»— no se cumple en A.7, donde la oficial es un PDF abierto directo.
+  Se conserva el orden del contrato; M31 dirá cuánto pesa (pregunta
+  abierta 5 de `01`).
+- Nuevo `scripts/lote.py`: lee el JSON, valida cada `Encargo` y descarga con
+  el mismo cableado que `cosecha.py` (cliente único, `guardar` +
+  `guardar_descarga`). **No se ejecuta sin `--dry-run`.**
+- Verificación: `lote.py --dry-run` → 7 encargos, puertas en orden, y la
+  línea de A.5 como no descargable.
+- Commit: `M30: Encargos del Bloque A y lote.py`
