@@ -3,7 +3,7 @@
 > **El documento más importante del Proyecto.** Las conversaciones no se ven entre sí;
 > estos esquemas son su única frontera común. Cualquier cambio aquí debe propagarse
 > a todas las conversaciones activas y anotarse en el changelog de abajo.
-> Estado: **v2.4** · esquemas en pseudocódigo Pydantic v2. **Primera versión que rompe
+> Estado: **v2.5** · esquemas en pseudocódigo Pydantic v2. **Primera versión que rompe
 > compatibilidad** (ver §"Qué rompe la v2.0 y cómo se migra"). Desde aquí vuelve a regir la
 > regla de siempre: las specs refinan sin romper; los cambios aditivos son libres; renombrar o
 > quitar campos exige actualizar aquí primero.
@@ -695,6 +695,12 @@ recomendado y una corrección. Tres hallazgos de esa lista moldearon los contrat
 3. **La lista trae su propio balance y no cuadra.** Declara 12 de 15 con copia libre y nombra
    tres sin ella (31, 37, 44). Pero la 45 también declara no tener copia libre: son 11.
 
+> **Nota (v2.5, 2026-09-25) — historia de diseño, no evidencia verificable.**
+> `Geologia_dois_.docx` **nunca llegó al repositorio** (M30 de `PLAN-MIGRACION.md`). Los tres
+> hallazgos de arriba no se pueden comprobar: se conservan porque explican de dónde salieron
+> los contratos, no como medición. La primera corrida académica (E15 de `08`, 2026-09-25) usó
+> `datos/lotes/bloque-a.txt`: 8 fichas del Bloque A, ya estructuradas.
+
 ---
 
 ## N11 · ArticleRef — la ficha del artículo (Lector de Lista) · v2.0
@@ -737,6 +743,10 @@ Una ficha es válida si trae **primer autor + año + al menos uno** de estos:
 Con esta regla, las 17 fichas de la lista real son válidas. La que no alcanza la identificación
 mínima **no se descarga**: va a `ArticleBatch.incompletos` con su renglón literal.
 
+> **Nota (v2.5):** las 17 fichas son las de `Geologia_dois_.docx`, que nunca llegó al repositorio
+> (ver la nota de §Evidencia de partida). La afirmación no es verificable. La primera corrida
+> académica usó `datos/lotes/bloque-a.txt` (8 fichas).
+
 **Excepción para correcciones.** Una ficha con `relacion="correccion"` se identifica por lo que
 corrige: basta `relacionado_con` + una puerta. `primer_autor` y `anio` pueden ir vacíos. En la
 lista real, la corrección de Burgess et al. (2014) solo trae un enlace; exigirle autor y año
@@ -778,6 +788,14 @@ El Lector de Lista ordena: **copias libres primero**, en el orden en que aparece
 **luego la oficial**; **al final el resolutor DOI**. Si la ficha trae DOI y la lista no incluye
 un enlace `doi.org`, el Lector de Lista agrega esa puerta construida al final. Razón: la copia libre suele ser un PDF
 directo; la oficial suele ser un vestíbulo con muro.
+
+**Primera medición (E15 de `08`, 2026-09-25).** *A favor:* las tres oficiales que se pidieron
+no entregaron. Nature (A.6) fue un vestíbulo cuya cadena de redirecciones pasó por
+`idp.nature.com`, que se lee como muro (lectura del log, no comprobación, E15.3). Annual
+Reviews (A.2) y ScienceDirect (A.4) respondieron `403`, que E15.4 lee como bloqueo al cliente,
+**no** como muro: apoyan poner la oficial detrás, pero no la segunda mitad de la razón. *En
+contra:* en A.7 la oficial es un PDF abierto de Cambridge (M30). No se pidió, porque la copia
+libre entregó antes (E15.2).
 
 **Costo aceptado:** a veces la copia libre es un manuscrito aceptado y la versión publicada
 también estaba abierta. El Verificador Académico anota la edición (N13) y el informe lo señala,
@@ -1039,3 +1057,4 @@ Lector de Índice produzca slugs correctos. Son minutos.
 | v2.2 | 2026-09-10 | `Observado.veredicto` admite `None` (N14): un artículo descargado cuyo Verificador Académico falló va a `con_observaciones` con nota «sin verificar», en vez de perderse. Surgió al redactar la regla de continuidad de `07` v2. **Compatible con v2.1.** |
 | v2.3 | 2026-09-10 | Propagación de `03` v3, ratificada: `Catalog` (N3) gana `fecha_corte_declarada`, `fecha_corte_texto` y `catalogo_caducado` (D12, C13); `CatalogEntry` (N2) gana `titulo_derivado` (C9); parámetro nuevo "Umbral de caducidad del índice" (18 meses). Cierra la propagación de la v2.0. **Compatible con v2.2.** |
 | **v2.4** | **2026-09-11** | **Criterios de migración, corregidos contra medición.** El criterio 2 deja de pedir «150/150» y pasa a «todo enlace publicado produce descarga», con **N medido = 156** (UAM 47, UJAT 109): el 150 venía de una heurística de slug que perdía 2 documentos en la UAM y de un filtro por extensión que ignoraba 4 enlaces de la UJAT con salto de línea. El criterio 3 admite `muro_de_pago` en modo jurídico, porque el reconocimiento de muros de `05` v3 no distingue modo (D8) y ninguna aserción de v1.4 lo contradice. **Sin cambios de esquema: ningún contrato N0–N14 se toca. Compatible con v2.3.** |
+| **v2.5** | **2026-09-25** | **Aclaración sobre la lista de origen, sin cambios de esquema.** `Geologia_dois_.docx`, la lista contra la que se diseñó §Modo académico, **nunca llegó al repositorio**: sus tres hallazgos (§Evidencia de partida) y las «17 fichas» (N11) se conservan como historia de diseño, con nota de que no son verificables. La primera corrida académica usó `datos/lotes/bloque-a.txt` (E15 de `08`). La razón del orden de puertas (§Nota sobre `puertas` y su orden) cita E15, con datos a favor y en contra. El registro de v2.0 no se toca. **Ningún contrato N0–N14 se toca. Compatible con v2.4.** |

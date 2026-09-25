@@ -405,22 +405,23 @@ recién al *leer*. Ya pasó allá.
 17. **Rutas seguras:** `etiqueta` con `..`, `/` o caracteres fuera del conjunto, y `cajon`
     absoluto o con `..`, se rechazan al construir el `Encargo`; nada se escribe fuera de
     `data/`.
-18. **Primera corrida académica real — medición, no umbral.** Con encargos armados a mano desde
-    `Geologia_dois_.docx` (17 fichas, `01` §Modo académico), como la primera corrida jurídica usó
-    slugs provisionales. Se miden por separado: cuántas puertas `copia_libre` entregaron archivo
-    directo, cuántos vestíbulos se cruzaron con éxito, cuántos `vestibulo_sin_pdf`,
+18. **Primera corrida académica real — medición, no umbral.** Con encargos armados desde una
+    lista real, como la primera corrida jurídica usó slugs provisionales. `01` §Modo académico
+    se diseñó contra `Geologia_dois_.docx`, que nunca llegó al repositorio (`01` v2.5). La
+    corrida usó `datos/lotes/bloque-a.txt` (8 fichas, M30). Se miden por separado: cuántas
+    puertas `copia_libre` entregaron archivo directo, cuántos vestíbulos se cruzaron con éxito, cuántos `vestibulo_sin_pdf`,
     `muro_de_pago` y `robots_prohibido`. **No hay porcentaje mínimo:** es la primera medición
     de un terreno nuevo. Se registra en `08` como evidencia nueva y alimenta las preguntas 8 y 9.
-    **Medido el 2026-09-25 (E15 de `08`), 3/7.** La lista de geología nunca llegó: la entrada
-    fue `datos/lotes/bloque-a.txt` (M30), 8 fichas, 7 encargos (A.5 sin puertas), 16 puertas
+    **Medido el 2026-09-25 (E15 de `08`), 3/7.** 7 encargos (A.5 sin puertas), 16 puertas
     declaradas y 12 pedidas.
     - `copia_libre` con archivo directo: **3** de 5 pedidas, las tres en la puerta 0 (E15.2);
     - vestíbulos cruzados con éxito: **0**. Hubo dos saltos (A.6, dos veces) y los dos
       volvieron a HTML (E15.6);
     - `vestibulo_sin_pdf`: **3** intentos (A.4 ×1, A.6 ×2);
-    - `muro_de_pago`: **0**, aunque A.6 pasó por `idp.nature.com/authorize` en un salto
-      intermedio que `es_muro_de_pago` no ve (E15.3);
-    - `robots_prohibido`: **0**, con fail-open en dos hosts (E15.7);
+    - `muro_de_pago`: **0**, aunque A.6 pasó por `idp.nature.com/authorize` en una
+      redirección intermedia que `es_muro_de_pago` no ve (E15.3);
+    - `robots_prohibido`: **0**, con fail-open en dos hosts (E15.7). Tres hosts se visitaron
+      solo por redirección, sin consultar su `robots.txt` (E15.8);
     - además, **6 `http_error`, todos `403`**, en cuatro hosts; son el primer dato de la
       pregunta 8 (E15.4).
 

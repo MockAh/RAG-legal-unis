@@ -1391,6 +1391,36 @@ Ninguno de los dos entregó después el archivo, así que aquí el fail-open no 
 documento. Lo que muestra es que el `403` de la UAM no es un caso único (E6.13).
 **Cero `robots_prohibido`** en la corrida.
 
+### E15.8 · Las redirecciones no pasan por `robots.txt`
+
+```
+02:40:48.314 GET https://doi.org/10.1126/science.1156963 "302 Found"
+02:40:48.693 GET https://www.science.org/doi/10.1126/science.1156963 "403 Forbidden"
+
+02:40:51.781 GET https://doi.org/10.1016/j.palaeo.2016.11.005 "302 Found"
+02:40:52.194 GET https://linkinghub.elsevier.com/retrieve/pii/S0031018216306915 "200 "
+
+02:40:52.674 GET https://www.nature.com/robots.txt "200 OK"
+02:40:52.941 GET https://www.nature.com/articles/nature09678 "303 See Other"
+02:40:53.354 GET https://idp.nature.com/authorize?… "302 Found"
+02:40:53.584 GET https://idp.nature.com/transit?… "302 Found"
+```
+
+*(El `robots.txt` de `doi.org` se pidió una sola vez, a las 02:40:46.903, en la puerta 1 de
+A.2, y desde entonces sale de la caché.)*
+
+**Medido en esta corrida:** `www.science.org`, `linkinghub.elsevier.com` e `idp.nature.com`
+se visitaron **sin que se pidiera su `robots.txt`**. El log no tiene ninguna petición a
+`/robots.txt` de esos tres hosts. Los tres aparecen solo como destinos de una redirección.
+
+**Medido en el código:** `puertas.probar_puertas` consulta `robots.permitido` con la URL de la
+puerta, y `_cruzar_vestibulo` con la del enlace del salto. `Fetcher._intentar` pide con
+`follow_redirects=True`, así que `httpx` sigue la cadena sin volver a pasar por robots.
+
+**Queda abierto si es un fallo o un hueco de la spec.** La pregunta 7 de `05` ratificó «la
+misma política que el modo jurídico, aplicada también al enlace del vestíbulo». No dice nada de
+los destinos de una redirección. E15.8 no propone arreglo.
+
 ---
 
 | Versión | Fecha | Cambio |
@@ -1404,4 +1434,4 @@ documento. Lo que muestra es que el `403` de la UAM no es un caso único (E6.13)
 | **v7** | **2026-09-06** | **Segunda descarga real: la UJAT, el caso sucio (E12).** 105/105 exitosas. Siete hallazgos: el índice está repartido en cinco páginas y son **105 documentos, no ~60** (E12.1); **`urlnorm` probado en campo** por primera vez, 17 URLs con espacios y una ya codificada (E12.2); los cinco `http` redirigen solos y **cierra la pregunta abierta 4 de `05`** a favor del TLS estricto (E12.3); las rutas de 2012 siguen vivas, **E6.7 cerrada** (E12.4); **24 de 105 documentos son escaneos sin texto**, 179 MB, contra 0 de 42 en la UAM (E12.5); la escala del corpus estaba mal estimada por 23× (E12.6); el percent-encoding se cuela en los slugs derivados (E12.7). **C19 corregida** — la extrapolación de 500 MB era falsa. Tres conclusiones nuevas (**C21–C23**) y tres deudas nuevas (E6.17–E6.19). Se corrige además una inferencia previa: el Reglamento de la Junta de Gobierno **no** era un escaneo; se dedujo del tamaño en vez de medirlo. **Con esto la spec `05` queda cerrada: diez de diez criterios de aceptación cumplidos, 150 documentos de dos universidades, 150/150.** |
 | **v8** | **2026-09-10** | **Auditoría de disco previa a la migración (E13).** No es una corrida nueva: es lo que apareció al inventariar el repo. Cinco hallazgos: hubo **dos corridas de la UAM**, el 06 y el 08, y la segunda nunca se registró (E13.1); **los 45 documentos de la UAM están duplicados en disco**, 45 hashes repetidos, 90 archivos (E13.2); la causa es la fecha de captura en el nombre cuando el índice no declara versión, así que **la idempotencia no cruza días** (E13.3); es la **primera evidencia medida a favor del alias por hash** (E13.4); y los slugs con forma de fecha confirman en disco lo que E11.6 anticipó (E13.5). Una conclusión nueva (**C24**) y dos deudas nuevas (E6.20, E6.21). **Corrección:** la corrida de la UJAT fue el **2026-09-08**, no el 2026-09-06 como decía la v7 en la cabecera y en el título de E12. Consecuencia para la migración: `data/` se vacía antes de verificar el criterio 11 de `05` (E13.6). |
 | **v9** | **2026-09-18** | **Corrida de migración (E14): UAM y UJAT a través de `Encargo`, sobre disco y base vacíos (E13.6).** **156/156**: 156 archivos con fecha 2026-09-18 (UAM 47, UJAT 109), 156 filas en `descargas`, `documentos` e `intentos`, cero fallos y cero omitidos (E14.2); 156 hashes distintos, aunque en una sola corrida, así que el alias por hash sigue sin caso real entre días (E14.3). **El Reglamento de Estudios Superiores aparece con tres `encargo_id` distintos: C20 cerrado con datos** (E14.4). **7 slugs con forma de fecha en la UAM: E13.5 sigue abierta, es del Lector** (E14.5). 3 `.docx`, todos en la UAM (E14.6). Ninguna conclusión ni deuda nueva. |
-| **v10** | **2026-09-25** | **Primera corrida académica (E15): 7 encargos del lote `bloque-a-txt-71bdfaf1`, 3/7.** 16 puertas declaradas, 12 pedidas, 13 hosts; base `legisuni_v2.db` con 163 filas, 7 académicas y las 156 jurídicas de E14 en número (E15.1). **Las tres exitosas, en la puerta 0 y `copia_libre`**; la oficial abierta de A.7 no se pidió (E15.2). **`muro_de_pago` no se emitió ni una vez, y Nature es un muro:** en A.6 la cadena de redirecciones pasó por `idp.nature.com/authorize`, pero `es_muro_de_pago` solo ve la URL final; queda como motivo de una micro-tarea futura. Que sea un IdP es lectura del log, no comprobación (E15.3). **Seis `403` en cuatro hosts (Annual Reviews, Science, ScienceDirect, Hull): bloqueo al cliente, no muro**, y la regla de M27 aguantó (E15.4). Un `[PDF]` de Hull verificado el 2026-09-10 dio `403` el 25 (E15.5). **Vestíbulo en campo por primera vez: 3 `vestibulo_sin_pdf`, cero cruces con éxito**; A.6 pidió la misma página dos veces, diez respuestas HTTP para un artículo, lo que la hace candidata a deduplicar puertas por destino (E15.6). Fail-open de `robots.txt` en dos hosts más, cero `robots_prohibido` (E15.7). Ninguna conclusión C ni deuda E6 nueva. |
+| **v10** | **2026-09-25** | **Primera corrida académica (E15): 7 encargos del lote `bloque-a-txt-71bdfaf1`, 3/7.** 16 puertas declaradas, 12 pedidas, 13 hosts; base `legisuni_v2.db` con 163 filas, 7 académicas y las 156 jurídicas de E14 en número (E15.1). **Las tres exitosas, en la puerta 0 y `copia_libre`**; la oficial abierta de A.7 no se pidió (E15.2). **`muro_de_pago` no se emitió ni una vez, y Nature es un muro:** en A.6 la cadena de redirecciones pasó por `idp.nature.com/authorize`, pero `es_muro_de_pago` solo ve la URL final; queda como motivo de una micro-tarea futura. Que sea un IdP es lectura del log, no comprobación (E15.3). **Seis `403` en cuatro hosts (Annual Reviews, Science, ScienceDirect, Hull): bloqueo al cliente, no muro**, y la regla de M27 aguantó (E15.4). Un `[PDF]` de Hull verificado el 2026-09-10 dio `403` el 25 (E15.5). **Vestíbulo en campo por primera vez: 3 `vestibulo_sin_pdf`, cero cruces con éxito**; A.6 pidió la misma página dos veces, diez respuestas HTTP para un artículo, lo que la hace candidata a deduplicar puertas por destino (E15.6). Fail-open de `robots.txt` en dos hosts más, cero `robots_prohibido` (E15.7). **Tres hosts visitados solo por redirección, sin consultar su `robots.txt`** (science.org, linkinghub.elsevier.com, idp.nature.com); queda abierto si es fallo o hueco de la spec, porque la pregunta 7 de `05` solo cubre el enlace del vestíbulo (E15.8, añadido el mismo día). Ninguna conclusión C ni deuda E6 nueva. |
