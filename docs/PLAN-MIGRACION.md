@@ -508,3 +508,26 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
 - Verificación: `lote.py --dry-run` → 7 encargos, puertas en orden, y la
   línea de A.5 como no descargable.
 - Commit: `M30: Encargos del Bloque A y lote.py`
+
+## M31 · Primera corrida académica real — la ejecuta el humano · **cerrada**
+- **La ejecutó el humano, no Claude Code**, el 2026-09-25:
+  `.venv/bin/python scripts/lote.py`, sin `--dry-run`, sobre
+  `datos/encargos_bloque_a.json` y la base `legisuni_v2.db` de E14.
+- Criterio 18 de `docs/05`: medición, no umbral. **3/7**, 163 filas en
+  `descargas` (156 jurídicas + 7 académicas). Evidencia completa en E15 de
+  `docs/08`; resumen medido en el criterio 18.
+- Pendientes que M28 y M30 dejaron para esta corrida:
+  - **Registros (PubMed, ADS):** `lote.py` no los pide, así que la corrida
+    no dice si llevan a PDF. No hay evidencia para proponer un tipo
+    `registro`.
+  - **Oficial abierta de A.7:** no se pidió; A.7 salió en la puerta 0. Sin
+    dato para la pregunta abierta 5 de `docs/01` (E15.2).
+  - **Regla del `<a>` único (pregunta 10 de `docs/05`):** sin dato. El único
+    vestíbulo sin enlace (A.4) no distingue «ninguno» de «dos» (E15.6).
+- Motivos de micro-tareas futuras, **sin arreglo propuesto**:
+  - `muros.es_muro_de_pago` solo ve la URL final; en A.6 la señal
+    (`idp.nature.com/authorize`) estaba en una redirección intermedia
+    (E15.3).
+  - Dos puertas del mismo encargo que acaban en el mismo destino se piden
+    dos veces, con su vestíbulo cada una (A.6; también A.2) (E15.6).
+- Commit: `E15: primera corrida académica, 3/7`

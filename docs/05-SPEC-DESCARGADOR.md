@@ -411,6 +411,18 @@ recién al *leer*. Ya pasó allá.
     directo, cuántos vestíbulos se cruzaron con éxito, cuántos `vestibulo_sin_pdf`,
     `muro_de_pago` y `robots_prohibido`. **No hay porcentaje mínimo:** es la primera medición
     de un terreno nuevo. Se registra en `08` como evidencia nueva y alimenta las preguntas 8 y 9.
+    **Medido el 2026-09-25 (E15 de `08`), 3/7.** La lista de geología nunca llegó: la entrada
+    fue `datos/lotes/bloque-a.txt` (M30), 8 fichas, 7 encargos (A.5 sin puertas), 16 puertas
+    declaradas y 12 pedidas.
+    - `copia_libre` con archivo directo: **3** de 5 pedidas, las tres en la puerta 0 (E15.2);
+    - vestíbulos cruzados con éxito: **0**. Hubo dos saltos (A.6, dos veces) y los dos
+      volvieron a HTML (E15.6);
+    - `vestibulo_sin_pdf`: **3** intentos (A.4 ×1, A.6 ×2);
+    - `muro_de_pago`: **0**, aunque A.6 pasó por `idp.nature.com/authorize` en un salto
+      intermedio que `es_muro_de_pago` no ve (E15.3);
+    - `robots_prohibido`: **0**, con fail-open en dos hosts (E15.7);
+    - además, **6 `http_error`, todos `403`**, en cuatro hosts; son el primer dato de la
+      pregunta 8 (E15.4).
 
 ---
 

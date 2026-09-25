@@ -1,14 +1,15 @@
 # 08 · Evidencia de campo
 
 > Hallazgos **medidos**, no supuestos, obtenidos antes de escribir una línea de código.
-> Estado: vivo · **v9** · se amplía con cada universidad nueva que se explore.
+> Estado: vivo · **v10** · se amplía con cada universidad nueva que se explore.
 > Mediciones: UAM, UNAM-70I, UNAM-OAG, UJAT, **UACAM**.
 > **Medido en vivo el 2026-09-06: la UAM (E1) y la UACAM (E10).** Los conteos de UNAM-OAG (E3)
 > y UJAT (E4) son de la captura original y **no se han vuelto a comprobar**; trátalos como
 > aproximados hasta que se recapturen (E6.8).
 > **Descargas reales ejecutadas:** 45/45 documentos de la UAM el **2026-09-06** (E11) y
 > **105/105 de la UJAT el 2026-09-08** (E12). **150 de 150.** Tras la migración a `Encargo`,
-> **156 de 156 (E14)**, medido el 2026-09-18. Es la evidencia que no viene de
+> **156 de 156 (E14)**, medido el 2026-09-18. **Primera corrida académica: 3 de 7 (E15)**, el
+> 2026-09-25. Es la evidencia que no viene de
 > mirar una página, sino de ejercitar código contra servidores reales. Con ella la spec `05`
 > queda cerrada.
 > **v8 (2026-09-10):** al auditar el disco antes de la migración apareció que la UAM se descargó
@@ -1166,6 +1167,232 @@ solo por `url_id` **no** están respaldados por ninguna medición sobre la base.
 
 ---
 
+## E15 · Primera corrida académica (2026-09-25)
+
+**Es la medición del criterio 18 de `05`:** la primera vez que el modo académico pide artículos
+a servidores reales. Entrada: `datos/encargos_bloque_a.json` (M30), lote
+`bloque-a-txt-71bdfaf1`. Todo lo que sigue sale del log de `scripts/lote.py` y de las cinco
+consultas que se muestran; no hay otra medición. Donde el texto **interpreta** el log, lo dice.
+
+### E15.1 · Qué se corrió: 3 de 7
+
+```
+.venv/bin/python scripts/lote.py 2>&1 | tee ~/respaldo-acervo/m31-bloque-a.log
+…
+--- resumen ---
+total: 7
+exitosas: 3
+  puertas_agotadas: 3
+  http_error: 1
+sin puertas (no se piden): 1
+
+find data/papers -type f | wc -l
+3
+
+sqlite3 legisuni_v2.db "select count(*) from descargas where modo='academico';"
+7
+sqlite3 legisuni_v2.db "select count(*) from descargas;"
+163
+```
+
+Siete encargos, **16 puertas declaradas** en el JSON y **12 pedidas**: las que no se pidieron
+quedaban detrás de una puerta que ya había entregado. La octava ficha, A.5 (Hallam & Wignall
+1997, monografía), no tiene puertas y no se pidió (`no_obtenidos`, motivo `sin_puertas`).
+El log toca **13 hosts distintos**. La corrida fue en serie y duró 13.3 s (02:40:45.108 →
+02:40:58.456).
+
+**3 de 7 exitosas, 3 archivos en `data/papers`.** La base es `legisuni_v2.db`, la misma de E14:
+163 filas en `descargas`, 7 académicas. 163 − 7 = 156, el conteo jurídico de E14.2. **Lo que
+esto no mide:** que las 156 filas jurídicas sigan intactas; solo que su número no cambió.
+
+### E15.2 · Las tres que funcionaron: puerta 0, `copia_libre`
+
+```
+sqlite3 legisuni_v2.db "select encargo_id, exito, motivo_fallo, puerta_usada from descargas where modo='academico' order by encargo_id;"
+doi:10.1017/ext.2022.4|1||0
+doi:10.1126/science.215.4539.1501|1||0
+ref:alroy-2008-617afec9|1||0
+
+ls -la data/papers/
+-rw-r--r-- 1 mock_ mock_  891577 Sep 25 02:40 alroy-2008__6dd8a57c.pdf
+-rw-r--r-- 1 mock_ mock_ 1016676 Sep 25 02:40 marshall-2023__a830b299.pdf
+-rw-r--r-- 1 mock_ mock_  905589 Sep 25 02:40 raup-1982__1fd5f147.pdf
+```
+
+*(De la primera consulta se muestran solo las tres filas exitosas.)*
+
+| Encargo | Lista | Puerta 0 (`copia_libre`) |
+|---|---|---|
+| `doi:10.1126/science.215.4539.1501` | A.1 | `coleoguy.github.io/…/Raup_Sepkoski_1982.pdf` |
+| `ref:alroy-2008-617afec9` | A.3S | `geosci.uchicago.edu/~foote/REPRINTS/SCI2008.SOM.pdf` |
+| `doi:10.1017/ext.2022.4` | A.7 | `pdfs.semanticscholar.org/581f/….pdf` |
+
+Las tres entregaron un PDF directo en la **primera** puerta, las tres de tipo `copia_libre`
+según el JSON, con una sola petición cada una aparte del `robots.txt`.
+
+**Interpretación:** el orden de `01` (línea 776: copias libres, luego la oficial, al final el
+resolutor) **acertó en los tres casos**, en el sentido de que la primera puerta pedida fue la
+que entregó. No dice qué habría pasado con las demás. En A.7 la oficial es un PDF abierto de
+Cambridge (hallazgo de M30) y **no se pidió**, así que la corrida no aporta nada a la pregunta
+abierta 5 de `01`.
+
+### E15.3 · `muro_de_pago` no se emitió ni una vez, y Nature es un muro
+
+```
+sqlite3 legisuni_v2.db "select i.encargo_id, i.orden, i.exito, i.motivo_fallo, i.http_status, substr(i.url,1,60), i.enlace_vestibulo from intentos i join descargas d using(encargo_id) where d.modo='academico' order by i.encargo_id, i.orden;"
+…
+doi:10.1038/nature09678|0|0|vestibulo_sin_pdf|200|https://www.nature.com/articles/nature09678|https://www.nature.com/articles/nature09678.pdf
+doi:10.1038/nature09678|1|0|vestibulo_sin_pdf|200|https://doi.org/10.1038/nature09678|https://www.nature.com/articles/nature09678.pdf
+…
+```
+
+Ninguno de los 12 intentos ni de las 7 descargas lleva `muro_de_pago`. La puerta 0 de A.6
+(`oficial`, Nature), en el log:
+
+```
+GET https://www.nature.com/articles/nature09678 "HTTP/1.1 303 See Other"
+GET https://idp.nature.com/authorize?response_type=cookie&client_id=grover&redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fnature09678 "HTTP/1.1 302 Found"
+GET https://idp.nature.com/transit?redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fnature09678&code=… "HTTP/1.1 302 Found"
+GET https://www.nature.com/articles/nature09678 "HTTP/1.1 200 OK"
+GET https://www.nature.com/articles/nature09678.pdf "HTTP/1.1 303 See Other"
+GET https://www.nature.com/articles/nature09678 "HTTP/1.1 200 OK"
+```
+
+**Medido:** la puerta devolvió HTML con `200`. M28 extrajo un enlace
+(`enlace_vestibulo = …/nature09678.pdf`) y saltó. El salto respondió `303` de vuelta a la página
+del artículo, otra vez HTML con `200` → `vestibulo_sin_pdf`. Por el camino la cadena de
+redirecciones de la puerta pasó por `idp.nature.com/authorize` y `idp.nature.com/transit`.
+
+**Medido en el código:** `muros.es_muro_de_pago(status, url_final)` recibe solo el status y la
+URL **final** de la cadena, que aquí era la página del artículo con `200`. Las URLs intermedias
+no le llegan. El log no dice cuál de las tres reglas de `vestibulo.extraer_enlace` produjo el
+enlace; la primera en prioridad es `citation_pdf_url`.
+
+**Interpretación, no comprobación:** que `idp.nature.com/authorize` sea un proveedor de
+identidad y que A.6 esté detrás de un muro es una **lectura del log**. Nadie comprobó en esta
+corrida qué pide ese endpoint ni si el artículo es de pago. La lectura se apoya en dos cosas:
+el nombre y los parámetros del endpoint (`response_type=cookie`, `redirect_uri` de vuelta al
+artículo) y que la URL del PDF redirija a la página del artículo en vez de servirlo.
+
+**`patrones.toml` no falló: no llegó a mirar donde estaba la evidencia.** Sus dos patrones
+(`/Shibboleth.sso/`, `/cas/login`) se evalúan contra `url_final`, y la señal estaba en un salto
+intermedio. Tampoco habría coincidido si la hubiera visto: la ruta es `/authorize`, que no es
+ninguno de los dos. Queda como **motivo de una micro-tarea futura**; E15 no propone el arreglo.
+
+### E15.4 · Cuatro hosts con 403: bloqueo anti-bot, no muro
+
+```
+doi:10.1016/j.palaeo.2016.11.005|0|0|http_error|403|https://hull-repository.worktribe.com/OutputFile/445196|
+doi:10.1016/j.palaeo.2016.11.005|1|0|http_error|403|https://hull-repository.worktribe.com/output/445171/on-the-c|
+doi:10.1016/j.palaeo.2016.11.005|2|0|http_error|403|https://www.sciencedirect.com/science/article/pii/S003101821|
+doi:10.1126/science.1156963|0|0|http_error|403|https://doi.org/10.1126/science.1156963|
+doi:10.1146/annurev.earth.33.092203.122654|0|0|http_error|403|https://www.annualreviews.org/content/journals/10.1146/annur|
+doi:10.1146/annurev.earth.33.092203.122654|1|0|http_error|403|https://doi.org/10.1146/annurev.earth.33.092203.122654|
+```
+
+Seis intentos con `403`, en cuatro hosts: `www.annualreviews.org` (A.2, dos puertas: la
+directa y la del resolutor acaban ahí), `www.science.org` (A.3, tras el `302` de `doi.org`),
+`www.sciencedirect.com` y `hull-repository.worktribe.com` (A.4). Todos quedaron en
+`http_error`. A.3 tenía una sola puerta y por eso su descarga termina en `http_error` y no en
+`puertas_agotadas`.
+
+Lo que el log dice del `robots.txt` de esos hosts no es lo mismo en los cuatro:
+
+```
+GET https://www.annualreviews.org/robots.txt "HTTP/1.1 200 OK"
+GET https://www.annualreviews.org/content/journals/10.1146/… "HTTP/1.1 403 Forbidden"
+
+GET https://hull-repository.worktribe.com/robots.txt "HTTP/1.1 403 Forbidden"
+GET https://www.sciencedirect.com/robots.txt "HTTP/1.1 403 Forbidden"
+```
+
+- **Annual Reviews:** el mismo cliente, con el mismo User-Agent, recibió `robots.txt` con `200`
+  y el artículo con `403`, con 80 ms de diferencia.
+- **Hull y ScienceDirect:** `403` también en `robots.txt` (E15.7). El host rechaza al cliente
+  entero, no solo el artículo.
+- **Science:** el log no pide `robots.txt` de `www.science.org`. La puerta era `doi.org` y
+  `www.science.org` solo aparece como destino de su redirección.
+
+**Interpretación:** en ninguno de los cuatro hay señal de muro, es decir, ni `401`/`402` ni
+redirección a un login. El patrón es el de un bloqueo al cliente: selectivo en Annual Reviews,
+general en Hull y ScienceDirect, y sin datos de contraste en Science. **La regla conservadora
+de M27 (`403` ≠ muro) aguantó:** el cliente ni siquiera llegó a ver la página en ninguno de
+los cuatro hosts, y llamarlos `muro_de_pago` habría sido un diagnóstico falso. Es el primer
+dato para la pregunta 8 de `05`: seis `http_error` que no distinguen la causa.
+
+### E15.5 · Un `[PDF]` verificado el 2026-09-10 ya no servía el 25
+
+```
+grep -n "VERIFICADOS\|445196" datos/lotes/bloque-a.txt
+2:# ENLACES VERIFICADOS EL: 2026-09-10
+87:[PDF] https://hull-repository.worktribe.com/OutputFile/445196
+
+GET https://hull-repository.worktribe.com/OutputFile/445196 "HTTP/1.1 403 Forbidden"
+```
+
+La lista marca ese enlace como `[PDF]` verificado el 2026-09-10. El 2026-09-25 respondió `403`:
+**de PDF a `403` en quince días.** Era la puerta 0 de A.4, la copia libre que el orden de `01`
+pone primero.
+
+**Lo que esto no distingue:** si el archivo cambió o si cambió el trato al cliente. Como el
+`robots.txt` del mismo host también dio `403` (E15.4), lo segundo es posible, pero no está
+medido. Lo medido es el efecto sobre la corrida: una verificación de hace dos semanas no
+garantizó el enlace.
+
+### E15.6 · Vestíbulo en campo: primera vez que se ejercita
+
+Hasta esta corrida el cruce de vestíbulo (M28) solo existía en tests. Tres intentos llegaron a
+HTML y los tres terminaron en `vestibulo_sin_pdf`:
+
+| Intento | Enlace extraído | Salto | Resultado |
+|---|---|---|---|
+| A.4 puerta 3 (`doi.org` → `linkinghub.elsevier.com`, `200`) | ninguno | no | `vestibulo_sin_pdf` |
+| A.6 puerta 0 (`oficial`) | `…/nature09678.pdf` | `303` → HTML | `vestibulo_sin_pdf` |
+| A.6 puerta 1 (`resolutor_doi`) | `…/nature09678.pdf` | `303` → HTML | `vestibulo_sin_pdf` |
+
+**Cero vestíbulos cruzados con éxito.** En A.6 la puerta oficial y el resolutor DOI acaban en
+la misma página, `www.nature.com/articles/nature09678`, y se pidió **dos veces, con su
+vestíbulo cada una**:
+
+```
+02:40:52.941 GET https://www.nature.com/articles/nature09678 "303 See Other"      ← puerta 0
+02:40:53.354 GET https://idp.nature.com/authorize?… "302 Found"
+02:40:53.584 GET https://idp.nature.com/transit?… "302 Found"
+02:40:54.148 GET https://www.nature.com/articles/nature09678 "200 OK"
+02:40:54.666 GET https://www.nature.com/articles/nature09678.pdf "303 See Other"  ← salto
+02:40:55.206 GET https://www.nature.com/articles/nature09678 "200 OK"
+02:40:55.527 GET https://doi.org/10.1038/nature09678 "302 Found"                  ← puerta 1
+02:40:55.964 GET https://www.nature.com/articles/nature09678 "200 OK"
+02:40:56.513 GET https://www.nature.com/articles/nature09678.pdf "303 See Other"  ← salto
+02:40:56.992 GET https://www.nature.com/articles/nature09678 "200 OK"
+```
+
+Cuatro peticiones del Fetcher (dos puertas y dos saltos), **diez respuestas HTTP** contando
+redirecciones, más el `robots.txt` de `www.nature.com`, para un artículo que no se obtuvo. La
+segunda vuelta repite la misma página y el mismo salto. **Candidato a deduplicar puertas por
+destino.** A.2 muestra lo mismo sin vestíbulo: la oficial y el resolutor terminan en
+`www.annualreviews.org` y ambos dan `403` (E15.4).
+
+**Lo que esto no mide:** la pregunta 10 de `05` (vestíbulos perdidos por tener dos `<a>` a
+`.pdf`). En A.4 no se extrajo enlace, y `intentos` no distingue «no había enlace» de «había
+dos».
+
+### E15.7 · Fail-open de `robots.txt`, en campo por segunda vez
+
+```
+GET https://hull-repository.worktribe.com/robots.txt "HTTP/1.1 403 Forbidden"
+WARNING legisuni.descargador.robots: status inesperado 403 al pedir https://hull-repository.worktribe.com/robots.txt; fail-open (permitido)
+GET https://www.sciencedirect.com/robots.txt "HTTP/1.1 403 Forbidden"
+WARNING legisuni.descargador.robots: status inesperado 403 al pedir https://www.sciencedirect.com/robots.txt; fail-open (permitido)
+```
+
+Dos hosts respondieron `403` a `robots.txt` y la corrida continuó, como manda E11.1 (C17).
+Ninguno de los dos entregó después el archivo, así que aquí el fail-open no salvó ningún
+documento. Lo que muestra es que el `403` de la UAM no es un caso único (E6.13).
+**Cero `robots_prohibido`** en la corrida.
+
+---
+
 | Versión | Fecha | Cambio |
 |---|---|---|
 | v1 | — | Solo UAM y el fallo del 70-I de la UNAM. |
@@ -1177,3 +1404,4 @@ solo por `url_id` **no** están respaldados por ninguna medición sobre la base.
 | **v7** | **2026-09-06** | **Segunda descarga real: la UJAT, el caso sucio (E12).** 105/105 exitosas. Siete hallazgos: el índice está repartido en cinco páginas y son **105 documentos, no ~60** (E12.1); **`urlnorm` probado en campo** por primera vez, 17 URLs con espacios y una ya codificada (E12.2); los cinco `http` redirigen solos y **cierra la pregunta abierta 4 de `05`** a favor del TLS estricto (E12.3); las rutas de 2012 siguen vivas, **E6.7 cerrada** (E12.4); **24 de 105 documentos son escaneos sin texto**, 179 MB, contra 0 de 42 en la UAM (E12.5); la escala del corpus estaba mal estimada por 23× (E12.6); el percent-encoding se cuela en los slugs derivados (E12.7). **C19 corregida** — la extrapolación de 500 MB era falsa. Tres conclusiones nuevas (**C21–C23**) y tres deudas nuevas (E6.17–E6.19). Se corrige además una inferencia previa: el Reglamento de la Junta de Gobierno **no** era un escaneo; se dedujo del tamaño en vez de medirlo. **Con esto la spec `05` queda cerrada: diez de diez criterios de aceptación cumplidos, 150 documentos de dos universidades, 150/150.** |
 | **v8** | **2026-09-10** | **Auditoría de disco previa a la migración (E13).** No es una corrida nueva: es lo que apareció al inventariar el repo. Cinco hallazgos: hubo **dos corridas de la UAM**, el 06 y el 08, y la segunda nunca se registró (E13.1); **los 45 documentos de la UAM están duplicados en disco**, 45 hashes repetidos, 90 archivos (E13.2); la causa es la fecha de captura en el nombre cuando el índice no declara versión, así que **la idempotencia no cruza días** (E13.3); es la **primera evidencia medida a favor del alias por hash** (E13.4); y los slugs con forma de fecha confirman en disco lo que E11.6 anticipó (E13.5). Una conclusión nueva (**C24**) y dos deudas nuevas (E6.20, E6.21). **Corrección:** la corrida de la UJAT fue el **2026-09-08**, no el 2026-09-06 como decía la v7 en la cabecera y en el título de E12. Consecuencia para la migración: `data/` se vacía antes de verificar el criterio 11 de `05` (E13.6). |
 | **v9** | **2026-09-18** | **Corrida de migración (E14): UAM y UJAT a través de `Encargo`, sobre disco y base vacíos (E13.6).** **156/156**: 156 archivos con fecha 2026-09-18 (UAM 47, UJAT 109), 156 filas en `descargas`, `documentos` e `intentos`, cero fallos y cero omitidos (E14.2); 156 hashes distintos, aunque en una sola corrida, así que el alias por hash sigue sin caso real entre días (E14.3). **El Reglamento de Estudios Superiores aparece con tres `encargo_id` distintos: C20 cerrado con datos** (E14.4). **7 slugs con forma de fecha en la UAM: E13.5 sigue abierta, es del Lector** (E14.5). 3 `.docx`, todos en la UAM (E14.6). Ninguna conclusión ni deuda nueva. |
+| **v10** | **2026-09-25** | **Primera corrida académica (E15): 7 encargos del lote `bloque-a-txt-71bdfaf1`, 3/7.** 16 puertas declaradas, 12 pedidas, 13 hosts; base `legisuni_v2.db` con 163 filas, 7 académicas y las 156 jurídicas de E14 en número (E15.1). **Las tres exitosas, en la puerta 0 y `copia_libre`**; la oficial abierta de A.7 no se pidió (E15.2). **`muro_de_pago` no se emitió ni una vez, y Nature es un muro:** en A.6 la cadena de redirecciones pasó por `idp.nature.com/authorize`, pero `es_muro_de_pago` solo ve la URL final; queda como motivo de una micro-tarea futura. Que sea un IdP es lectura del log, no comprobación (E15.3). **Seis `403` en cuatro hosts (Annual Reviews, Science, ScienceDirect, Hull): bloqueo al cliente, no muro**, y la regla de M27 aguantó (E15.4). Un `[PDF]` de Hull verificado el 2026-09-10 dio `403` el 25 (E15.5). **Vestíbulo en campo por primera vez: 3 `vestibulo_sin_pdf`, cero cruces con éxito**; A.6 pidió la misma página dos veces, diez respuestas HTTP para un artículo, lo que la hace candidata a deduplicar puertas por destino (E15.6). Fail-open de `robots.txt` en dos hosts más, cero `robots_prohibido` (E15.7). Ninguna conclusión C ni deuda E6 nueva. |
