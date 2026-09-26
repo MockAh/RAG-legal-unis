@@ -650,3 +650,46 @@ Dos deudas, ambas medidas.
   scripts anteriores.
 - Criterio 11: ninguna aserción existente cambia. Contratos sin cambios.
 - Commit: `M35: una omisión no pisa la fila registrada`
+
+## M35b · Reparación de las 47 filas (la aplica el humano)
+- Es un script de reparación de datos, no una corrección de código. Motivo:
+  E17 de `docs/08`. Nuevo `scripts/reparar_omisiones.py`, con `--db`
+  obligatorio; no lee `Settings` ni `.env`.
+- Por defecto solo muestra, y abre la base en solo lectura (`mode=ro`).
+  Escribe únicamente con `--aplicar`, en una transacción (`BEGIN IMMEDIATE`).
+  **Aborta sin escribir** si las filas afectadas no son exactamente 47
+  (constante `FILAS_ESPERADAS`, no argumento). Afectadas: `descargas` con
+  `encargo_id LIKE 'uam:%'`, `exito = 1` y `bytes`, `http_status`,
+  `url_final` y `puerta_usada` en NULL.
+- Fuentes, y ninguna otra:
+  - `url_final` y `http_status`: del **único** intento con `exito = 1` del
+    encargo, al que después se exige `orden = 0`. Filtrar por `orden = 0` y
+    comprobarlo luego no comprobaría nada.
+  - `puerta_usada = 0`: el `orden` de ese intento.
+  - `bytes`: tamaño del archivo en `ruta_local`, solo si su SHA-256 coincide
+    con el `sha256` de la fila.
+  - `capturado_en`: **estimación**, la fecha de modificación del archivo, que
+    indica cuándo se escribió el archivo y no cuándo se capturó la respuesta.
+    Se declara así en el docstring, en la cabecera de la salida y en cada fila.
+  - `content_type`: no se toca. Pérdida definitiva.
+- **Una fila se repara entera o no se toca:** una fila medio reparada parece
+  buena y no lo es. La que no cumple una condición (cero o varios intentos
+  exitosos, `orden` distinto de 0, intento sin `url_final` o sin
+  `http_status`, archivo ausente o ilegible, hash distinto) queda intacta y se
+  reporta con su motivo. Nada se rellena por analogía. El recuento de fechas
+  estimadas por día es solo informativo: no filtra.
+- El `UPDATE` repite la firma de fila dañada en su `WHERE` y exige tocar
+  exactamente una fila. Una segunda aplicación aborta (0 afectadas).
+- `documentos` e `intentos` no se tocan.
+- Se ejecuta desde la raíz del repo (`ruta_local` es relativa). **La copia de
+  seguridad va fuera del repo**, nunca en la raíz del proyecto:
+  `cp legisuni_v2.db ~/respaldo-acervo/legisuni_v2.antes-M35b.db`.
+- Tests en `tests/test_reparar_omisiones.py`, con filas dañadas por el mismo
+  camino que en campo (descarga buena y, encima, su omisión): la vista previa
+  deja la base idéntica byte a byte; si las afectadas no son las esperadas,
+  aborta sin escribir; `--aplicar` repara la fila entera y deja
+  `content_type` en NULL y `documentos` igual; hash distinto, archivo
+  ausente, cero o dos intentos exitosos y `orden = 1` quedan intactas y
+  reportadas; una segunda aplicación aborta.
+- Criterio 11: ninguna aserción existente cambia. Contratos sin cambios.
+- Commit: `M35b: script de reparación de las 47 filas`
