@@ -140,10 +140,6 @@ def main(
             logger.info("pidiendo %s (%s)", encargo.encargo_id, entrada.url_documento)
             omitido = store.hash_registrado(encargo.encargo_id) is not None
             resultado = descargar(encargo, fetcher, robots, settings, store=store)
-            # M35: una omisión no es una observación nueva; escribirla pisaba la fila (E16)
-            if not omitido:
-                store.guardar(resultado)
-                store.guardar_descarga(resultado, encargo.grupo_alias)
             # categorías disjuntas: un omitido también trae exito=True (E16 de docs/08)
             if omitido:
                 omitidos += 1

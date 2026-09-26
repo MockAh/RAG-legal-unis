@@ -356,7 +356,7 @@ recién al *leer*. Ya pasó allá.
    - **De disco y base (cumplido, E11):** una segunda corrida completa no crea archivos nuevos
      ni filas nuevas. Verificado sobre la UAM.
    - **De red (cumplido según el cierre de `08` v7):** una segunda corrida tampoco debe **pedir** la URL cuando el
-     `sha256` ya registrado en `documentos` coincide. Exige que `descargar()` consulte
+     `sha256` ya registrado en `descargas` (desde M34) coincide. Exige que `descargar()` consulte
      `Store.hash_registrado` antes de llamar al `Fetcher`. Sin esto, re-cosechar 40
      universidades son 1 600 peticiones inútiles.
 5. **Versión nueva:** ante un documento cuyo hash cambió, quedan dos archivos y dos filas, y

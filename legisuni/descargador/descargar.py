@@ -40,6 +40,21 @@ def descargar(
                 intentos=[],
             )
 
+    # un solo camino de escritura (M34): se persiste aquí, y una omisión no escribe (M35)
+    resultado = _pedir_y_escribir(encargo, fetcher, robots, settings, capturado_en, store)
+    if store is not None:
+        store.guardar_descarga(resultado, encargo.grupo_alias)
+    return resultado
+
+
+def _pedir_y_escribir(
+    encargo: Encargo,
+    fetcher: Fetcher,
+    robots: RobotsCache,
+    settings: Settings,
+    capturado_en: datetime,
+    store: Store | None,
+) -> DownloadResult:
     resultado = probar_puertas(encargo, fetcher, robots, settings)
 
     if not resultado.exito:

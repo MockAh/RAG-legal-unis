@@ -693,3 +693,66 @@ Dos deudas, ambas medidas.
   reportadas; una segunda aplicación aborta.
 - Criterio 11: ninguna aserción existente cambia. Contratos sin cambios.
 - Commit: `M35b: script de reparación de las 47 filas`
+
+## M34 · La idempotencia lee de `descargas`
+- Deuda anotada en M21 y M23c: la idempotencia leía `documentos`, mientras la
+  escritura iba a `documentos` y a `descargas`. Ahora lee `descargas` y nadie
+  escribe en `documentos`.
+- **Qué fila se elige (opción A).** `descargas` tiene PK `(encargo_id,
+  sha256)`, y un encargo puede tener varias filas: versiones distintas, o filas
+  con `sha256` NULL de intentos fallidos (en SQLite los NULL de la PK son
+  distintos, así que cada fallo añade una fila). Se toma **la última fila del
+  encargo** (`capturado_en DESC, rowid DESC`). Si tiene `exito = 1`, se
+  devuelven su `sha256` y su `ruta_local`; si no, `None`. Es lo que hacía
+  `documentos`: la última escritura gana. Por eso es lo fiel al criterio 11.
+  Un fallo nunca se devuelve como descarga buena. `capturado_en` va antes que
+  `rowid` porque el upsert de un hash ya registrado conserva el `rowid` viejo.
+- `hash_registrado` y `ruta_registrada` leen **la misma fila**, elegida por
+  una única función privada (`Store._fila_vigente`). Antes no filtraban igual y
+  podían devolver el hash de una versión y la ruta de otra.
+- **Un solo camino de escritura: `descargar()`.** Con `store`, persiste con
+  `guardar_descarga(resultado, encargo.grupo_alias)` todo lo que no es una
+  omisión: éxito, fallo o alias. **La regla de M35 (no escribir al omitir) pasa
+  de los tres scripts a `descargar()`.** `cosecha.py`, `cosecha_uam.py` y
+  `lote.py` ya no llaman a `guardar` ni a `guardar_descarga`; conservan
+  `hash_registrado` para el resumen de M33. Sin `store`, nada cambia.
+- **`documentos` no se borra** (`docs/07` la divide, no la elimina): queda como
+  tabla de la fase v1, **sin escritores, congelada en sus 156 filas**.
+  `Store.guardar` y `Store.contar` se conservan con sus tests. **Su esquema no
+  es el `documentos` de `docs/07` §Persistencia** (N6 + N7, PK `doc_id`): es el
+  de v1 (PK `entry_id`, forma de N5). La tabla jurídica de `docs/07` sigue
+  pendiente. `docs/07` no se toca.
+- Criterio 4 de `docs/05`: el texto pasa de «registrado en `documentos`» a
+  «registrado en `descargas` (desde M34)». Se alinea el texto con el código; no
+  es un criterio nuevo. `Store.hash_registrado` conserva su papel.
+- **Criterio 11: los cambios de preparación son mecánicos.** Cambia la tabla,
+  no el comportamiento medido. Ocho tests registraban con `guardar` y leían con
+  `hash_registrado` o `ruta_registrada`: cinco en `tests/test_store.py` (en
+  `test_guardar_mismo_entry_id_con_datos_distintos_actualiza` se añade
+  `guardar_descarga` junto a `guardar`, porque su `contar()` mide
+  `documentos`) y tres en `tests/test_descargar.py`. Además se quitan las tres
+  llamadas a `guardar_descarga(resultado1, …)` de los tests de alias de M29:
+  con `descargar()` escribiendo, duplicaban en silencio las filas de
+  `intentos`. **Cero `assert` eliminados en el diff.**
+- Tests nuevos:
+  - `tests/test_store.py`: fallo viejo y éxito posterior → el éxito; éxito y
+    fallo posterior → `None`; solo fallos NULL → `None`; dos versiones → hash
+    y ruta de la misma fila; `capturado_en` decide antes que `rowid`; una fila
+    solo en `documentos` ya no cuenta.
+  - `tests/test_descargar.py`: con `store`, `descargar()` escribe en
+    `descargas` y no en `documentos`; un fallo también se escribe; una omisión
+    no escribe nada.
+  - `tests/test_cliente_http.py`, sobre los tres `main()`: `documentos` queda
+    vacía.
+- Efecto en campo: la base v2 tiene las 47 filas de la UAM en `descargas`
+  (reparadas en E18), así que la idempotencia sigue viendo las 47. Lo
+  comprueba el humano, sin red, leyendo la base con `Store.hash_registrado`.
+- Commit: `M34: la idempotencia lee de descargas`
+
+## Deuda · La idempotencia no mira el disco (regla 5 de `docs/05`)
+- La regla 5 exige, para no pedir ninguna puerta, una descarga exitosa
+  registrada **y que su archivo exista con el hash registrado**.
+  `Store.hash_registrado` solo mira la base, no el disco: **si alguien borra un
+  archivo, la idempotencia lo dará por descargado** y no se vuelve a pedir.
+- **Precede a M34:** ya pasaba cuando la lectura era contra `documentos`. M34
+  no la introduce y no la arregla. Queda para una micro-tarea propia.

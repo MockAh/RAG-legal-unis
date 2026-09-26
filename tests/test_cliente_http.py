@@ -282,3 +282,29 @@ def test_omision_no_pisa_la_fila_registrada(
 
     assert len(tras_primera[0]) == 1
     assert _filas(db_path) == tras_primera
+
+
+@pytest.mark.parametrize("modulo", [cosecha, cosecha_uam, lote], ids=["cosecha", "cosecha_uam", "lote"])
+def test_los_scripts_ya_no_escriben_en_documentos(
+    modulo: object,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    httpx_mock: HTTPXMock,
+) -> None:
+    # M34: documentos queda congelada; el único camino de escritura es descargar()
+    db_path = tmp_path / "prueba.db"
+    monkeypatch.setenv("LEGISUNI_USER_AGENT", _USER_AGENT)
+    monkeypatch.setenv("LEGISUNI_DB_PATH", str(db_path))
+    monkeypatch.setenv("LEGISUNI_DATA_ROOT", str(tmp_path / "data"))
+    monkeypatch.setenv("LEGISUNI_RATE_LIMIT_S", "0")
+    httpx_mock.add_callback(_servir_pdf, is_reusable=True)
+    if modulo is lote:
+        argumentos = _lote_de_un_encargo(tmp_path)
+    else:
+        argumentos = {**(_UJAT if modulo is cosecha else _UAM), "limite": 1}
+
+    modulo.main(dry_run=False, **argumentos)
+
+    descargas, documentos = _filas(db_path)
+    assert len(descargas) == 1
+    assert documentos == []

@@ -240,7 +240,7 @@ def test_omite_encargo_id_ya_registrado_con_exito(tmp_path: Path) -> None:
     fetcher = FetcherContador()
 
     with Store(tmp_path / "store.db") as store:
-        store.guardar(
+        store.guardar_descarga(
             DownloadResult(
                 encargo_id=encargo.encargo_id,
                 modo="juridico",
@@ -249,7 +249,8 @@ def test_omite_encargo_id_ya_registrado_con_exito(tmp_path: Path) -> None:
                 ruta_local=tmp_path / "reglamento-organico.pdf",
                 sha256="abc123",
                 intentos=[],
-            )
+            ),
+            encargo.grupo_alias,
         )
 
         resultado = descargar(encargo, fetcher, RobotsPermiteTodo(), settings, store=store)
@@ -282,7 +283,7 @@ def test_encargo_id_registrado_como_fallo_descarga_igual(
     encargo = _encargo()
 
     with Store(tmp_path / "store.db") as store:
-        store.guardar(
+        store.guardar_descarga(
             DownloadResult(
                 encargo_id=encargo.encargo_id,
                 modo="juridico",
@@ -290,7 +291,8 @@ def test_encargo_id_registrado_como_fallo_descarga_igual(
                 motivo_fallo="timeout",
                 capturado_en=datetime(2026, 1, 1),
                 intentos=[],
-            )
+            ),
+            encargo.grupo_alias,
         )
 
         resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
@@ -420,7 +422,7 @@ def test_ya_registrado_no_toca_la_red_sin_ninguna_respuesta_mockeada(
     encargo = _encargo()
 
     with Store(tmp_path / "store.db") as store:
-        store.guardar(
+        store.guardar_descarga(
             DownloadResult(
                 encargo_id=encargo.encargo_id,
                 modo="juridico",
@@ -429,7 +431,8 @@ def test_ya_registrado_no_toca_la_red_sin_ninguna_respuesta_mockeada(
                 ruta_local=tmp_path / "reglamento-organico.pdf",
                 sha256="abc123",
                 intentos=[],
-            )
+            ),
+            encargo.grupo_alias,
         )
 
         resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
@@ -603,8 +606,8 @@ def test_robots_que_prohibe_el_enlace_no_lo_pide(tmp_path: Path, httpx_mock: HTT
     assert len(httpx_mock.get_requests()) == 1
 
 
-# M29, criterio 16: alias por hash. El primer resultado se persiste con
-# guardar_descarga(resultado, encargo.grupo_alias), igual que los scripts. Las
+# M29, criterio 16: alias por hash. El primer resultado lo persiste descargar()
+# (desde M34, con store). Las
 # etiquetas difieren a propósito: se mide el alias, no "misma ruta, mismos bytes".
 # Excepción al criterio 11 autorizada por el criterio 16: en v1, un encargo_id
 # nuevo con bytes idénticos en el mismo grupo escribía un segundo archivo.
@@ -630,7 +633,6 @@ def test_mismos_bytes_mismo_grupo_no_escribe_y_apunta_al_original(
 
     with Store(tmp_path / "store.db") as store:
         resultado1 = descargar(primero, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
-        store.guardar_descarga(resultado1, primero.grupo_alias)
         resultado2 = descargar(segundo, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
 
     assert resultado2.exito is True
@@ -650,7 +652,6 @@ def test_mismos_bytes_otro_grupo_tiene_archivo_propio(tmp_path: Path, httpx_mock
 
     with Store(tmp_path / "store.db") as store:
         resultado1 = descargar(primero, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
-        store.guardar_descarga(resultado1, primero.grupo_alias)
         resultado2 = descargar(otro, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
 
     assert resultado2.exito is True
@@ -671,7 +672,6 @@ def test_original_ausente_en_disco_no_hay_alias_y_se_escribe_el_propio(
 
     with Store(tmp_path / "store.db") as store:
         resultado1 = descargar(primero, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
-        store.guardar_descarga(resultado1, primero.grupo_alias)
         assert resultado1.ruta_local is not None
         resultado1.ruta_local.unlink()  # solo el test borra: simula un disco que perdió el archivo
         resultado2 = descargar(segundo, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
@@ -838,3 +838,61 @@ def test_dos_puertas_con_destinos_distintos_se_piden_con_su_vestibulo(
     assert resultado.intentos[0].motivo_fallo == "vestibulo_sin_pdf"
     assert resultado.intentos[1].enlace_vestibulo == pdf_1
     assert [str(p.url) for p in httpx_mock.get_requests()] == [url_0, pdf_0, url_1, pdf_1]
+
+
+# M34: descargar() es el único camino de escritura. Con store persiste en `descargas`
+# (nunca en `documentos`), éxito o fallo; una omisión no escribe (regla de M35).
+
+
+def _contar(store: Store, tabla: str) -> int:
+    return store._conn.execute(f"SELECT COUNT(*) FROM {tabla}").fetchone()[0]
+
+
+def test_con_store_descargar_escribe_en_descargas_y_no_en_documentos(
+    tmp_path: Path, httpx_mock: HTTPXMock
+) -> None:
+    httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
+    settings = _settings(tmp_path)
+    encargo = _encargo()
+
+    with Store(tmp_path / "store.db") as store:
+        resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+
+        assert store.hash_registrado(encargo.encargo_id) == resultado.sha256
+        assert _contar(store, "descargas") == 1
+        assert _contar(store, "intentos") == 1
+        assert store.contar() == 0
+
+
+def test_con_store_un_fallo_tambien_se_escribe(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    httpx_mock.add_response(status_code=404)
+    settings = _settings(tmp_path)
+    encargo = _encargo()
+
+    with Store(tmp_path / "store.db") as store:
+        resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+
+        assert resultado.exito is False
+        fila = store._conn.execute("SELECT exito, motivo_fallo FROM descargas").fetchone()
+        assert (fila["exito"], fila["motivo_fallo"]) == (0, resultado.motivo_fallo)
+        assert store.contar() == 0
+
+
+def test_una_omision_no_escribe_nada(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    httpx_mock.add_response(status_code=200, content=_PDF_BYTES)
+    settings = _settings(tmp_path)
+    encargo = _encargo()
+
+    with Store(tmp_path / "store.db") as store:
+        descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+        descargas_antes = store._conn.execute("SELECT * FROM descargas").fetchall()
+        intentos_antes = store._conn.execute("SELECT * FROM intentos").fetchall()
+
+        descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+
+        assert [tuple(f) for f in store._conn.execute("SELECT * FROM descargas").fetchall()] == [
+            tuple(f) for f in descargas_antes
+        ]
+        assert [tuple(f) for f in store._conn.execute("SELECT * FROM intentos").fetchall()] == [
+            tuple(f) for f in intentos_antes
+        ]

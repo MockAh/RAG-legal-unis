@@ -166,18 +166,34 @@ class Store:
             )
         self._conn.commit()
 
-    def hash_registrado(self, entry_id: str) -> str | None:
+    def _fila_vigente(self, encargo_id: str) -> sqlite3.Row | None:
+        """La última fila escrita del encargo en `descargas` (M34), o None si fue un fallo.
+
+        La última escritura gana, como en `documentos` (PK entry_id): un fallo viejo seguido
+        de un éxito da el éxito; un éxito seguido de un fallo da None. `capturado_en` va antes
+        que `rowid` porque el upsert de un hash ya registrado conserva el `rowid` viejo.
+        hash_registrado y ruta_registrada leen esta misma fila: nunca el hash de una versión
+        y la ruta de otra.
+        """
         fila = self._conn.execute(
-            "SELECT sha256 FROM documentos WHERE entry_id = ? AND exito = 1",
-            (entry_id,),
+            """
+            SELECT sha256, ruta_local, exito FROM descargas
+            WHERE encargo_id = ?
+            ORDER BY capturado_en DESC, rowid DESC
+            LIMIT 1
+            """,
+            (encargo_id,),
         ).fetchone()
+        if fila is None or not fila["exito"]:
+            return None
+        return fila
+
+    def hash_registrado(self, entry_id: str) -> str | None:
+        fila = self._fila_vigente(entry_id)
         return fila["sha256"] if fila is not None else None
 
     def ruta_registrada(self, entry_id: str) -> Path | None:
-        fila = self._conn.execute(
-            "SELECT ruta_local FROM documentos WHERE entry_id = ?",
-            (entry_id,),
-        ).fetchone()
+        fila = self._fila_vigente(entry_id)
         if fila is None or fila["ruta_local"] is None:
             return None
         return Path(fila["ruta_local"])

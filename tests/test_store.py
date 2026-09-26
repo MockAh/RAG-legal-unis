@@ -34,7 +34,7 @@ def test_crear_store_crea_archivo_y_tabla_vacia(tmp_path: Path) -> None:
 def test_guardar_exitoso_y_recuperar_hash(tmp_path: Path) -> None:
     with Store(tmp_path / "test.db") as store:
         resultado = _resultado_exitoso()
-        store.guardar(resultado)
+        store.guardar_descarga(resultado, grupo_alias="g1")
         assert store.hash_registrado(resultado.encargo_id) == resultado.sha256
 
 
@@ -50,8 +50,10 @@ def test_guardar_mismo_entry_id_con_datos_distintos_actualiza(tmp_path: Path) ->
     with Store(tmp_path / "test.db") as store:
         resultado = _resultado_exitoso()
         store.guardar(resultado)
+        store.guardar_descarga(resultado, grupo_alias="g1")
         actualizado = resultado.model_copy(update={"sha256": "b" * 64})
         store.guardar(actualizado)
+        store.guardar_descarga(actualizado, grupo_alias="g1")
         assert store.contar() == 1
         assert store.hash_registrado(resultado.encargo_id) == "b" * 64
 
@@ -64,14 +66,14 @@ def test_hash_registrado_entry_id_inexistente_devuelve_none(tmp_path: Path) -> N
 def test_hash_registrado_con_exito_falso_devuelve_none(tmp_path: Path) -> None:
     with Store(tmp_path / "test.db") as store:
         resultado = _resultado_exitoso(exito=False, sha256="c" * 64)
-        store.guardar(resultado)
+        store.guardar_descarga(resultado, grupo_alias="g1")
         assert store.hash_registrado(resultado.encargo_id) is None
 
 
 def test_ruta_registrada_vuelve_como_path(tmp_path: Path) -> None:
     with Store(tmp_path / "test.db") as store:
         resultado = _resultado_exitoso()
-        store.guardar(resultado)
+        store.guardar_descarga(resultado, grupo_alias="g1")
         ruta = store.ruta_registrada(resultado.encargo_id)
         assert isinstance(ruta, Path)
         assert ruta == resultado.ruta_local
@@ -96,7 +98,7 @@ def test_utf8_se_conserva_intacto(tmp_path: Path) -> None:
     entry_id = "uñam:reglamento-académico"
     with Store(tmp_path / "test.db") as store:
         resultado = _resultado_exitoso(encargo_id=entry_id)
-        store.guardar(resultado)
+        store.guardar_descarga(resultado, grupo_alias="g1")
         assert store.hash_registrado(entry_id) == resultado.sha256
 
 
@@ -262,3 +264,83 @@ def test_alias_por_hash_nunca_elige_un_alias_como_original(tmp_path: Path) -> No
         store.guardar_descarga(alias, _GRUPO)
 
         assert store.alias_por_hash(_GRUPO, "a" * 64, "uam:ro:cccccccccccc") is None
+
+
+# M34: hash_registrado y ruta_registrada leen `descargas`, la última fila escrita del
+# encargo (capturado_en DESC, rowid DESC), y solo si es exitosa. La última escritura
+# gana, como en `documentos`.
+
+
+def _fallo(**overrides) -> DownloadResult:
+    datos = dict(
+        encargo_id="uam:reglamento-organico",
+        modo="juridico",
+        exito=False,
+        motivo_fallo="timeout",
+        capturado_en=datetime(2026, 1, 1, 12, 0, 0),
+        intentos=[],
+    )
+    datos.update(overrides)
+    return DownloadResult(**datos)
+
+
+def test_fallo_viejo_y_exito_posterior_da_el_exito(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 1)), "g1")
+        exito = _resultado_exitoso(capturado_en=datetime(2026, 1, 2))
+        store.guardar_descarga(exito, "g1")
+        assert store.hash_registrado(exito.encargo_id) == exito.sha256
+        assert store.ruta_registrada(exito.encargo_id) == exito.ruta_local
+
+
+def test_exito_y_fallo_posterior_da_none(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        exito = _resultado_exitoso(capturado_en=datetime(2026, 1, 1))
+        store.guardar_descarga(exito, "g1")
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 2)), "g1")
+        assert store.hash_registrado(exito.encargo_id) is None
+        assert store.ruta_registrada(exito.encargo_id) is None
+
+
+def test_solo_fallos_con_sha256_nulo_da_none(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 1)), "g1")
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 2)), "g1")
+        assert store.hash_registrado("uam:reglamento-organico") is None
+        assert store.ruta_registrada("uam:reglamento-organico") is None
+
+
+def test_dos_versiones_hash_y_ruta_salen_de_la_misma_fila(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(
+            _resultado_exitoso(sha256="a" * 64, ruta_local=Path("/datos/a.pdf"), capturado_en=datetime(2026, 1, 1)),
+            "g1",
+        )
+        store.guardar_descarga(
+            _resultado_exitoso(sha256="b" * 64, ruta_local=Path("/datos/b.pdf"), capturado_en=datetime(2026, 1, 2)),
+            "g1",
+        )
+        assert store.hash_registrado("uam:reglamento-organico") == "b" * 64
+        assert store.ruta_registrada("uam:reglamento-organico") == Path("/datos/b.pdf")
+
+
+def test_capturado_en_decide_antes_que_rowid(tmp_path: Path) -> None:
+    # el upsert de un hash ya registrado conserva su rowid viejo
+    with Store(tmp_path / "test.db") as store:
+        version_a = _resultado_exitoso(sha256="a" * 64, ruta_local=Path("/datos/a.pdf"), capturado_en=datetime(2026, 1, 1))
+        store.guardar_descarga(version_a, "g1")
+        store.guardar_descarga(
+            _resultado_exitoso(sha256="b" * 64, ruta_local=Path("/datos/b.pdf"), capturado_en=datetime(2026, 1, 2)),
+            "g1",
+        )
+        store.guardar_descarga(version_a.model_copy(update={"capturado_en": datetime(2026, 1, 3)}), "g1")
+        assert store.hash_registrado("uam:reglamento-organico") == "a" * 64
+        assert store.ruta_registrada("uam:reglamento-organico") == Path("/datos/a.pdf")
+
+
+def test_fila_solo_en_documentos_ya_no_cuenta(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        resultado = _resultado_exitoso()
+        store.guardar(resultado)
+        assert store.hash_registrado(resultado.encargo_id) is None
+        assert store.ruta_registrada(resultado.encargo_id) is None
