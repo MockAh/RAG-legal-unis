@@ -1,7 +1,7 @@
 # 08 · Evidencia de campo
 
 > Hallazgos **medidos**, no supuestos, obtenidos antes de escribir una línea de código.
-> Estado: vivo · **v11** · se amplía con cada universidad nueva que se explore.
+> Estado: vivo · **v12** · se amplía con cada universidad nueva que se explore.
 > Mediciones: UAM, UNAM-70I, UNAM-OAG, UJAT, **UACAM**.
 > **Medido en vivo el 2026-09-06: la UAM (E1) y la UACAM (E10).** Los conteos de UNAM-OAG (E3)
 > y UJAT (E4) son de la captura original y **no se han vuelto a comprobar**; trátalos como
@@ -1433,6 +1433,40 @@ puerta, y `_cruzar_vestibulo` con la del enlace del salto. `Fetcher._intentar` p
 misma política que el modo jurídico, aplicada también al enlace del vestíbulo». No dice nada de
 los destinos de una redirección. E15.8 no propone arreglo.
 
+## E16 · Idempotencia en campo (2026-09-23)
+
+Segunda corrida de la UAM sobre los mismos fixtures, **cinco días después de E14**, con la base
+`legisuni_v2.db` de E14. Es anterior a E15 en el tiempo; se registra aquí porque no se anotó
+cuando se hizo.
+
+```
+$ .venv/bin/python scripts/cosecha_uam.py --html fixtures/uam-index.html \
+    --url-indice https://www.uam.mx/legislacion/index.html
+[...]
+--- resumen ---
+total: 47
+exitosas: 47
+omitidos: 47
+
+$ find data/norm/uam -type f | wc -l
+47
+$ sqlite3 legisuni_v2.db "select count(*) from descargas; select count(*) from intentos;"
+156
+156
+```
+
+**Medido:** los 47 encargos de la UAM ya estaban registrados y los 47 salieron como omitidos.
+El disco sigue con 47 archivos de la UAM y las tablas con 156 filas cada una, los mismos
+números que dejó E14.2. Ninguno se volvió a pedir ni a escribir: el disco y las tablas quedaron
+intactos.
+
+**Es la primera medición en campo de la regla 5 de `05`** (idempotencia de red, M21). **Y es
+el primer dato sobre C24:** una segunda corrida en otro día no duplicó la UAM en disco, al
+contrario que en E13.2.
+
+**El resumen cuenta los omitidos también como exitosas.** `exitosas: 47` y `omitidos: 47` con
+`total: 47`: las categorías no son disjuntas. Es lo que motiva M33.
+
 ---
 
 | Versión | Fecha | Cambio |
@@ -1448,3 +1482,4 @@ los destinos de una redirección. E15.8 no propone arreglo.
 | **v9** | **2026-09-18** | **Corrida de migración (E14): UAM y UJAT a través de `Encargo`, sobre disco y base vacíos (E13.6).** **156/156**: 156 archivos con fecha 2026-09-18 (UAM 47, UJAT 109), 156 filas en `descargas`, `documentos` e `intentos`, cero fallos y cero omitidos (E14.2); 156 hashes distintos, aunque en una sola corrida, así que el alias por hash sigue sin caso real entre días (E14.3). **El Reglamento de Estudios Superiores aparece con tres `encargo_id` distintos: C20 cerrado con datos** (E14.4). **7 slugs con forma de fecha en la UAM: E13.5 sigue abierta, es del Lector** (E14.5). 3 `.docx`, todos en la UAM (E14.6). Ninguna conclusión ni deuda nueva. |
 | **v10** | **2026-09-25** | **Primera corrida académica (E15): 7 encargos del lote `bloque-a-txt-71bdfaf1`, 3/7.** 16 puertas declaradas, 12 pedidas, 13 hosts; base `legisuni_v2.db` con 163 filas, 7 académicas y las 156 jurídicas de E14 en número (E15.1). **Las tres exitosas, en la puerta 0 y `copia_libre`**; la oficial abierta de A.7 no se pidió (E15.2). **`muro_de_pago` no se emitió ni una vez, y Nature es un muro:** en A.6 la cadena de redirecciones pasó por `idp.nature.com/authorize`, pero `es_muro_de_pago` solo ve la URL final; queda como motivo de una micro-tarea futura. Que sea un IdP es lectura del log, no comprobación (E15.3). **Seis `403` en cuatro hosts (Annual Reviews, Science, ScienceDirect, Hull): bloqueo al cliente, no muro**, y la regla de M27 aguantó (E15.4). Un `[PDF]` de Hull verificado el 2026-09-10 dio `403` el 25 (E15.5). **Vestíbulo en campo por primera vez: 3 `vestibulo_sin_pdf`, cero cruces con éxito**; A.6 pidió la misma página dos veces, diez respuestas HTTP para un artículo, lo que la hace candidata a deduplicar puertas por destino (E15.6). Fail-open de `robots.txt` en dos hosts más, cero `robots_prohibido` (E15.7). **Tres hosts visitados solo por redirección, sin consultar su `robots.txt`** (science.org, linkinghub.elsevier.com, idp.nature.com); queda abierto si es fallo o hueco de la spec, porque la pregunta 7 de `05` solo cubre el enlace del vestíbulo (E15.8, añadido el mismo día). Ninguna conclusión C ni deuda E6 nueva. |
 | **v11** | **2026-09-26** | **Lectura revisada de E15.3, con el mismo log de E15; sin cambios de medición.** El paso de A.6 por `idp.nature.com/authorize` es un intercambio de cookie de sesión en la primera visita al host, no un muro: la puerta 1 acabó en la misma página del artículo sin pasar por el IdP, y los saltos al PDF tampoco pasaron (E15.6). Un patrón sobre esa ruta haría depender el diagnóstico de las cookies. **La señal candidata es otra:** el enlace del PDF redirige (`303`) a la página del artículo en vez de servir el archivo; no está implementada y no tiene criterio en `05`. M32 hizo que los patrones de muro se evalúen contra toda la cadena de redirecciones, sin añadir ninguno; A.6 sigue siendo `vestibulo_sin_pdf`. La nota va en E15.3, fechada. La fila v10 se conserva tal como se escribió. Ningún número de E15 cambia. |
+| **v12** | **2026-09-26** | **Idempotencia en campo (E16), medida el 2026-09-23 y registrada ahora.** Segunda corrida de la UAM sobre los mismos fixtures, cinco días después de E14: `total: 47`, `omitidos: 47`; el disco sigue con 47 archivos de la UAM y `descargas` e `intentos` con 156 filas. Ninguno de los 47 encargos se volvió a pedir ni a escribir. **Primera medición en campo de la regla 5 de `05` (M21) y primer dato sobre C24.** **El resumen cuenta los omitidos también como exitosas** (`exitosas: 47` a la vez que `omitidos: 47`), lo que motiva M33. |
