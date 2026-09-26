@@ -1,7 +1,7 @@
 # 08 · Evidencia de campo
 
 > Hallazgos **medidos**, no supuestos, obtenidos antes de escribir una línea de código.
-> Estado: vivo · **v13** · se amplía con cada universidad nueva que se explore.
+> Estado: vivo · **v14** · se amplía con cada universidad nueva que se explore.
 > Mediciones: UAM, UNAM-70I, UNAM-OAG, UJAT, **UACAM**.
 > **Medido en vivo el 2026-09-06: la UAM (E1) y la UACAM (E10).** Los conteos de UNAM-OAG (E3)
 > y UJAT (E4) son de la captura original y **no se han vuelto a comprobar**; trátalos como
@@ -1520,6 +1520,47 @@ de filas (47 y 156), y esos números son correctos. Que las filas quedaran intac
 con el código del 23 no pudo ser cierto: la corrida reescribió los campos de las 47 filas. E16 se
 conserva tal como se escribió.
 
+## E18 · Reparación de las 47 filas (2026-09-26)
+
+`scripts/reparar_omisiones.py` (M35b) reparó las 47 filas de E17 en una transacción:
+**47 afectadas, 47 reparables, 0 intactas.** Antes se hizo una copia en
+`~/respaldo-acervo/legisuni_v2.antes-M35b.db`, fuera del repo.
+
+**Fuentes:** `url_final` y `http_status` salen de `intentos`. `bytes` es el tamaño del archivo,
+con el SHA-256 verificado contra la fila. `puerta_usada = 0`, comprobado contra el `orden` del
+intento.
+
+**`capturado_en` es una estimación** (fecha de modificación del archivo). Las 47 caen el
+2026-09-18, en secuencia de 13:57:31 a 13:58:14, unos 43 segundos. La fecha y la secuencia
+respaldan que son los archivos de E14.
+
+**`content_type` sigue en NULL en las 47:** pérdida definitiva (E17).
+
+**Verificación posterior:** 0 filas con `bytes` en NULL. `descargas` sigue con 163 filas e
+`intentos` con 168, sin cambios. 168 = 156 jurídicos + 12 puertas pedidas por las 7 fichas del
+Bloque A (E15.1).
+
+### E18.1 · Anomalía abierta: 43 s es menos que el mínimo del rate limit
+
+Con `rate_limit_s = 1.0` (el valor por defecto de `legisuni/config.py`), 47 peticiones seguidas
+a un mismo host están separadas, entre la primera y la última, por **al menos 46 s**. Entre el
+primer archivo y el último se observan **43 s**. No es una confirmación del rate limit: es una
+discrepancia.
+
+Dos cosas impiden cerrarla:
+- **`rate_limit_s` no se registró en E14.** El 1.0 es el valor por defecto, no el valor medido
+  de esa corrida.
+- **`capturado_en` marca cuándo se escribió el archivo, no cuándo se recibió la respuesta.** La
+  distancia observada no es la distancia entre peticiones.
+
+Hay tres explicaciones posibles. **Ninguna está medida:**
+1. La primera respuesta tardó al menos 3 s más que la última.
+2. `rate_limit_s` era menor que 1 en esa corrida.
+3. Los 47 no fueron a un mismo host.
+
+**Pendiente:** que el informe de las corridas futuras registre `rate_limit_s` y el host, para
+que esto sea medible. No está implementado.
+
 ---
 
 | Versión | Fecha | Cambio |
@@ -1537,3 +1578,4 @@ conserva tal como se escribió.
 | **v11** | **2026-09-26** | **Lectura revisada de E15.3, con el mismo log de E15; sin cambios de medición.** El paso de A.6 por `idp.nature.com/authorize` es un intercambio de cookie de sesión en la primera visita al host, no un muro: la puerta 1 acabó en la misma página del artículo sin pasar por el IdP, y los saltos al PDF tampoco pasaron (E15.6). Un patrón sobre esa ruta haría depender el diagnóstico de las cookies. **La señal candidata es otra:** el enlace del PDF redirige (`303`) a la página del artículo en vez de servir el archivo; no está implementada y no tiene criterio en `05`. M32 hizo que los patrones de muro se evalúen contra toda la cadena de redirecciones, sin añadir ninguno; A.6 sigue siendo `vestibulo_sin_pdf`. La nota va en E15.3, fechada. La fila v10 se conserva tal como se escribió. Ningún número de E15 cambia. |
 | **v12** | **2026-09-26** | **Idempotencia en campo (E16), medida el 2026-09-23 y registrada ahora.** Segunda corrida de la UAM sobre los mismos fixtures, cinco días después de E14: `total: 47`, `omitidos: 47`; el disco sigue con 47 archivos de la UAM y `descargas` e `intentos` con 156 filas. Ninguno de los 47 encargos se volvió a pedir ni a escribir. **Primera medición en campo de la regla 5 de `05` (M21) y primer dato sobre C24.** **El resumen cuenta los omitidos también como exitosas** (`exitosas: 47` a la vez que `omitidos: 47`), lo que motiva M33. |
 | **v13** | **2026-09-26** | **Una omisión pisó 47 filas (E17).** Una corrida de verificación del 26, sin red y sobre los mismos fixtures, dejó las 47 filas de la UAM en `descargas` con `bytes`, `content_type`, `http_status`, `url_final` y `puerta_usada` en NULL y `capturado_en` = 2026-09-26; el valor anterior no se conserva en la base. Causa: los scripts persistían el resultado de la omisión y el upsert sobrescribía la fila. **El daño empezó el 23** (el código de E16 ya pisaba) y el 26 lo repitió. Solo modo jurídico; la UJAT y las 7 académicas, intactas; cero alias, así que `duplicado_de` no se perdió. `documentos`, mismo daño, no se repara. **`content_type` es pérdida definitiva**; lo demás es recuperable (M35b, pendiente), y `capturado_en` solo como estimación. Arreglado en M35. **Nota fechada sobre E16:** «las tablas quedaron intactas» solo lo respaldan los recuentos, que siguen siendo correctos; E16 se conserva tal como se escribió. Ningún número de E14 ni de E16 cambia. |
+| **v14** | **2026-09-26** | **Reparación de las 47 filas (E18).** `scripts/reparar_omisiones.py` (M35b), en una transacción: 47 afectadas, 47 reparables, 0 intactas. `url_final` y `http_status` de `intentos`; `bytes` del tamaño del archivo con SHA-256 verificado; `puerta_usada = 0` comprobado contra el `orden` del intento. `capturado_en` es estimación (fecha de modificación): las 47 caen el 2026-09-18, de 13:57:31 a 13:58:14. `content_type` sigue en NULL: pérdida definitiva. Después: 0 filas con `bytes` en NULL; `descargas` 163 e `intentos` 168, sin cambios. Copia previa fuera del repo. **Anomalía abierta (E18.1):** 43 s entre el primer archivo y el último es menos que los 46 s mínimos de un rate limit de 1 s sobre 47 peticiones a un host; hay tres explicaciones y ninguna está medida, porque `rate_limit_s` no se registró en E14 y la fecha de un archivo no es la de su petición. Pendiente: registrar `rate_limit_s` y el host en el informe de las corridas futuras. |
