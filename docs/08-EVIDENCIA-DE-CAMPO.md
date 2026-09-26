@@ -1,7 +1,7 @@
 # 08 · Evidencia de campo
 
 > Hallazgos **medidos**, no supuestos, obtenidos antes de escribir una línea de código.
-> Estado: vivo · **v12** · se amplía con cada universidad nueva que se explore.
+> Estado: vivo · **v13** · se amplía con cada universidad nueva que se explore.
 > Mediciones: UAM, UNAM-70I, UNAM-OAG, UJAT, **UACAM**.
 > **Medido en vivo el 2026-09-06: la UAM (E1) y la UACAM (E10).** Los conteos de UNAM-OAG (E3)
 > y UJAT (E4) son de la captura original y **no se han vuelto a comprobar**; trátalos como
@@ -1467,6 +1467,59 @@ contrario que en E13.2.
 **El resumen cuenta los omitidos también como exitosas.** `exitosas: 47` y `omitidos: 47` con
 `total: 47`: las categorías no son disjuntas. Es lo que motiva M33.
 
+## E17 · Una omisión pisó 47 filas (2026-09-26)
+
+Una corrida de verificación del 26 de septiembre, sin red y sobre los mismos fixtures, reescribió
+las 47 filas de la UAM en `descargas`: `bytes`, `content_type`, `http_status`, `url_final` y
+`puerta_usada` quedaron en NULL, y `capturado_en` = 2026-09-26 en las 47 filas. **El valor
+anterior de `capturado_en` no se conserva en la base.** Que fuera 2026-09-18 se deduce de E14;
+no está medido.
+
+```
+$ sqlite3 -readonly legisuni_v2.db "SELECT COUNT(*) FROM descargas WHERE encargo_id LIKE 'uam:%' AND exito=1 AND bytes IS NULL;"
+47
+$ sqlite3 -readonly legisuni_v2.db "SELECT COUNT(*) FROM descargas WHERE encargo_id LIKE 'uam:%' AND exito=1 AND content_type IS NULL;"
+47
+$ sqlite3 -readonly legisuni_v2.db "SELECT modo, COUNT(*) FROM descargas WHERE exito=1 AND bytes IS NULL GROUP BY modo;"
+juridico|47
+$ sqlite3 -readonly legisuni_v2.db "SELECT COUNT(*) FROM descargas WHERE duplicado_de IS NOT NULL;"
+0
+$ sqlite3 -readonly legisuni_v2.db "SELECT encargo_id, bytes, http_status, substr(capturado_en,1,10) FROM descargas WHERE encargo_id LIKE 'uam:%' LIMIT 3;"
+uam:2026:c24626739b6f|||2026-09-26
+uam:lo:315cd99e5cb9|||2026-09-26
+uam:ro:2225840dbe72|||2026-09-26
+```
+
+**Causa:** los scripts llamaban a `guardar_descarga` también con el resultado de una omisión,
+que no trae esos campos, y el upsert sobre `(encargo_id, sha256)` los sobrescribió.
+
+**El daño empezó el 23.** El código de E16 (2026-09-23) ya persistía el resultado de la
+omisión: `guardar` y `guardar_descarga` sin condición en `cosecha_uam.py` desde M23c, visto en
+git. La corrida del 26 lo repitió. Por eso el `capturado_en` que se mide es el del 26.
+
+**Alcance medido:** 47 filas, solo modo jurídico. La UJAT y las 7 académicas, intactas. Cero
+alias en la base, así que el riesgo de borrar `duplicado_de` no se materializó. `documentos`
+sufrió el mismo daño y no se repara.
+
+**`content_type` es pérdida definitiva:** `intentos` no guarda esa columna, y deducirla de la
+extensión sería inventar la cabecera del servidor.
+
+**Lo demás es recuperable** desde `intentos` y desde los archivos en disco (M35b, pendiente).
+**`capturado_en` no es reparable con certeza:** la fecha de modificación de un archivo es cuándo
+se escribió el archivo, no cuándo se capturó la respuesta. Sirve como estimación, y M35b tiene
+que declararla como tal.
+
+**Arreglado en M35:** una omisión ya no escribe nada.
+
+**Los números de E14 y E16 no cambian:** describen lo medido entonces, y lo medido fue correcto.
+Lo que cambió después es la base.
+
+**Nota sobre E16 (2026-09-26).** E16 dice que ninguno de los 47 se volvió a pedir **ni a
+escribir** y que «el disco y las tablas quedaron intactos». Lo medido fue el número de archivos y
+de filas (47 y 156), y esos números son correctos. Que las filas quedaran intactas no se midió, y
+con el código del 23 no pudo ser cierto: la corrida reescribió los campos de las 47 filas. E16 se
+conserva tal como se escribió.
+
 ---
 
 | Versión | Fecha | Cambio |
@@ -1483,3 +1536,4 @@ contrario que en E13.2.
 | **v10** | **2026-09-25** | **Primera corrida académica (E15): 7 encargos del lote `bloque-a-txt-71bdfaf1`, 3/7.** 16 puertas declaradas, 12 pedidas, 13 hosts; base `legisuni_v2.db` con 163 filas, 7 académicas y las 156 jurídicas de E14 en número (E15.1). **Las tres exitosas, en la puerta 0 y `copia_libre`**; la oficial abierta de A.7 no se pidió (E15.2). **`muro_de_pago` no se emitió ni una vez, y Nature es un muro:** en A.6 la cadena de redirecciones pasó por `idp.nature.com/authorize`, pero `es_muro_de_pago` solo ve la URL final; queda como motivo de una micro-tarea futura. Que sea un IdP es lectura del log, no comprobación (E15.3). **Seis `403` en cuatro hosts (Annual Reviews, Science, ScienceDirect, Hull): bloqueo al cliente, no muro**, y la regla de M27 aguantó (E15.4). Un `[PDF]` de Hull verificado el 2026-09-10 dio `403` el 25 (E15.5). **Vestíbulo en campo por primera vez: 3 `vestibulo_sin_pdf`, cero cruces con éxito**; A.6 pidió la misma página dos veces, diez respuestas HTTP para un artículo, lo que la hace candidata a deduplicar puertas por destino (E15.6). Fail-open de `robots.txt` en dos hosts más, cero `robots_prohibido` (E15.7). **Tres hosts visitados solo por redirección, sin consultar su `robots.txt`** (science.org, linkinghub.elsevier.com, idp.nature.com); queda abierto si es fallo o hueco de la spec, porque la pregunta 7 de `05` solo cubre el enlace del vestíbulo (E15.8, añadido el mismo día). Ninguna conclusión C ni deuda E6 nueva. |
 | **v11** | **2026-09-26** | **Lectura revisada de E15.3, con el mismo log de E15; sin cambios de medición.** El paso de A.6 por `idp.nature.com/authorize` es un intercambio de cookie de sesión en la primera visita al host, no un muro: la puerta 1 acabó en la misma página del artículo sin pasar por el IdP, y los saltos al PDF tampoco pasaron (E15.6). Un patrón sobre esa ruta haría depender el diagnóstico de las cookies. **La señal candidata es otra:** el enlace del PDF redirige (`303`) a la página del artículo en vez de servir el archivo; no está implementada y no tiene criterio en `05`. M32 hizo que los patrones de muro se evalúen contra toda la cadena de redirecciones, sin añadir ninguno; A.6 sigue siendo `vestibulo_sin_pdf`. La nota va en E15.3, fechada. La fila v10 se conserva tal como se escribió. Ningún número de E15 cambia. |
 | **v12** | **2026-09-26** | **Idempotencia en campo (E16), medida el 2026-09-23 y registrada ahora.** Segunda corrida de la UAM sobre los mismos fixtures, cinco días después de E14: `total: 47`, `omitidos: 47`; el disco sigue con 47 archivos de la UAM y `descargas` e `intentos` con 156 filas. Ninguno de los 47 encargos se volvió a pedir ni a escribir. **Primera medición en campo de la regla 5 de `05` (M21) y primer dato sobre C24.** **El resumen cuenta los omitidos también como exitosas** (`exitosas: 47` a la vez que `omitidos: 47`), lo que motiva M33. |
+| **v13** | **2026-09-26** | **Una omisión pisó 47 filas (E17).** Una corrida de verificación del 26, sin red y sobre los mismos fixtures, dejó las 47 filas de la UAM en `descargas` con `bytes`, `content_type`, `http_status`, `url_final` y `puerta_usada` en NULL y `capturado_en` = 2026-09-26; el valor anterior no se conserva en la base. Causa: los scripts persistían el resultado de la omisión y el upsert sobrescribía la fila. **El daño empezó el 23** (el código de E16 ya pisaba) y el 26 lo repitió. Solo modo jurídico; la UJAT y las 7 académicas, intactas; cero alias, así que `duplicado_de` no se perdió. `documentos`, mismo daño, no se repara. **`content_type` es pérdida definitiva**; lo demás es recuperable (M35b, pendiente), y `capturado_en` solo como estimación. Arreglado en M35. **Nota fechada sobre E16:** «las tablas quedaron intactas» solo lo respaldan los recuentos, que siguen siendo correctos; E16 se conserva tal como se escribió. Ningún número de E14 ni de E16 cambia. |
