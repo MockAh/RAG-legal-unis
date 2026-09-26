@@ -11,6 +11,7 @@ tope de tamaño); lo prueban `test_el_salto_del_vestibulo_sale_por_el_fetcher` y
 
 import ast
 import json
+import sqlite3
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -242,3 +243,42 @@ def test_resumen_no_cuenta_los_omitidos_como_exitosas(
     assert "total: 1\nexitosas: 0\nomitidos: 1\n" in segunda
     # la segunda corrida no pide nada: el omitido lo es de verdad
     assert len(httpx_mock.get_requests()) == peticiones_primera
+
+
+# M35: una omisión no escribe. Medido en la base v2: la segunda corrida de la UAM
+# (E16) dejó 47 filas con bytes, content_type, http_status, url_final y
+# puerta_usada en NULL y capturado_en con la fecha de la omisión.
+
+
+def _filas(db_path: Path) -> tuple[list[tuple], list[tuple]]:
+    conn = sqlite3.connect(str(db_path))
+    descargas = conn.execute("SELECT * FROM descargas ORDER BY encargo_id, sha256").fetchall()
+    documentos = conn.execute("SELECT * FROM documentos ORDER BY entry_id").fetchall()
+    conn.close()
+    return descargas, documentos
+
+
+@pytest.mark.parametrize("modulo", [cosecha, cosecha_uam, lote], ids=["cosecha", "cosecha_uam", "lote"])
+def test_omision_no_pisa_la_fila_registrada(
+    modulo: object,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    httpx_mock: HTTPXMock,
+) -> None:
+    db_path = tmp_path / "prueba.db"
+    monkeypatch.setenv("LEGISUNI_USER_AGENT", _USER_AGENT)
+    monkeypatch.setenv("LEGISUNI_DB_PATH", str(db_path))
+    monkeypatch.setenv("LEGISUNI_DATA_ROOT", str(tmp_path / "data"))
+    monkeypatch.setenv("LEGISUNI_RATE_LIMIT_S", "0")
+    httpx_mock.add_callback(_servir_pdf, is_reusable=True)
+    if modulo is lote:
+        argumentos = _lote_de_un_encargo(tmp_path)
+    else:
+        argumentos = {**(_UJAT if modulo is cosecha else _UAM), "limite": 1}
+
+    modulo.main(dry_run=False, **argumentos)
+    tras_primera = _filas(db_path)
+    modulo.main(dry_run=False, **argumentos)
+
+    assert len(tras_primera[0]) == 1
+    assert _filas(db_path) == tras_primera

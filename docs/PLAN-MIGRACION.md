@@ -602,3 +602,45 @@ Dos deudas, ambas medidas.
   sin el segundo salto (falla con el `puertas.py` anterior); control
   negativo, dos destinos distintos → cada puerta con su vestíbulo.
 - Commit: `M33: resumen disjunto y puertas duplicadas por destino`
+
+## M35 · Una omisión no pisa la fila registrada
+- Motivo, medido en `legisuni_v2.db` (2026-09-26): la segunda corrida de la
+  UAM (E16 de `docs/08`) dejó sus **47 filas** de `descargas` con `bytes`,
+  `content_type`, `http_status`, `url_final` y `puerta_usada` en NULL y
+  `capturado_en = 2026-09-26`. La UJAT está intacta. El daño es solo del modo
+  jurídico.
+- Causa: el resultado de una omisión (regla 5) solo trae `sha256` y
+  `ruta_local`. Los scripts lo persistían igual, y el upsert sobre
+  `(encargo_id, sha256)` pisaba la fila buena. `documentos` recibía el mismo
+  resultado por `guardar`.
+- **Decisión (opción A): al omitir no se escribe.** `cosecha.py`,
+  `cosecha_uam.py` y `lote.py` solo llaman a `guardar` y `guardar_descarga`
+  si el encargo no se omitió. Una omisión no es una observación nueva, así que
+  `capturado_en` conserva el momento real de la captura (D5). Cubre las dos
+  tablas.
+  - Descartada B (COALESCE en el `ON CONFLICT`): no protege `capturado_en`
+    (NOT NULL) y, en `documentos` (PK solo `entry_id`), dejaría `sha256` y
+    `ruta_local` de un éxito en una fila con `exito = 0`.
+  - Descartada C (`Store` ignora resultados con `exito` e `intentos == []`):
+    deduce la omisión de la forma del resultado.
+- **La regla vive, por ahora, en los tres scripts.** Un llamador nuevo que
+  persista una omisión volvería a pisar. M34 la centraliza en `descargar()`.
+- **Riesgo que no llegó a materializarse:** el resultado de una omisión trae
+  `duplicado_de = None`, así que omitir un alias le habría borrado el
+  `duplicado_de` y lo habría convertido en dueño de su archivo. Medido: la
+  base tiene cero alias (E14 es anterior a M29).
+- **Pérdida medida, no reparable: `content_type`** de las 47 filas de la UAM.
+  `intentos` no lo guarda, y deducirlo de la extensión sería inventar la
+  cabecera del servidor. Se queda en NULL.
+- **`documentos` no se repara:** sus 47 filas de la UAM sufrieron el mismo
+  daño y quedan así. M34 la congela y deja de leerse.
+- La reparación de las 47 filas de `descargas` (`url_final` y `http_status`
+  desde `intentos`, `bytes` del archivo en disco, `puerta_usada = 0`,
+  `capturado_en` de la fecha de modificación del archivo) queda para **M35b**,
+  aparte, y la ejecuta el humano.
+- Test en `tests/test_cliente_http.py`, parametrizado sobre los tres `main()`:
+  dos corridas sobre la misma base, y las filas de `descargas` y `documentos`
+  quedan idénticas tras la segunda, `capturado_en` incluido. Falla con los
+  scripts anteriores.
+- Criterio 11: ninguna aserción existente cambia. Contratos sin cambios.
+- Commit: `M35: una omisión no pisa la fila registrada`
