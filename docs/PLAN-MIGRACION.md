@@ -561,3 +561,44 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
 - Criterio 11: los patrones siguen siendo `Shibboleth.sso` y `/cas/login`;
   las redirecciones jurídicas medidas son http→https (E12.3).
 - Commit: `M32: muros sobre la cadena de redirecciones`
+
+## M33 · Resumen disjunto y puertas duplicadas por destino
+Dos deudas, ambas medidas.
+
+**1. El resumen de los scripts cuenta los omitidos como exitosas** (E16 de
+`docs/08`: `total: 47`, `exitosas: 47`, `omitidos: 47`).
+- Causa: `descargar()` devuelve `exito=True` también para el omitido por la
+  regla 5, y `cosecha.py` / `cosecha_uam.py` lo contaban en las dos
+  categorías. `lote.py` ni siquiera tenía `omitidos`.
+- Los tres scripts: omitido → `omitidos`; si no, `exito` → `exitosas`; si
+  no, su motivo. `exitosas + omitidos + fallos == total`. `lote.py` gana la
+  línea `omitidos:`; `sin puertas` sigue aparte, fuera de `total`. Un alias
+  por hash (`duplicado_de`) sigue siendo exitosa: sí se pidió.
+- Test en `tests/test_cliente_http.py`, parametrizado sobre los tres
+  `main()`: dos corridas sobre la misma base → `exitosas: 1, omitidos: 0` y
+  luego `exitosas: 0, omitidos: 1`, sin peticiones en la segunda. Falla con
+  los scripts anteriores.
+
+**2. Puertas duplicadas por destino** (E15.6: en A.6 la oficial y el
+`resolutor_doi` acaban en la misma página y cada una cruzó su vestíbulo).
+- **Se detecta después de pedir, por `url_final`, antes del vestíbulo**
+  (opción b). No antes de pedir por URL normalizada (a): en A.6 las URLs
+  iniciales eran distintas y solo coincidían tras redirigir, así que (a) no
+  se activaría y nada medido la pide. No durante la cadena (c): exige
+  seguir redirecciones a mano en el `Fetcher` y se cruza con E15.8, abierta.
+- `puertas.py` guarda, por encargo, `url_final → (orden, motivo)` de cada
+  puerta fallida que tuvo respuesta HTTP (un timeout o `robots_prohibido` no
+  dejan destino). Si una puerta posterior acaba en un destino ya visto, no
+  se evalúa ni se cruza su vestíbulo: su `IntentoPuerta` lleva el motivo de
+  la primera, con su `url_final` y `http_status` reales y sin
+  `enlace_vestibulo`. El recibo sigue con una fila por puerta.
+- **Qué ahorra en A.6:** el salto al PDF de la puerta 1 y su redirección (2
+  de 4 respuestas). **Qué no:** la página del artículo se vuelve a pedir,
+  porque el `Fetcher` ya siguió la redirección.
+- Modo jurídico: una sola puerta, el diccionario nunca tiene entrada previa.
+  Criterio 11: ninguna aserción existente cambia. Contratos sin cambios.
+- Tests en `tests/test_descargar.py`: A.6 con dos puertas → dos intentos
+  `vestibulo_sin_pdf`, `puertas_agotadas`, y la lista exacta de peticiones
+  sin el segundo salto (falla con el `puertas.py` anterior); control
+  negativo, dos destinos distintos → cada puerta con su vestíbulo.
+- Commit: `M33: resumen disjunto y puertas duplicadas por destino`

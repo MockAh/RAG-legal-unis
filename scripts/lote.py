@@ -64,14 +64,19 @@ def main(
 
     motivos_fallo: Counter[str] = Counter()
     exitosas = 0
+    omitidos = 0
 
     with Store(settings.db_path) as store:
         for encargo in encargos:
             logger.info("pidiendo %s (%d puertas)", encargo.encargo_id, len(encargo.puertas))
+            omitido = store.hash_registrado(encargo.encargo_id) is not None
             resultado = descargar(encargo, fetcher, robots, settings, store=store)
             store.guardar(resultado)
             store.guardar_descarga(resultado, encargo.grupo_alias)
-            if resultado.exito:
+            # categorías disjuntas: un omitido también trae exito=True (E16 de docs/08)
+            if omitido:
+                omitidos += 1
+            elif resultado.exito:
                 exitosas += 1
             else:
                 assert resultado.motivo_fallo is not None
@@ -84,6 +89,7 @@ def main(
     typer.echo("--- resumen ---")
     typer.echo(f"total: {len(encargos)}")
     typer.echo(f"exitosas: {exitosas}")
+    typer.echo(f"omitidos: {omitidos}")
     for motivo, cuenta in motivos_fallo.items():
         typer.echo(f"  {motivo}: {cuenta}")
     typer.echo(f"sin puertas (no se piden): {len(lote['no_obtenidos'])}")

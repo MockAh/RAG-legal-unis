@@ -2,8 +2,14 @@
 
 Orden dentro de una puerta (docs/01 línea 937): petición → guardián → vestíbulo (un
 salto, solo con `cruzar_vestibulos=True` y respuesta HTML) → guardián.
+
+M33 (E15.6 de docs/08): si la respuesta de una puerta acaba en una `url_final` a la
+que ya llegó una puerta anterior del mismo encargo, no se evalúa ni se cruza su
+vestíbulo otra vez: su intento lleva el motivo de la primera. Se detecta después de
+pedir, porque en A.6 las URLs iniciales eran distintas y solo coincidían tras redirigir.
 """
 
+import logging
 from dataclasses import dataclass
 
 from legisuni.config import Settings
@@ -11,6 +17,8 @@ from legisuni.contracts import Encargo, IntentoPuerta, MotivoFallo, Puerta
 from legisuni.descargador import guard, muros, urlnorm, vestibulo
 from legisuni.descargador.fetch import Fetcher, RespuestaCruda
 from legisuni.descargador.robots import RobotsCache
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -28,6 +36,8 @@ def probar_puertas(
 ) -> ResultadoPuertas:
     intentos: list[IntentoPuerta] = []
     ultimo_motivo: MotivoFallo | None = None
+    # url_final de cada puerta que tuvo respuesta HTTP (antes del vestíbulo) → (orden, motivo)
+    destinos: dict[str, tuple[int, MotivoFallo]] = {}
 
     for orden, puerta in enumerate(encargo.puertas):
         # puerta.url nunca se modifica: es proveniencia (D5)
@@ -39,6 +49,14 @@ def probar_puertas(
             continue
 
         respuesta = fetcher.pedir(url)
+        destino = respuesta.url_final if respuesta.status is not None else None
+
+        if destino is not None and destino in destinos:
+            orden_previo, ultimo_motivo = destinos[destino]
+            logger.info("puerta %d: destino %s ya pedido por la puerta %d", orden, destino, orden_previo)
+            intentos.append(construir_intento(orden, puerta, url, respuesta, exito=False, motivo=ultimo_motivo))
+            continue
+
         motivo, extension = _evaluar_respuesta(respuesta, settings)
         enlace_vestibulo: str | None = None
 
@@ -53,6 +71,8 @@ def probar_puertas(
 
         if motivo is not None:
             ultimo_motivo = motivo
+            if destino is not None:
+                destinos.setdefault(destino, (orden, motivo))
             intentos.append(
                 construir_intento(
                     orden, puerta, url, respuesta, exito=False, motivo=motivo,

@@ -10,6 +10,7 @@ tope de tamaño); lo prueban `test_el_salto_del_vestibulo_sale_por_el_fetcher` y
 """
 
 import ast
+import json
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -33,6 +34,7 @@ sys.path.insert(0, str(_RAIZ / "scripts"))
 
 import cosecha  # noqa: E402
 import cosecha_uam  # noqa: E402
+import lote  # noqa: E402
 
 _USER_AGENT = "LegisUni-test/9.9 (+https://example.org)"
 
@@ -180,3 +182,63 @@ def test_vestibulo_no_importa_httpx() -> None:
     ] + [nodo.module or "" for nodo in ast.walk(arbol) if isinstance(nodo, ast.ImportFrom)]
 
     assert not any(m == "httpx" or m.startswith("httpx.") for m in modulos)
+
+
+# M33: las categorías del resumen son disjuntas. Medido en E16 de docs/08: la segunda
+# corrida de la UAM dio `exitosas: 47` y `omitidos: 47` con `total: 47`.
+
+
+def _servir_pdf(peticion: httpx.Request) -> httpx.Response:
+    if peticion.url.path == "/robots.txt":
+        return httpx.Response(404)
+    return httpx.Response(200, content=b"%PDF-1.7\n")
+
+
+def _lote_de_un_encargo(tmp_path: Path) -> dict:
+    encargo = Encargo(
+        encargo_id="doi:10.1/x",
+        modo="academico",
+        solicitante="lote-test",
+        puertas=[Puerta(url="https://repo.example.org/1.pdf", tipo="copia_libre", url_base=None, evidencia="lista:t#1")],
+        cajon="papers",
+        etiqueta="autor-2020__00000000",
+        cruzar_vestibulos=True,
+        grupo_alias="doi:10.1/x",
+        creado_en=datetime(2026, 1, 1),
+    )
+    ruta = tmp_path / "lote.json"
+    ruta.write_text(
+        json.dumps({"lote_id": "lote-test", "encargos": [encargo.model_dump(mode="json")], "no_obtenidos": []}),
+        encoding="utf-8",
+    )
+    return dict(encargos_json=ruta, limite=None)
+
+
+@pytest.mark.parametrize("modulo", [cosecha, cosecha_uam, lote], ids=["cosecha", "cosecha_uam", "lote"])
+def test_resumen_no_cuenta_los_omitidos_como_exitosas(
+    modulo: object,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    httpx_mock: HTTPXMock,
+) -> None:
+    monkeypatch.setenv("LEGISUNI_USER_AGENT", _USER_AGENT)
+    monkeypatch.setenv("LEGISUNI_DB_PATH", str(tmp_path / "prueba.db"))
+    monkeypatch.setenv("LEGISUNI_DATA_ROOT", str(tmp_path / "data"))
+    monkeypatch.setenv("LEGISUNI_RATE_LIMIT_S", "0")
+    httpx_mock.add_callback(_servir_pdf, is_reusable=True)
+    if modulo is lote:
+        argumentos = _lote_de_un_encargo(tmp_path)
+    else:
+        argumentos = {**(_UJAT if modulo is cosecha else _UAM), "limite": 1}
+
+    modulo.main(dry_run=False, **argumentos)
+    primera = capsys.readouterr().out
+    peticiones_primera = len(httpx_mock.get_requests())
+    modulo.main(dry_run=False, **argumentos)
+    segunda = capsys.readouterr().out
+
+    assert "total: 1\nexitosas: 1\nomitidos: 0\n" in primera
+    assert "total: 1\nexitosas: 0\nomitidos: 1\n" in segunda
+    # la segunda corrida no pide nada: el omitido lo es de verdad
+    assert len(httpx_mock.get_requests()) == peticiones_primera

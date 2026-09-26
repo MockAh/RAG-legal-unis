@@ -764,3 +764,77 @@ def test_cadena_de_a6_nature_da_vestibulo_sin_pdf_no_muro(tmp_path: Path, httpx_
         url_articulo, url_authorize, url_transit, url_articulo, url_pdf, url_articulo,
     ]
     assert list(tmp_path.rglob("*")) == []
+
+
+# M33: puertas duplicadas por destino (E15.6 de docs/08). Se detecta después de pedir,
+# por url_final antes del vestíbulo: en A.6 las URLs iniciales eran distintas.
+
+
+def _encargo_de_dos_puertas(url_0: str, url_1: str) -> Encargo:
+    return _encargo_academico(
+        puertas=[
+            Puerta(url=url_0, tipo="oficial", url_base=None, evidencia="lista:test#A.6"),
+            Puerta(url=url_1, tipo="resolutor_doi", url_base=None, evidencia="lista:test#A.6"),
+        ]
+    )
+
+
+def test_a6_segunda_puerta_con_el_mismo_destino_no_cruza_otra_vez_el_vestibulo(
+    tmp_path: Path, httpx_mock: HTTPXMock
+) -> None:
+    url_articulo = "https://www.nature.com/articles/nature09678"
+    url_pdf = "https://www.nature.com/articles/nature09678.pdf"
+    url_doi = "https://doi.org/10.1038/nature09678"
+    url_authorize = "https://idp.nature.com/authorize?response_type=cookie&client_id=grover"
+    html_articulo = _html(f'<meta name="citation_pdf_url" content="{url_pdf}">')
+    # puerta 0: 303 → authorize → 302 → artículo HTML; salto al PDF 303 → artículo HTML
+    httpx_mock.add_response(url=url_articulo, status_code=303, headers={"Location": url_authorize})
+    httpx_mock.add_response(url=url_authorize, status_code=302, headers={"Location": url_articulo})
+    httpx_mock.add_response(url=url_articulo, status_code=200, content=html_articulo)
+    httpx_mock.add_response(url=url_pdf, status_code=303, headers={"Location": url_articulo})
+    httpx_mock.add_response(url=url_articulo, status_code=200, content=html_articulo)
+    # puerta 1: doi.org 302 → la misma página; su vestíbulo ya no se cruza
+    httpx_mock.add_response(url=url_doi, status_code=302, headers={"Location": url_articulo})
+    httpx_mock.add_response(url=url_articulo, status_code=200, content=html_articulo)
+    settings = _settings(tmp_path)
+
+    resultado = descargar(
+        _encargo_de_dos_puertas(url_articulo, url_doi), _fetcher(settings), RobotsPermiteTodo(), settings
+    )
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "puertas_agotadas"
+    assert [i.orden for i in resultado.intentos] == [0, 1]
+    assert [i.motivo_fallo for i in resultado.intentos] == ["vestibulo_sin_pdf", "vestibulo_sin_pdf"]
+    omitida = resultado.intentos[1]
+    assert omitida.url == url_doi
+    assert omitida.url_final == url_articulo
+    assert omitida.http_status == 200
+    assert omitida.enlace_vestibulo is None
+    assert [str(p.url) for p in httpx_mock.get_requests()] == [
+        url_articulo, url_authorize, url_articulo, url_pdf, url_articulo,
+        url_doi, url_articulo,
+    ]
+
+
+def test_dos_puertas_con_destinos_distintos_se_piden_con_su_vestibulo(
+    tmp_path: Path, httpx_mock: HTTPXMock
+) -> None:
+    # control negativo: destinos distintos, cada puerta con su propio cruce
+    url_0 = "https://editorial.example.org/articulo/1"
+    url_1 = "https://repo.example.org/articulo/1"
+    pdf_0 = "https://editorial.example.org/articulo/1.pdf"
+    pdf_1 = "https://repo.example.org/articulo/1.pdf"
+    httpx_mock.add_response(url=url_0, status_code=200, content=_html(f'<meta name="citation_pdf_url" content="{pdf_0}">'))
+    httpx_mock.add_response(url=pdf_0, status_code=200, content=_html())
+    httpx_mock.add_response(url=url_1, status_code=200, content=_html(f'<meta name="citation_pdf_url" content="{pdf_1}">'))
+    httpx_mock.add_response(url=pdf_1, status_code=200, content=_PDF_BYTES)
+    settings = _settings(tmp_path)
+
+    resultado = descargar(_encargo_de_dos_puertas(url_0, url_1), _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is True
+    assert resultado.puerta_usada == 1
+    assert resultado.intentos[0].motivo_fallo == "vestibulo_sin_pdf"
+    assert resultado.intentos[1].enlace_vestibulo == pdf_1
+    assert [str(p.url) for p in httpx_mock.get_requests()] == [url_0, pdf_0, url_1, pdf_1]
