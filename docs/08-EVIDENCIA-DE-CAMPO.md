@@ -1279,6 +1279,18 @@ artículo) y que la URL del PDF redirija a la página del artículo en vez de se
 intermedio. Tampoco habría coincidido si la hubiera visto: la ruta es `/authorize`, que no es
 ninguno de los dos. Queda como **motivo de una micro-tarea futura**; E15 no propone el arreglo.
 
+**Lectura revisada (2026-09-26, M32).** La interpretación de arriba se revisó **con el mismo
+log**, sin medición nueva. La puerta 1 de A.6 acabó en la misma página del artículo 1.4 s
+después y **no pasó por `idp.nature.com`** (E15.6: `doi.org` `302` → artículo `200`). Tampoco
+pasó por él ninguno de los dos saltos al PDF. Si el IdP fuera el muro, la puerta 1 lo habría
+atravesado. La lectura corregida es que `idp.nature.com/authorize?response_type=cookie` es un
+intercambio de cookie de sesión en la primera visita al host, no una señal de muro. Un patrón
+sobre esa ruta haría depender el diagnóstico de las cookies del cliente. M32 hizo que los
+patrones se evalúen contra toda la cadena de redirecciones y **no añadió ningún patrón**.
+**La señal candidata es otra:** el enlace del PDF (`…/nature09678.pdf`) redirige (`303`) a la
+página del artículo en vez de servir el archivo. **No está implementada y no tiene criterio en
+`05`.** A.6 sigue siendo `vestibulo_sin_pdf`. Ningún número de E15 cambia.
+
 ### E15.4 · Cuatro hosts con 403: bloqueo anti-bot, no muro
 
 ```
