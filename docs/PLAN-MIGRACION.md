@@ -604,11 +604,14 @@ Dos deudas, ambas medidas.
 - Commit: `M33: resumen disjunto y puertas duplicadas por destino`
 
 ## M35 · Una omisión no pisa la fila registrada
-- Motivo, medido en `legisuni_v2.db` (2026-09-26): la segunda corrida de la
-  UAM (E16 de `docs/08`) dejó sus **47 filas** de `descargas` con `bytes`,
-  `content_type`, `http_status`, `url_final` y `puerta_usada` en NULL y
+- Motivo, medido en `legisuni_v2.db` (2026-09-26, E17 de `docs/08`): las
+  **47 filas** de la UAM en `descargas` tienen `bytes`, `content_type`,
+  `http_status`, `url_final` y `puerta_usada` en NULL y
   `capturado_en = 2026-09-26`. La UJAT está intacta. El daño es solo del modo
-  jurídico.
+  jurídico. **Corrección (E17.1):** este punto atribuía el daño a E16, que es
+  del 2026-09-23. El daño empezó con E16, porque el código de entonces ya
+  pisaba las filas, y la corrida de verificación del 26 lo repitió. Esa es la
+  que dejó el `capturado_en` medido.
 - Causa: el resultado de una omisión (regla 5) solo trae `sha256` y
   `ruta_local`. Los scripts lo persistían igual, y el upsert sobre
   `(encargo_id, sha256)` pisaba la fila buena. `documentos` recibía el mismo
@@ -637,7 +640,10 @@ Dos deudas, ambas medidas.
 - La reparación de las 47 filas de `descargas` (`url_final` y `http_status`
   desde `intentos`, `bytes` del archivo en disco, `puerta_usada = 0`,
   `capturado_en` de la fecha de modificación del archivo) queda para **M35b**,
-  aparte, y la ejecuta el humano.
+  aparte, y la ejecuta el humano. **`capturado_en` no es reparable con
+  certeza** (E17): la fecha de modificación es cuándo se escribió el archivo,
+  no cuándo se capturó la respuesta. Sirve como estimación, y M35b tiene que
+  declararla como tal.
 - Test en `tests/test_cliente_http.py`, parametrizado sobre los tres `main()`:
   dos corridas sobre la misma base, y las filas de `descargas` y `documentos`
   quedan idénticas tras la segunda, `capturado_en` incluido. Falla con los
