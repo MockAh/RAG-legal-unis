@@ -20,3 +20,16 @@ ruta_regex = "^/Shibboleth\\.sso/"
 [[patrones]]
 nombre = "CAS (Central Authentication Service)"
 ruta_regex = "^/cas/login"
+
+# M32 (2026-09-26): los patrones se evalúan contra toda la cadena de
+# redirecciones, no solo contra la URL final.
+#
+# NO se añade idp.nature.com/authorize, aunque E15.3 de docs/08 lo vio en la
+# cadena de A.6 (Nature). El mismo log lo descarta como señal de muro: la
+# puerta 0 pasó por el IdP en la primera visita al host, y la puerta 1, que
+# acabó en la misma página 1.4 s después, no pasó (E15.6). Tampoco el salto al
+# PDF, que es donde el acceso falla. Es un intercambio de cookie de sesión, no
+# un login: un patrón sobre él haría que el diagnóstico dependiera de las
+# cookies del cliente, y probablemente marcaría como muro artículos abiertos.
+# Además /authorize es una ruta genérica de OAuth. A.6 sigue siendo
+# vestibulo_sin_pdf (tests/test_descargar.py, M32).

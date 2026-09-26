@@ -30,3 +30,18 @@ def test_redireccion_a_shibboleth_es_muro() -> None:
 
 def test_url_sin_patron_no_es_muro() -> None:
     assert muros.es_muro_de_pago(200, "https://a.mx/articulo.pdf") is False
+
+
+def test_patron_en_salto_intermedio_es_muro() -> None:
+    redirecciones = ("https://a.mx/articulo.pdf", "https://a.mx/Shibboleth.sso/Login?target=x")
+    assert muros.es_muro_de_pago(200, "https://a.mx/articulo", redirecciones) is True
+
+
+def test_authorize_generico_en_la_cadena_no_es_muro() -> None:
+    # /authorize es una ruta genérica de OAuth: no es patrón (M32, E15.3 de docs/08)
+    redirecciones = (
+        "https://www.nature.com/articles/nature09678",
+        "https://idp.nature.com/authorize?response_type=cookie&client_id=grover",
+        "https://idp.nature.com/transit?code=abc",
+    )
+    assert muros.es_muro_de_pago(200, "https://www.nature.com/articles/nature09678", redirecciones) is False

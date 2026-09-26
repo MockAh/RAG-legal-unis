@@ -36,6 +36,8 @@ class RespuestaCruda:
     excedio_tamano: bool
     motivo_red: MotivoRed | None
     intentos: int
+    # URLs pedidas antes de url_final, en orden (la primera es la pedida); para muros.py
+    redirecciones: tuple[str, ...] = ()
 
 
 class Fetcher:
@@ -127,6 +129,7 @@ class Fetcher:
                 excedio_tamano=excedio,
                 motivo_red=None,
                 intentos=0,
+                redirecciones=tuple(str(paso.url) for paso in respuesta.history),
             )
 
     def _respuesta_vacia(self, url: str, motivo: MotivoRed, intentos: int) -> RespuestaCruda:

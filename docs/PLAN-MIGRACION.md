@@ -531,3 +531,33 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   - Dos puertas del mismo encargo que acaban en el mismo destino se piden
     dos veces, con su vestíbulo cada una (A.6; también A.2) (E15.6).
 - Commit: `E15: primera corrida académica, 3/7`
+
+## M32 · Muros sobre la cadena de redirecciones
+- Motivo: E15.3 de `docs/08`. En A.6, `muros.es_muro_de_pago(status,
+  url_final)` solo veía la URL final (la página del artículo, `200`); los
+  saltos intermedios no le llegaban.
+- **Solo mecanismo, sin patrones nuevos.** `RespuestaCruda` (dataclass
+  interno de `fetch.py`, no contrato) gana `redirecciones: tuple[str, ...] =
+  ()`, llenado desde `response.history` de httpx. `es_muro_de_pago` gana un
+  argumento opcional `redirecciones` y evalúa los patrones contra cada URL de
+  la cadena más `url_final`. Las llamadas existentes no cambian (un `str`
+  como segundo argumento posicional sigue siendo `url_final`).
+  `puertas._evaluar_respuesta` pasa la cadena, así que cubre puerta y salto.
+- **`IntentoPuerta` y `DownloadResult` no se tocan.** La cadena no se
+  persiste.
+- **Por qué no `idp.nature.com/authorize`:** el mismo log de E15.6 lo
+  descarta. La puerta 0 de A.6 pasó por el IdP en la primera visita al host;
+  la puerta 1 acabó en la misma página sin pasar por él, y el salto al PDF
+  tampoco. Es un intercambio de cookie de sesión: un patrón haría depender el
+  diagnóstico de las cookies. Además `/authorize` es ruta genérica de OAuth.
+  Queda anotado en `datos/patrones.toml`. En la duda, no es muro.
+- Tests nuevos (ninguna aserción existente cambia): Shibboleth en un salto
+  intermedio con destino `200` → `muro_de_pago` (falla con la lógica
+  anterior); control negativo, `301` → `302` → PDF → éxito; la cadena de A.6
+  (`303` → authorize → `302` → transit → `302` → artículo HTML, salto al PDF
+  `303` → artículo HTML) → `vestibulo_sin_pdf`, con el porqué escrito. En
+  `tests/test_muros.py`: patrón en salto intermedio → muro; authorize
+  genérico en la cadena → no muro.
+- Criterio 11: los patrones siguen siendo `Shibboleth.sso` y `/cas/login`;
+  las redirecciones jurídicas medidas son http→https (E12.3).
+- Commit: `M32: muros sobre la cadena de redirecciones`

@@ -6,6 +6,10 @@ ambigüedad: `401`/`402`, o una redirección a una ruta de login federado conoci
 (`datos/patrones.toml`). Un `403` nunca es muro: también lo producen bloqueos
 anti-bots o servidores mal configurados.
 
+Los patrones se evalúan contra **toda la cadena de redirecciones**, no solo contra
+`url_final` (M32, E15.3 de `docs/08`): en A.6 el paso por un IdP estaba en un salto
+intermedio y el destino era la página del artículo con `200`.
+
 **Ante la duda, este módulo no decide nada** (`docs/01` línea 155: "en la duda, el
 motivo es `vestibulo_sin_pdf`", no `http_error` ni `muro_de_pago` mal diagnosticado).
 Un HTML que no matchea ningún patrón sigue a `guard.evaluar` (`no_es_pdf`); si el
@@ -15,6 +19,7 @@ falla el motivo es `vestibulo_sin_pdf`.
 
 import re
 import tomllib
+from collections.abc import Sequence
 from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -33,8 +38,8 @@ def _cargar_patrones() -> tuple[dict, ...]:
     )
 
 
-def _redirige_a_patron_de_autenticacion(url_final: str) -> bool:
-    partes = urlsplit(url_final)
+def _redirige_a_patron_de_autenticacion(url: str) -> bool:
+    partes = urlsplit(url)
     host = (partes.hostname or "").lower()
     for patron in _cargar_patrones():
         host_esperado = patron.get("host")
@@ -45,7 +50,9 @@ def _redirige_a_patron_de_autenticacion(url_final: str) -> bool:
     return False
 
 
-def es_muro_de_pago(status: int | None, url_final: str) -> bool:
+def es_muro_de_pago(
+    status: int | None, url_final: str, redirecciones: Sequence[str] = ()
+) -> bool:
     if status in _STATUS_MURO:
         return True
-    return _redirige_a_patron_de_autenticacion(url_final)
+    return any(_redirige_a_patron_de_autenticacion(url) for url in (*redirecciones, url_final))

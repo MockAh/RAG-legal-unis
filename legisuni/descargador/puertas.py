@@ -88,7 +88,7 @@ def _evaluar_respuesta(
     respuesta: RespuestaCruda, settings: Settings
 ) -> tuple[MotivoFallo | None, str | None]:
     """Lo que pasa una respuesta, sea de puerta o de salto: muros → red → tamaño → guardián."""
-    if muros.es_muro_de_pago(respuesta.status, respuesta.url_final):
+    if muros.es_muro_de_pago(respuesta.status, respuesta.url_final, respuesta.redirecciones):
         return "muro_de_pago", None
     if respuesta.motivo_red is not None:
         return respuesta.motivo_red, None

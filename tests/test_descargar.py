@@ -681,3 +681,86 @@ def test_original_ausente_en_disco_no_hay_alias_y_se_escribe_el_propio(
     assert resultado2.ruta_local is not None
     assert resultado2.ruta_local != resultado1.ruta_local
     assert resultado2.ruta_local.read_bytes() == _PDF_BYTES
+
+
+# M32: los patrones de muro se evalúan contra toda la cadena de redirecciones,
+# no solo contra url_final (E15.3 de docs/08). Sin patrones nuevos.
+
+
+def test_shibboleth_en_salto_intermedio_da_muro_de_pago(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    # el login está en medio de la cadena y el destino final es un 200: antes de M32 daba no_es_pdf
+    url_documento = "https://a.mx/articulo.pdf"
+    url_login = "https://a.mx/Shibboleth.sso/Login?target=articulo.pdf"
+    url_articulo = "https://a.mx/articulo"
+    httpx_mock.add_response(url=url_documento, status_code=302, headers={"Location": url_login})
+    httpx_mock.add_response(url=url_login, status_code=302, headers={"Location": url_articulo})
+    httpx_mock.add_response(url=url_articulo, status_code=200, content=_HTML_BYTES)
+    settings = _settings(tmp_path)
+    encargo = _encargo(url_documento=url_documento)
+
+    resultado = descargar(encargo, _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "muro_de_pago"
+    assert resultado.intentos[0].url_final == url_articulo
+    assert list(tmp_path.rglob("*")) == []
+
+
+def test_redireccion_normal_a_pdf_no_es_muro(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    # control negativo: una redirección sin patrón de autenticación no cambia nada
+    url_documento = "http://repo.example.org/bitstream/123"
+    url_intermedia = "https://repo.example.org/bitstream/123"
+    url_archivo = "https://repo.example.org/bitstream/handle/123/articulo.pdf"
+    httpx_mock.add_response(url=url_documento, status_code=301, headers={"Location": url_intermedia})
+    httpx_mock.add_response(url=url_intermedia, status_code=302, headers={"Location": url_archivo})
+    httpx_mock.add_response(url=url_archivo, status_code=200, content=_PDF_BYTES)
+    settings = _settings(tmp_path)
+
+    resultado = descargar(_encargo_academico(url=url_documento), _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is True
+    assert resultado.motivo_fallo is None
+    assert resultado.url_final == url_archivo
+
+
+def test_cadena_de_a6_nature_da_vestibulo_sin_pdf_no_muro(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    # Cadena de A.6 (E15.3 y E15.6 de docs/08). NO es muro_de_pago, a propósito:
+    # idp.nature.com/authorize?response_type=cookie es un intercambio de cookie de
+    # sesión, no un login. En la corrida real solo apareció en la primera visita al
+    # host (puerta 0); la puerta 1 acabó en la misma página sin pasar por él, y el
+    # salto al PDF tampoco. Un patrón sobre esa ruta haría depender el diagnóstico
+    # de las cookies. Ver la nota de M32 en datos/patrones.toml.
+    url_articulo = "https://www.nature.com/articles/nature09678"
+    url_pdf = "https://www.nature.com/articles/nature09678.pdf"
+    url_authorize = (
+        "https://idp.nature.com/authorize?response_type=cookie&client_id=grover"
+        "&redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fnature09678"
+    )
+    url_transit = (
+        "https://idp.nature.com/transit"
+        "?redirect_uri=https%3A%2F%2Fwww.nature.com%2Farticles%2Fnature09678&code=abc"
+    )
+    html_articulo = _html(f'<meta name="citation_pdf_url" content="{url_pdf}">')
+    # puerta: 303 → authorize → 302 → transit → 302 → artículo 200 HTML
+    httpx_mock.add_response(url=url_articulo, status_code=303, headers={"Location": url_authorize})
+    httpx_mock.add_response(url=url_authorize, status_code=302, headers={"Location": url_transit})
+    httpx_mock.add_response(url=url_transit, status_code=302, headers={"Location": url_articulo})
+    httpx_mock.add_response(url=url_articulo, status_code=200, content=html_articulo)
+    # salto del vestíbulo: el PDF redirige a la página del artículo
+    httpx_mock.add_response(url=url_pdf, status_code=303, headers={"Location": url_articulo})
+    httpx_mock.add_response(url=url_articulo, status_code=200, content=html_articulo)
+    settings = _settings(tmp_path)
+
+    resultado = descargar(_encargo_academico(url=url_articulo), _fetcher(settings), RobotsPermiteTodo(), settings)
+
+    assert resultado.exito is False
+    assert resultado.motivo_fallo == "vestibulo_sin_pdf"
+    intento = resultado.intentos[0]
+    assert intento.motivo_fallo == "vestibulo_sin_pdf"
+    assert intento.http_status == 200
+    assert intento.enlace_vestibulo == url_pdf
+    assert intento.url_final == url_articulo
+    assert [str(p.url) for p in httpx_mock.get_requests()] == [
+        url_articulo, url_authorize, url_transit, url_articulo, url_pdf, url_articulo,
+    ]
+    assert list(tmp_path.rglob("*")) == []
