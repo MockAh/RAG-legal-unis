@@ -1874,12 +1874,54 @@ Cada intento de B.7–B.10 salió dos veces, una por cada una de sus dos filas e
 intentos de más (16 `http_error` y 4 `vestibulo_sin_pdf`), 94 en vez de 74. **Toda consulta que
 una `intentos` con `descargas` por `encargo_id` hereda esta duplicación.**
 
+### E19.12 · Un `robots.txt` que acaba en un login SAML
+
+```
+01:21:38.820 INFO __main__: pidiendo doi:10.1126/science.aah6561 (5 puertas)
+01:21:40.039 … GET https://www.pure.ed.ac.uk/robots.txt "HTTP/1.1 302 Found"
+01:21:40.711 … GET https://www.pure.ed.ac.uk/admin "HTTP/1.1 302 Found"
+01:21:41.177 … GET https://www.pure.ed.ac.uk/admin/ "HTTP/1.1 302 Found"
+01:21:41.690 … GET https://www.pure.ed.ac.uk/admin/saml2/authenticate/pure "HTTP/1.1 302 Found"
+01:21:42.205 … GET https://login.microsoftonline.com/…/saml2?SAMLRequest=…&RelayState=…&SigAlg=…&Signature=… "HTTP/1.1 200 OK"
+01:21:43.128 … GET https://www.pure.ed.ac.uk/ws/portalfiles/portal/30050008/morgan_science_2016.pdf "HTTP/1.1 200 OK"
+01:21:43.762 INFO __main__: resultado doi:10.1126/science.aah6561: exito=True puerta=0 motivo=None
+```
+
+**Medido en el log:** la petición de `www.pure.ed.ac.uk/robots.txt` siguió cuatro `302` hasta un
+login SAML en `login.microsoftonline.com`, que respondió `200`. No hay línea `WARNING` de
+fail-open: la respuesta se trató como un `robots.txt` legible. Después se pidió la puerta 0 de
+B.32, así que el resultado fue «permitido».
+
+**Medido en el código:** `RobotsCache._cargar` pide con `follow_redirects=True` y, ante un `200`,
+pasa el cuerpo a `RobotFileParser` sin comprobar qué documento es. **La decisión de cortesía se
+tomó sobre un documento que no es un `robots.txt`:** una página de inicio de sesión de otro host.
+
+Toca **D8**: una política de `robots.txt` que se obedece si es legible supone que lo leído es un
+`robots.txt`. **Merece una micro-tarea propia.** E19 no propone el arreglo.
+
+### E19.13 · B.16 pasó por el IdP de Nature y descargó
+
+```
+01:21:04.348 … GET https://www.nature.com/articles/s41467-017-00083-9 "HTTP/1.1 303 See Other"
+01:21:04.793 … GET https://idp.nature.com/authorize?response_type=cookie&client_id=grover&redirect_uri=… "HTTP/1.1 302 Found"
+01:21:05.061 … GET https://idp.nature.com/transit?redirect_uri=…&code=… "HTTP/1.1 302 Found"
+01:21:05.576 … GET https://www.nature.com/articles/s41467-017-00083-9 "HTTP/1.1 200 OK"
+01:21:07.970 … GET https://www.nature.com/articles/s41467-017-00083-9.pdf "HTTP/1.1 200 OK"
+01:21:08.070 INFO __main__: resultado doi:10.1038/s41467-017-00083-9: exito=True puerta=1 motivo=None
+```
+
+La puerta 1 de B.16 recorrió la misma cadena que A.6 en E15.3 (`303` → `idp.nature.com/authorize`
+→ `idp.nature.com/transit` → artículo `200`) **y aun así descargó el PDF.** Es un dato positivo
+para la lectura revisada de M32 (E15.3): **el IdP es un intercambio de cookie en la primera
+visita al host, no un muro.** En E15 la lectura se apoyaba solo en que la puerta 1 de A.6 no
+pasara por él. Ahora hay además un artículo abierto que pasa por el IdP y se descarga.
+
 > **Nota (2026-09-27) — contrastada contra el log.** La primera redacción de E19 (commit
 > `184106c`) salió del resumen del operador, sin log. Al contrastarla cambiaron: M33 actuó 11
 > veces, no 10 (E19.6); se pidieron 7 portales CRIS, no 9 (E19.8); el reloj retrocedió tres veces,
 > no dos, y su causa es interpretación (E19.7); el log no muestra la regla de `robots.txt` que
 > prohibió la puerta de B.13 (E19.4); los 9 archivos nuevos suman las dos corridas (E19.1). Se
-> añadieron E19.9–E19.11. Ese commit conserva la versión anterior.
+> añadieron E19.9–E19.11, y después E19.12–E19.13. Ese commit conserva la versión anterior.
 
 ---
 
@@ -1899,4 +1941,4 @@ una `intentos` con `descargas` por `encargo_id` hereda esta duplicación.**
 | **v12** | **2026-09-26** | **Idempotencia en campo (E16), medida el 2026-09-23 y registrada ahora.** Segunda corrida de la UAM sobre los mismos fixtures, cinco días después de E14: `total: 47`, `omitidos: 47`; el disco sigue con 47 archivos de la UAM y `descargas` e `intentos` con 156 filas. Ninguno de los 47 encargos se volvió a pedir ni a escribir. **Primera medición en campo de la regla 5 de `05` (M21) y primer dato sobre C24.** **El resumen cuenta los omitidos también como exitosas** (`exitosas: 47` a la vez que `omitidos: 47`), lo que motiva M33. |
 | **v13** | **2026-09-26** | **Una omisión pisó 47 filas (E17).** Una corrida de verificación del 26, sin red y sobre los mismos fixtures, dejó las 47 filas de la UAM en `descargas` con `bytes`, `content_type`, `http_status`, `url_final` y `puerta_usada` en NULL y `capturado_en` = 2026-09-26; el valor anterior no se conserva en la base. Causa: los scripts persistían el resultado de la omisión y el upsert sobrescribía la fila. **El daño empezó el 23** (el código de E16 ya pisaba) y el 26 lo repitió. Solo modo jurídico; la UJAT y las 7 académicas, intactas; cero alias, así que `duplicado_de` no se perdió. `documentos`, mismo daño, no se repara. **`content_type` es pérdida definitiva**; lo demás es recuperable (M35b, pendiente), y `capturado_en` solo como estimación. Arreglado en M35. **Nota fechada sobre E16:** «las tablas quedaron intactas» solo lo respaldan los recuentos, que siguen siendo correctos; E16 se conserva tal como se escribió. Ningún número de E14 ni de E16 cambia. |
 | **v14** | **2026-09-26** | **Reparación de las 47 filas (E18).** `scripts/reparar_omisiones.py` (M35b), en una transacción: 47 afectadas, 47 reparables, 0 intactas. `url_final` y `http_status` de `intentos`; `bytes` del tamaño del archivo con SHA-256 verificado; `puerta_usada = 0` comprobado contra el `orden` del intento. `capturado_en` es estimación (fecha de modificación): las 47 caen el 2026-09-18, de 13:57:31 a 13:58:14. `content_type` sigue en NULL: pérdida definitiva. Después: 0 filas con `bytes` en NULL; `descargas` 163 e `intentos` 168, sin cambios. Copia previa fuera del repo. **Anomalía abierta (E18.1):** 43 s entre el primer archivo y el último es menos que los 46 s mínimos de un rate limit de 1 s sobre 47 peticiones a un host; hay tres explicaciones y ninguna está medida, porque `rate_limit_s` no se registró en E14 y la fecha de un archivo no es la de su petición. Pendiente: registrar `rate_limit_s` y el host en el informe de las corridas futuras. |
-| **v15** | **2026-09-27** | **Corrida del Bloque B (E19): 8/30, más 1 omitido.** 30 encargos, 85 puertas, 27 hosts pedidos, `rate_limit_s` 1.0; 2 `sin_puertas`; 9 archivos nuevos. Primera idempotencia académica en campo (B.12). Control de Nature: la señal de E15.3 distingue muro de acceso abierto, pero sigue sin implementarse (E19.2). PMC sirve HTML en la ruta del PDF en 4 fichas (E19.3). Primer `robots_prohibido` en campo (E19.4). Un enlace muerto en un día (E19.5). M33 actuó 11 veces (E19.6). El reloj retrocede tres veces en el log (WSL, interpretación): cuarta hipótesis, no medida, para E18.1 (E19.7). Portales CRIS: 7 pedidos, 0 éxitos (E19.8). Primeros 3 vestíbulos cruzados con éxito (E19.9). 63 puertas pedidas, 0 `muro_de_pago`, 37 `http_error` (todos `403`); 75 puertas sin muro con el Bloque A (E19.10). 41 filas académicas para 37 encargos: los fallos con `sha256` NULL no se deduplican (M34); son las filas que inflaron una consulta con JOIN (E19.11). **Fuente: logs en `~/respaldo-acervo/m37-*.log`, fuera del repo; fragmentos citados en E19.** Incluye además la nota de M36.2 en E18.1: el pendiente de registrar `rate_limit_s` y los hosts queda cubierto desde M36.1, con la salvedad de que el conteo no incluye los hosts de las redirecciones ni el del salto de vestíbulo. |
+| **v15** | **2026-09-27** | **Corrida del Bloque B (E19): 8/30, más 1 omitido.** 30 encargos, 85 puertas, 27 hosts pedidos, `rate_limit_s` 1.0; 2 `sin_puertas`; 9 archivos nuevos. Primera idempotencia académica en campo (B.12). Control de Nature: la señal de E15.3 distingue muro de acceso abierto, pero sigue sin implementarse (E19.2). PMC sirve HTML en la ruta del PDF en 4 fichas (E19.3). Primer `robots_prohibido` en campo (E19.4). Un enlace muerto en un día (E19.5). M33 actuó 11 veces (E19.6). El reloj retrocede tres veces en el log (WSL, interpretación): cuarta hipótesis, no medida, para E18.1 (E19.7). Portales CRIS: 7 pedidos, 0 éxitos (E19.8). Primeros 3 vestíbulos cruzados con éxito (E19.9). 63 puertas pedidas, 0 `muro_de_pago`, 37 `http_error` (todos `403`); 75 puertas sin muro con el Bloque A (E19.10). 41 filas académicas para 37 encargos: los fallos con `sha256` NULL no se deduplican (M34); son las filas que inflaron una consulta con JOIN (E19.11). Un `robots.txt` que redirige a un login SAML con `200` se leyó como legible: toca D8 (E19.12). B.16 pasó por `idp.nature.com` y descargó: confirma la lectura de M32 (E19.13). **Fuente: logs en `~/respaldo-acervo/m37-*.log`, fuera del repo; fragmentos citados en E19.** Incluye además la nota de M36.2 en E18.1: el pendiente de registrar `rate_limit_s` y los hosts queda cubierto desde M36.1, con la salvedad de que el conteo no incluye los hosts de las redirecciones ni el del salto de vestíbulo. |
