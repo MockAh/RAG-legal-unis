@@ -245,6 +245,39 @@ def test_resumen_no_cuenta_los_omitidos_como_exitosas(
     assert len(httpx_mock.get_requests()) == peticiones_primera
 
 
+
+# M36.1: el resumen registra los parámetros de la corrida. Sin ellos, la anomalía de
+# E18.1 de docs/08 (43 s para 47 peticiones a un host) no es medible.
+
+
+@pytest.mark.parametrize("modulo", [cosecha, cosecha_uam, lote], ids=["cosecha", "cosecha_uam", "lote"])
+def test_resumen_registra_parametros_de_la_corrida(
+    modulo: object,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    httpx_mock: HTTPXMock,
+) -> None:
+    monkeypatch.setenv("LEGISUNI_USER_AGENT", _USER_AGENT)
+    monkeypatch.setenv("LEGISUNI_DB_PATH", str(tmp_path / "prueba.db"))
+    monkeypatch.setenv("LEGISUNI_DATA_ROOT", str(tmp_path / "data"))
+    monkeypatch.setenv("LEGISUNI_RATE_LIMIT_S", "0")
+    httpx_mock.add_callback(_servir_pdf, is_reusable=True)
+    if modulo is lote:
+        argumentos = _lote_de_un_encargo(tmp_path)
+    else:
+        argumentos = {**(_UJAT if modulo is cosecha else _UAM), "limite": 1}
+
+    modulo.main(dry_run=False, **argumentos)
+    primera = capsys.readouterr().out
+    modulo.main(dry_run=False, **argumentos)
+    segunda = capsys.readouterr().out
+
+    parametros = f"rate_limit_s: 0.0\nuser_agent: {_USER_AGENT}\n"
+    assert parametros + "hosts distintos pedidos: 1\n" in primera
+    # un omitido no pide nada: no aporta host
+    assert parametros + "hosts distintos pedidos: 0\n" in segunda
+
 # M35: una omisión no escribe. Medido en la base v2: la segunda corrida de la UAM
 # (E16) dejó 47 filas con bytes, content_type, http_status, url_final y
 # puerta_usada en NULL y capturado_en con la fecha de la omisión.

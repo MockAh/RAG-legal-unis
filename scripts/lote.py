@@ -9,6 +9,7 @@ import json
 import logging
 from collections import Counter
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import typer
 
@@ -65,12 +66,19 @@ def main(
     motivos_fallo: Counter[str] = Counter()
     exitosas = 0
     omitidos = 0
+    hosts_pedidos: set[str] = set()
 
     with Store(settings.db_path) as store:
         for encargo in encargos:
             logger.info("pidiendo %s (%d puertas)", encargo.encargo_id, len(encargo.puertas))
             omitido = store.hash_registrado(encargo.encargo_id) is not None
             resultado = descargar(encargo, fetcher, robots, settings, store=store)
+            # E18.1 de docs/08: una puerta con robots_prohibido no llega a pedirse
+            hosts_pedidos.update(
+                urlsplit(i.url_pedida).hostname or ""
+                for i in resultado.intentos
+                if i.url_pedida and i.motivo_fallo != "robots_prohibido"
+            )
             # categorías disjuntas: un omitido también trae exito=True (E16 de docs/08)
             if omitido:
                 omitidos += 1
@@ -91,6 +99,10 @@ def main(
     for motivo, cuenta in motivos_fallo.items():
         typer.echo(f"  {motivo}: {cuenta}")
     typer.echo(f"sin puertas (no se piden): {len(lote['no_obtenidos'])}")
+    # parámetros de la corrida (E18.1 de docs/08)
+    typer.echo(f"rate_limit_s: {settings.rate_limit_s}")
+    typer.echo(f"user_agent: {settings.user_agent}")
+    typer.echo(f"hosts distintos pedidos: {len(hosts_pedidos)}")
 
 
 if __name__ == "__main__":
