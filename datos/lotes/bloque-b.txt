@@ -1,0 +1,608 @@
+# CORPUS: Extinciones masivas del Fanerozoico — BLOQUE B (las cinco extinciones)
+# ENLACES VERIFICADOS EL: 2026-09-26
+# BLOQUES EN ESTA LISTA: 32 (31 obras + 1 correccion)
+# CODIFICACION: UTF-8
+#
+# La numeracion B.7 a B.36 conserva la del corpus original. La entrada 33 del
+# corpus contenia dos articulos publicados en paralelo: aqui son B.33 y B.33B.
+
+====
+
+ID        : B.7
+REFERENCIA: Sheehan, Peter M. (2001). The Late Ordovician Mass Extinction. Annual Review of Earth and Planetary Sciences, 29, 331-364.
+AUTORES   : Sheehan, Peter M.
+AÑO       : 2001
+TITULO    : The Late Ordovician Mass Extinction
+REVISTA   : Annual Review of Earth and Planetary Sciences
+VOLUMEN   : 29
+PAGINA    : 331
+DOI       : 10.1146/annurev.earth.29.1.331
+RELACION  : —
+NOTA      : Sin PDF de acceso libre localizado. Requiere suscripcion a Annual Reviews.
+
+[REG] https://www.annualreviews.org/content/journals/10.1146/annurev.earth.29.1.331
+[REG] https://www.researchgate.net/publication/257815428_The_Late_Ordovician_Mass_Extinction
+[DOI] https://doi.org/10.1146/annurev.earth.29.1.331
+
+====
+
+ID        : B.8
+REFERENCIA: Finnegan, Seth; Bergmann, Kristin; Eiler, John M.; Jones, David S.; Fike, David A.; Eisenman, Ian; Hughes, Nigel C.; Tripati, Aradhna K.; Fischer, Woodward W. (2011). The Magnitude and Duration of Late Ordovician-Early Silurian Glaciation. Science, 331(6019), 903-906.
+AUTORES   : Finnegan, Seth; Bergmann, Kristin; Eiler, John M.; Jones, David S.; Fike, David A.; Eisenman, Ian; Hughes, Nigel C.; Tripati, Aradhna K.; Fischer, Woodward W.
+AÑO       : 2011
+TITULO    : The Magnitude and Duration of Late Ordovician-Early Silurian Glaciation
+REVISTA   : Science
+VOLUMEN   : 331
+PAGINA    : 903
+DOI       : 10.1126/science.1200803
+RELACION  : —
+NOTA      : El PDF listado es la version aceptada alojada por el propio editor (science.org), no la maquetada final.
+
+[PDF] https://www.science.org/cms/asset/14788632-30a2-4c3e-8e93-3e8c8b26958b/pap.pdf
+[REG] https://pubmed.ncbi.nlm.nih.gov/21273448
+[REG] https://profiles.wustl.edu/en/publications/the-magnitude-and-duration-of-late-ordovician-early-silurian-glac/
+[DOI] https://doi.org/10.1126/science.1200803
+
+====
+
+ID        : B.9
+REFERENCIA: Harper, David A. T.; Hammarlund, Emma U.; Rasmussen, Christian M. Ø. (2014). End Ordovician extinctions: A coincidence of causes. Gondwana Research, 25(4), 1294-1307.
+AUTORES   : Harper, David A. T.; Hammarlund, Emma U.; Rasmussen, Christian M. Ø.
+AÑO       : 2014
+TITULO    : End Ordovician extinctions: A coincidence of causes
+REVISTA   : Gondwana Research
+VOLUMEN   : 25
+PAGINA    : 1294
+DOI       : 10.1016/j.gr.2012.12.021
+RELACION  : —
+NOTA      : Sin PDF de acceso libre localizado. Requiere suscripcion a Elsevier.
+
+[REG] https://www.sciencedirect.com/science/article/abs/pii/S1342937X13000154
+[REG] https://www.researchgate.net/publication/256938435_End_Ordovician_extinctions_A_coincidence_of_causes
+[DOI] https://doi.org/10.1016/j.gr.2012.12.021
+
+====
+
+ID        : B.10
+REFERENCIA: Bond, David P. G.; Grasby, Stephen E. (2020). Late Ordovician mass extinction caused by volcanism, warming, and anoxia, not cooling and glaciation. Geology, 48(8), 777-781.
+AUTORES   : Bond, David P. G.; Grasby, Stephen E.
+AÑO       : 2020
+TITULO    : Late Ordovician mass extinction caused by volcanism, warming, and anoxia, not cooling and glaciation
+REVISTA   : Geology
+VOLUMEN   : 48
+PAGINA    : 777
+DOI       : 10.1130/G47377.1
+RELACION  : —
+NOTA      : El articulo publicado esta depositado en acceso abierto (CC BY-NC 4.0) en el repositorio de la Universidad de Hull, descargable desde la pagina [REG], pero no se verifico la URL directa del archivo PDF. Existen COMMENT (Mitchell y Melchin, DOI 10.1130/G47946C.1) y REPLY (DOI 10.1130/G47984Y.1) en Geology 48(8).
+
+[REG] https://hull-repository.worktribe.com/output/3480749/late-ordovician-mass-extinction-caused-by-volcanism-warming-and-anoxia-not-cooling-and-glaciation
+[REG] https://pubs.geoscienceworld.org/gsa/geology/article/48/8/777/586486/Late-Ordovician-mass-extinction-caused-by
+[REG] https://gsapubs.figshare.com/articles/journal_contribution/Supplemental_Material_Late_Ordovician_mass_extinction_caused_by_volcanism_warming_and_anoxia_not_cooling_and_glaciation/12221825
+[DOI] https://doi.org/10.1130/G47377.1
+
+====
+
+ID        : B.11
+REFERENCIA: McGhee, George R., Jr. (1996). The Late Devonian Mass Extinction: The Frasnian/Famennian Crisis. New York: Columbia University Press.
+AUTORES   : McGhee, George R., Jr.
+AÑO       : 1996
+TITULO    : The Late Devonian Mass Extinction: The Frasnian/Famennian Crisis
+REVISTA   : Columbia University Press (monografia)
+VOLUMEN   : —
+PAGINA    : —
+DOI       : —
+RELACION  : —
+NOTA      : Monografia con derechos vigentes (ISBN 0-231-07504-9). No existe PDF de acceso libre legal y no se localizo URL verificable. Obtener por biblioteca o compra. No descargable automaticamente.
+
+====
+
+ID        : B.12
+REFERENCIA: Bond, David P. G.; Wignall, Paul B. (2008). The role of sea-level change and marine anoxia in the Frasnian-Famennian (Late Devonian) mass extinction. Palaeogeography, Palaeoclimatology, Palaeoecology, 263(3-4), 107-118.
+AUTORES   : Bond, David P. G.; Wignall, Paul B.
+AÑO       : 2008
+TITULO    : The role of sea-level change and marine anoxia in the Frasnian-Famennian (Late Devonian) mass extinction
+REVISTA   : Palaeogeography, Palaeoclimatology, Palaeoecology
+VOLUMEN   : 263
+PAGINA    : 107
+DOI       : 10.1016/j.palaeo.2008.02.015
+RELACION  : —
+NOTA      : El PDF es la version de autor depositada en White Rose Research Online; texto completo verificado.
+
+[PDF] https://eprints.whiterose.ac.uk/id/eprint/3460/1/bondb2.pdf
+[REG] https://eprints.whiterose.ac.uk/id/eprint/3460/
+[DOI] https://doi.org/10.1016/j.palaeo.2008.02.015
+
+====
+
+ID        : B.13
+REFERENCIA: Percival, L. M. E.; Davies, J. H. F. L.; Schaltegger, U.; De Vleeschouwer, D.; Da Silva, A.-C.; Föllmi, K. B. (2018). Precisely dating the Frasnian-Famennian boundary: implications for the cause of the Late Devonian mass extinction. Scientific Reports, 8, 9578.
+AUTORES   : Percival, L. M. E.; Davies, J. H. F. L.; Schaltegger, U.; De Vleeschouwer, D.; Da Silva, A.-C.; Föllmi, K. B.
+AÑO       : 2018
+TITULO    : Precisely dating the Frasnian-Famennian boundary: implications for the cause of the Late Devonian mass extinction
+REVISTA   : Scientific Reports
+VOLUMEN   : 8
+PAGINA    : 9578
+DOI       : 10.1038/s41598-018-27847-7
+RELACION  : —
+
+[PDF] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6014997/
+[REG] https://www.nature.com/articles/s41598-018-27847-7
+[REG] https://pubmed.ncbi.nlm.nih.gov/29934550/
+[REG] https://archive-ouverte.unige.ch/unige:113341
+[DOI] https://doi.org/10.1038/s41598-018-27847-7
+
+====
+
+ID        : B.14
+REFERENCIA: Marshall, John E. A.; Lakin, Jon; Troth, Ian; Wallace-Johnson, Sarah M. (2020). UV-B radiation was the Devonian-Carboniferous boundary terrestrial extinction kill mechanism. Science Advances, 6(22), eaba0768.
+AUTORES   : Marshall, John E. A.; Lakin, Jon; Troth, Ian; Wallace-Johnson, Sarah M.
+AÑO       : 2020
+TITULO    : UV-B radiation was the Devonian-Carboniferous boundary terrestrial extinction kill mechanism
+REVISTA   : Science Advances
+VOLUMEN   : 6
+PAGINA    : eaba0768
+DOI       : 10.1126/sciadv.aba0768
+RELACION  : —
+NOTA      : Acceso abierto (CC BY-NC) en el sitio del editor; no se verifico una URL directa de archivo PDF. Existe un eLetter/Comment critico publicado el 21 de diciembre de 2020 en la misma pagina del articulo.
+
+[REG] https://www.science.org/doi/10.1126/sciadv.aba0768
+[REG] https://eprints.soton.ac.uk/441062
+[REG] https://ui.adsabs.harvard.edu/abs/2020SciA....6..768M
+[DOI] https://doi.org/10.1126/sciadv.aba0768
+
+====
+
+ID        : B.15
+REFERENCIA: Burgess, Seth D.; Bowring, Samuel A.; Shen, Shu-zhong (2014). High-precision timeline for Earth's most severe extinction. Proceedings of the National Academy of Sciences, 111(9), 3316-3321.
+AUTORES   : Burgess, Seth D.; Bowring, Samuel A.; Shen, Shu-zhong
+AÑO       : 2014
+TITULO    : High-precision timeline for Earth's most severe extinction
+REVISTA   : Proceedings of the National Academy of Sciences
+VOLUMEN   : 111
+PAGINA    : 3316
+DOI       : 10.1073/pnas.1317692111
+RELACION  : —
+
+[PDF] https://pmc.ncbi.nlm.nih.gov/articles/PMC3948271
+[REG] https://www.pnas.org/doi/10.1073/pnas.1317692111
+[DOI] https://doi.org/10.1073/pnas.1317692111
+
+====
+
+ID        : B.15C
+REFERENCIA: Burgess, Seth D.; Bowring, Samuel A.; Shen, Shu-zhong (2014). Correction for "High-precision timeline for Earth's most severe extinction". Proceedings of the National Academy of Sciences, 111.
+AUTORES   : Burgess, Seth D.; Bowring, Samuel A.; Shen, Shu-zhong
+AÑO       : 2014
+TITULO    : Correction for "High-precision timeline for Earth's most severe extinction"
+REVISTA   : Proceedings of the National Academy of Sciences
+VOLUMEN   : 111
+PAGINA    : —
+DOI       : —
+RELACION  : correccion de B.15 (afecta a la Fig. 3)
+
+[PDF] https://pmc.ncbi.nlm.nih.gov/articles/PMC3977310/
+
+====
+
+ID        : B.16
+REFERENCIA: Burgess, Seth D.; Muirhead, James D.; Bowring, Samuel A. (2017). Initial pulse of Siberian Traps sills as the trigger of the end-Permian mass extinction. Nature Communications, 8, 164.
+AUTORES   : Burgess, Seth D.; Muirhead, James D.; Bowring, Samuel A.
+AÑO       : 2017
+TITULO    : Initial pulse of Siberian Traps sills as the trigger of the end-Permian mass extinction
+REVISTA   : Nature Communications
+VOLUMEN   : 8
+PAGINA    : 164
+DOI       : 10.1038/s41467-017-00083-9
+RELACION  : —
+
+[PDF] https://pmc.ncbi.nlm.nih.gov/articles/PMC5537227
+[REG] https://www.nature.com/articles/s41467-017-00083-9
+[REG] https://doaj.org/article/28be87e7332d407280e3bbdbaf062372
+[DOI] https://doi.org/10.1038/s41467-017-00083-9
+
+====
+
+ID        : B.17
+REFERENCIA: Sun, Yadong; Joachimski, Michael M.; Wignall, Paul B.; Yan, Chunbo; Chen, Yanlong; Jiang, Haishui; Wang, Lina; Lai, Xulong (2012). Lethally Hot Temperatures During the Early Triassic Greenhouse. Science, 338(6105), 366-370.
+AUTORES   : Sun, Yadong; Joachimski, Michael M.; Wignall, Paul B.; Yan, Chunbo; Chen, Yanlong; Jiang, Haishui; Wang, Lina; Lai, Xulong
+AÑO       : 2012
+TITULO    : Lethally Hot Temperatures During the Early Triassic Greenhouse
+REVISTA   : Science
+VOLUMEN   : 338
+PAGINA    : 366
+DOI       : 10.1126/science.1224126
+RELACION  : —
+NOTA      : Sin PDF de acceso libre; el repositorio White Rose indica expresamente que no dispone del texto completo. Existen Comment (DOI 10.1126/science.1232924) y Response (DOI 10.1126/science.1233090) en Science 339:1033.
+
+[REG] https://eprints.whiterose.ac.uk/77504/
+[REG] https://pubmed.ncbi.nlm.nih.gov/23087244/
+[DOI] https://doi.org/10.1126/science.1224126
+
+====
+
+ID        : B.18
+REFERENCIA: Clarkson, M. O.; Kasemann, S. A.; Wood, R. A.; Lenton, T. M.; Daines, S. J.; Richoz, S.; Ohnemueller, F.; Meixner, A.; Poulton, S. W.; Tipper, E. T. (2015). Ocean acidification and the Permo-Triassic mass extinction. Science, 348(6231), 229-232.
+AUTORES   : Clarkson, M. O.; Kasemann, S. A.; Wood, R. A.; Lenton, T. M.; Daines, S. J.; Richoz, S.; Ohnemueller, F.; Meixner, A.; Poulton, S. W.; Tipper, E. T.
+AÑO       : 2015
+TITULO    : Ocean acidification and the Permo-Triassic mass extinction
+REVISTA   : Science
+VOLUMEN   : 348
+PAGINA    : 229
+DOI       : 10.1126/science.aaa0193
+RELACION  : —
+NOTA      : El PDF es la version de autor depositada en White Rose Research Online.
+
+[PDF] https://eprints.whiterose.ac.uk/id/eprint/85124/1/Clarkson_Boron_final.pdf
+[REG] https://www.research.ed.ac.uk/en/publications/ocean-acidification-and-the-permo-triassic-mass-extinction/
+[REG] https://www.repository.cam.ac.uk/items/f828f2dc-a078-4bc9-ae93-d08e70e234d6
+[REG] https://pubmed.ncbi.nlm.nih.gov/25859043/
+[DOI] https://doi.org/10.1126/science.aaa0193
+
+====
+
+ID        : B.19
+REFERENCIA: Penn, Justin L.; Deutsch, Curtis; Payne, Jonathan L.; Sperling, Erik A. (2018). Temperature-dependent hypoxia explains biogeography and severity of end-Permian marine mass extinction. Science, 362(6419), eaat1327.
+AUTORES   : Penn, Justin L.; Deutsch, Curtis; Payne, Jonathan L.; Sperling, Erik A.
+AÑO       : 2018
+TITULO    : Temperature-dependent hypoxia explains biogeography and severity of end-Permian marine mass extinction
+REVISTA   : Science
+VOLUMEN   : 362
+PAGINA    : eaat1327
+DOI       : 10.1126/science.aat1327
+RELACION  : —
+NOTA      : El PDF es la copia alojada en la pagina personal del primer autor, no en el editor ni en un repositorio institucional.
+
+[PDF] https://jlpenn.github.io/papers/PENN_2018_SCIENCE.pdf
+[REG] https://www.science.org/doi/10.1126/science.aat1327
+[DOI] https://doi.org/10.1126/science.aat1327
+
+====
+
+ID        : B.20
+REFERENCIA: Jurikova, Hana; Gutjahr, Marcus; Wallmann, Klaus; Flögel, Sascha; Liebetrau, Volker; Posenato, Renato; Angiolini, Lucia; Garbelli, Claudio; Brand, Uwe; Wiedenbeck, Michael; Eisenhauer, Anton (2020). Permian-Triassic mass extinction pulses driven by major marine carbon cycle perturbations. Nature Geoscience, 13, 745-750.
+AUTORES   : Jurikova, Hana; Gutjahr, Marcus; Wallmann, Klaus; Flögel, Sascha; Liebetrau, Volker; Posenato, Renato; Angiolini, Lucia; Garbelli, Claudio; Brand, Uwe; Wiedenbeck, Michael; Eisenhauer, Anton
+AÑO       : 2020
+TITULO    : Permian-Triassic mass extinction pulses driven by major marine carbon cycle perturbations
+REVISTA   : Nature Geoscience
+VOLUMEN   : 13
+PAGINA    : 745
+DOI       : 10.1038/s41561-020-00646-4
+RELACION  : —
+NOTA      : Sin PDF de acceso libre localizado. Requiere suscripcion a Nature Geoscience.
+
+[REG] https://www.nature.com/articles/s41561-020-00646-4
+[REG] https://research-portal.st-andrews.ac.uk/en/publications/permiantriassic-mass-extinction-pulses-driven-by-major-marine-car
+[DOI] https://doi.org/10.1038/s41561-020-00646-4
+
+====
+
+ID        : B.21
+REFERENCIA: Dal Corso, Jacopo; Song, Haijun; Callegaro, Sara; Chu, Daoliang; Sun, Yadong; Hilton, Jason; Grasby, Stephen E.; Joachimski, Michael M.; Wignall, Paul B. (2022). Environmental crises at the Permian-Triassic mass extinction. Nature Reviews Earth & Environment, 3, 197-214.
+AUTORES   : Dal Corso, Jacopo; Song, Haijun; Callegaro, Sara; Chu, Daoliang; Sun, Yadong; Hilton, Jason; Grasby, Stephen E.; Joachimski, Michael M.; Wignall, Paul B.
+AÑO       : 2022
+TITULO    : Environmental crises at the Permian-Triassic mass extinction
+REVISTA   : Nature Reviews Earth & Environment
+VOLUMEN   : 3
+PAGINA    : 197
+DOI       : 10.1038/s43017-021-00259-4
+RELACION  : —
+NOTA      : El PDF es el manuscrito aceptado depositado en el repositorio de la Universidad de Birmingham.
+
+[PDF] https://pure-oai.bham.ac.uk/ws/files/158605446/corsoj2022environmental.pdf
+[REG] https://www.nature.com/articles/s43017-021-00259-4
+[REG] https://research.birmingham.ac.uk/en/publications/environmental-crises-at-the-permiantriassic-mass-extinction/
+[DOI] https://doi.org/10.1038/s43017-021-00259-4
+
+====
+
+ID        : B.22
+REFERENCIA: Erwin, Douglas H. (2006). Extinction: How Life on Earth Nearly Ended 250 Million Years Ago. Princeton: Princeton University Press.
+AUTORES   : Erwin, Douglas H.
+AÑO       : 2006
+TITULO    : Extinction: How Life on Earth Nearly Ended 250 Million Years Ago
+REVISTA   : Princeton University Press (monografia)
+VOLUMEN   : —
+PAGINA    : —
+DOI       : —
+RELACION  : —
+NOTA      : Monografia con derechos vigentes. No existe PDF de acceso libre legal y no se localizo URL verificable. No descargable automaticamente.
+
+====
+
+ID        : B.23
+REFERENCIA: Schaller, Morgan F.; Wright, James D.; Kent, Dennis V. (2011). Atmospheric Pco2 Perturbations Associated with the Central Atlantic Magmatic Province. Science, 331(6023), 1404-1409.
+AUTORES   : Schaller, Morgan F.; Wright, James D.; Kent, Dennis V.
+AÑO       : 2011
+TITULO    : Atmospheric Pco2 Perturbations Associated with the Central Atlantic Magmatic Province
+REVISTA   : Science
+VOLUMEN   : 331
+PAGINA    : 1404
+DOI       : 10.1126/science.1199011
+RELACION  : —
+NOTA      : Sin PDF de acceso libre localizado. Existen Comment (Rampino y Caldeira, DOI 10.1126/science.1208653) y Response (DOI 10.1126/science.1209422) en Science 334:594.
+
+[REG] https://www.science.org/doi/10.1126/science.1199011
+[REG] https://pubmed.ncbi.nlm.nih.gov/21330490/
+[DOI] https://doi.org/10.1126/science.1199011
+
+====
+
+ID        : B.24
+REFERENCIA: Ruhl, Micha; Bonis, Nina R.; Reichart, Gert-Jan; Sinninghe Damsté, Jaap S.; Kürschner, Wolfram M. (2011). Atmospheric Carbon Injection Linked to End-Triassic Mass Extinction. Science, 333(6041), 430-434.
+AUTORES   : Ruhl, Micha; Bonis, Nina R.; Reichart, Gert-Jan; Sinninghe Damsté, Jaap S.; Kürschner, Wolfram M.
+AÑO       : 2011
+TITULO    : Atmospheric Carbon Injection Linked to End-Triassic Mass Extinction
+REVISTA   : Science
+VOLUMEN   : 333
+PAGINA    : 430
+DOI       : 10.1126/science.1204255
+RELACION  : —
+NOTA      : Sin PDF de acceso libre localizado; el registro del repositorio de Utrecht no expone texto completo.
+
+[REG] https://dspace.library.uu.nl/handle/1874/208941
+[REG] https://pubmed.ncbi.nlm.nih.gov/21778394/
+[REG] https://www.science.org/doi/10.1126/science.1204255
+[DOI] https://doi.org/10.1126/science.1204255
+
+====
+
+ID        : B.25
+REFERENCIA: Blackburn, Terrence J.; Olsen, Paul E.; Bowring, Samuel A.; McLean, Noah M.; Kent, Dennis V.; Puffer, John; McHone, Greg; Rasbury, E. Troy; Et-Touhami, Mohammed (2013). Zircon U-Pb Geochronology Links the End-Triassic Extinction with the Central Atlantic Magmatic Province. Science, 340(6135), 941-945.
+AUTORES   : Blackburn, Terrence J.; Olsen, Paul E.; Bowring, Samuel A.; McLean, Noah M.; Kent, Dennis V.; Puffer, John; McHone, Greg; Rasbury, E. Troy; Et-Touhami, Mohammed
+AÑO       : 2013
+TITULO    : Zircon U-Pb Geochronology Links the End-Triassic Extinction with the Central Atlantic Magmatic Province
+REVISTA   : Science
+VOLUMEN   : 340
+PAGINA    : 941
+DOI       : 10.1126/science.1234204
+RELACION  : —
+NOTA      : Sin PDF de acceso libre localizado.
+
+[REG] https://www.science.org/doi/10.1126/science.1234204
+[REG] https://www.researchwithrutgers.com/en/publications/zircon-u-pb-geochronology-links-the-end-triassic-extinction-with-/
+[REG] https://ui.adsabs.harvard.edu/abs/2013Sci...340..941B
+[DOI] https://doi.org/10.1126/science.1234204
+
+====
+
+ID        : B.26
+REFERENCIA: Davies, J. H. F. L.; et al. (2017). End-Triassic mass extinction started by intrusive CAMP activity. Nature Communications, 8, 15596.
+AUTORES   : Davies, J. H. F. L.; et al.
+AÑO       : 2017
+TITULO    : End-Triassic mass extinction started by intrusive CAMP activity
+REVISTA   : Nature Communications
+VOLUMEN   : 8
+PAGINA    : 15596
+DOI       : 10.1038/ncomms15596
+RELACION  : —
+NOTA      : Acceso abierto en el sitio del editor; no se verifico una URL directa de archivo PDF. No se verifico la lista completa de coautores.
+
+[REG] https://www.nature.com/articles/ncomms15596
+[DOI] https://doi.org/10.1038/ncomms15596
+
+====
+
+ID        : B.27
+REFERENCIA: Alvarez, Luis W.; Alvarez, Walter; Asaro, Frank; Michel, Helen V. (1980). Extraterrestrial Cause for the Cretaceous-Tertiary Extinction. Science, 208(4448), 1095-1108.
+AUTORES   : Alvarez, Luis W.; Alvarez, Walter; Asaro, Frank; Michel, Helen V.
+AÑO       : 1980
+TITULO    : Extraterrestrial Cause for the Cretaceous-Tertiary Extinction
+REVISTA   : Science
+VOLUMEN   : 208
+PAGINA    : 1095
+DOI       : 10.1126/science.208.4448.1095
+RELACION  : —
+NOTA      : El PDF esta alojado en un repositorio docente universitario (Rutgers), no en el editor.
+
+[PDF] https://ebme.marine.rutgers.edu/HistoryEarthSystems/HistEarthSystems_Fall2010/Week9_Oct29_2009_Alvarez%20.pdf
+[REG] https://www.science.org/doi/10.1126/science.208.4448.1095
+[REG] https://ui.adsabs.harvard.edu/abs/1980Sci...208.1095A
+[DOI] https://doi.org/10.1126/science.208.4448.1095
+
+====
+
+ID        : B.28
+REFERENCIA: Bohor, Bruce F.; Foord, Eugene E.; Modreski, Peter J.; Triplehorn, Don M. (1984). Mineralogic Evidence for an Impact Event at the Cretaceous-Tertiary Boundary. Science, 224(4651), 867-869.
+AUTORES   : Bohor, Bruce F.; Foord, Eugene E.; Modreski, Peter J.; Triplehorn, Don M.
+AÑO       : 1984
+TITULO    : Mineralogic Evidence for an Impact Event at the Cretaceous-Tertiary Boundary
+REVISTA   : Science
+VOLUMEN   : 224
+PAGINA    : 867
+DOI       : 10.1126/science.224.4651.867
+RELACION  : —
+NOTA      : Sin PDF de acceso libre localizado.
+
+[REG] https://www.science.org/doi/10.1126/science.224.4651.867
+[REG] https://pubmed.ncbi.nlm.nih.gov/17743194/
+[REG] https://ui.adsabs.harvard.edu/abs/1984Sci...224..867B
+[DOI] https://doi.org/10.1126/science.224.4651.867
+
+====
+
+ID        : B.29
+REFERENCIA: Hildebrand, Alan R.; Penfield, Glen T.; Kring, David A.; Pilkington, Mark; Camargo Z., Antonio; Jacobsen, Stein B.; Boynton, William V. (1991). Chicxulub Crater: A possible Cretaceous/Tertiary boundary impact crater on the Yucatán Peninsula, Mexico. Geology, 19(9), 867-871.
+AUTORES   : Hildebrand, Alan R.; Penfield, Glen T.; Kring, David A.; Pilkington, Mark; Camargo Z., Antonio; Jacobsen, Stein B.; Boynton, William V.
+AÑO       : 1991
+TITULO    : Chicxulub Crater: A possible Cretaceous/Tertiary boundary impact crater on the Yucatán Peninsula, Mexico
+REVISTA   : Geology
+VOLUMEN   : 19
+PAGINA    : 867
+DOI       : 10.1130/0091-7613(1991)019<0867:CCAPCT>2.3.CO;2
+RELACION  : —
+NOTA      : Sin PDF de acceso libre localizado. El DOI contiene los caracteres < y >; codificar la URL si el descargador lo requiere.
+
+[REG] https://ui.adsabs.harvard.edu/abs/1991Geo....19..867H/abstract
+[REG] https://experts.arizona.edu/en/publications/chicxulub-crater-a-possible-cretaceoustertiary-boundary-impact-cr/
+[DOI] https://doi.org/10.1130/0091-7613(1991)019<0867:CCAPCT>2.3.CO;2
+
+====
+
+ID        : B.30
+REFERENCIA: Schulte, Peter; et al. (2010). The Chicxulub Asteroid Impact and Mass Extinction at the Cretaceous-Paleogene Boundary. Science, 327(5970), 1214-1218.
+AUTORES   : Schulte, Peter; et al.
+AÑO       : 2010
+TITULO    : The Chicxulub Asteroid Impact and Mass Extinction at the Cretaceous-Paleogene Boundary
+REVISTA   : Science
+VOLUMEN   : 327
+PAGINA    : 1214
+DOI       : 10.1126/science.1177265
+RELACION  : —
+NOTA      : Articulo de 41 autores; no se verifico la lista completa. El PDF esta alojado en una pagina academica (Universidad de Notre Dame), no en el editor.
+
+[PDF] https://www3.nd.edu/~cneal/CRN_Papers/Schulte10_Sci_Chicxulub.pdf
+[REG] https://www.science.org/doi/10.1126/science.1177265
+[REG] https://pure.psu.edu/en/publications/the-chicxulub-asteroid-impact-and-mass-extinction-at-the-cretaceo/
+[DOI] https://doi.org/10.1126/science.1177265
+
+====
+
+ID        : B.31
+REFERENCIA: Renne, Paul R.; Deino, Alan L.; Hilgen, Frederik J.; Kuiper, Klaudia F.; Mark, Darren F.; Mitchell, William S., III; Morgan, Leah E.; Mundil, Roland; Smit, Jan (2013). Time Scales of Critical Events Around the Cretaceous-Paleogene Boundary. Science, 339(6120), 684-687.
+AUTORES   : Renne, Paul R.; Deino, Alan L.; Hilgen, Frederik J.; Kuiper, Klaudia F.; Mark, Darren F.; Mitchell, William S., III; Morgan, Leah E.; Mundil, Roland; Smit, Jan
+AÑO       : 2013
+TITULO    : Time Scales of Critical Events Around the Cretaceous-Paleogene Boundary
+REVISTA   : Science
+VOLUMEN   : 339
+PAGINA    : 684
+DOI       : 10.1126/science.1230492
+RELACION  : —
+NOTA      : Sin PDF de acceso libre localizado.
+
+[REG] https://www.science.org/doi/10.1126/science.1230492
+[REG] https://research.vu.nl/en/publications/time-scales-of-critical-events-around-the-cretaceous-paleogene-bo
+[REG] https://ui.adsabs.harvard.edu/abs/2013Sci...339..684R/abstract
+[DOI] https://doi.org/10.1126/science.1230492
+
+====
+
+ID        : B.32
+REFERENCIA: Morgan, Joanna V.; Gulick, Sean P. S.; Bralower, Timothy; Chenot, Elise; Christeson, Gail; Claeys, Philippe; Cockell, Charles; Collins, Gareth S.; Coolen, Marco J. L.; Ferrière, Ludovic; Gebhardt, Catalina; Goto, Kazuhisa; Jones, Heather; Kring, David A.; Le Ber, Erwan; Lofi, Johanna; Long, Xiao; Lowery, Christopher; Mellett, Claire; Ocampo-Torres, Rubén; Osinski, Gordon R.; Perez-Cruz, Ligia; Pickersgill, Annemarie; Poelchau, Michael; Rae, Auriol; Rasmussen, Cornelia; Rebolledo-Vieyra, Mario; Riller, Ulrich; Sato, Honami; Schmitt, Douglas R.; Smit, Jan; Tikoo, Sonia; Tomioka, Naotaka; Urrutia-Fucugauchi, Jaime; Whalen, Michael; Wittmann, Axel; Yamaguchi, Kosei E.; Zylberman, William (2016). The formation of peak rings in large impact craters. Science, 354(6314), 878-882.
+AUTORES   : Morgan, Joanna V.; Gulick, Sean P. S.; Bralower, Timothy; Chenot, Elise; Christeson, Gail; Claeys, Philippe; Cockell, Charles; Collins, Gareth S.; Coolen, Marco J. L.; Ferrière, Ludovic; Gebhardt, Catalina; Goto, Kazuhisa; Jones, Heather; Kring, David A.; Le Ber, Erwan; Lofi, Johanna; Long, Xiao; Lowery, Christopher; Mellett, Claire; Ocampo-Torres, Rubén; Osinski, Gordon R.; Perez-Cruz, Ligia; Pickersgill, Annemarie; Poelchau, Michael; Rae, Auriol; Rasmussen, Cornelia; Rebolledo-Vieyra, Mario; Riller, Ulrich; Sato, Honami; Schmitt, Douglas R.; Smit, Jan; Tikoo, Sonia; Tomioka, Naotaka; Urrutia-Fucugauchi, Jaime; Whalen, Michael; Wittmann, Axel; Yamaguchi, Kosei E.; Zylberman, William
+AÑO       : 2016
+TITULO    : The formation of peak rings in large impact craters
+REVISTA   : Science
+VOLUMEN   : 354
+PAGINA    : 878
+DOI       : 10.1126/science.aah6561
+RELACION  : —
+NOTA      : El PDF es la version depositada en el repositorio de la Universidad de Edimburgo.
+
+[PDF] https://www.pure.ed.ac.uk/ws/portalfiles/portal/30050008/morgan_science_2016.pdf
+[REG] https://www.research.ed.ac.uk/en/publications/the-formation-of-peak-rings-in-large-impact-craters/
+[REG] https://nora.nerc.ac.uk/id/eprint/516086/
+[REG] https://www.science.org/doi/10.1126/science.aah6561
+[DOI] https://doi.org/10.1126/science.aah6561
+
+====
+
+ID        : B.33
+REFERENCIA: Schoene, Blair; Eddy, Michael P.; Samperton, Kyle M.; Keller, C. Brenhin; Keller, Gerta; Adatte, Thierry; Khadri, Syed F. R. (2019). U-Pb constraints on pulsed eruption of the Deccan Traps across the end-Cretaceous mass extinction. Science, 363(6429), 862-866.
+AUTORES   : Schoene, Blair; Eddy, Michael P.; Samperton, Kyle M.; Keller, C. Brenhin; Keller, Gerta; Adatte, Thierry; Khadri, Syed F. R.
+AÑO       : 2019
+TITULO    : U-Pb constraints on pulsed eruption of the Deccan Traps across the end-Cretaceous mass extinction
+REVISTA   : Science
+VOLUMEN   : 363
+PAGINA    : 862
+DOI       : 10.1126/science.aau2422
+RELACION  : publicado en paralelo con B.33B
+NOTA      : Sin PDF de acceso libre localizado. PMID 30792300.
+
+[REG] https://pubmed.ncbi.nlm.nih.gov/30792300/
+[DOI] https://doi.org/10.1126/science.aau2422
+
+====
+
+ID        : B.33B
+REFERENCIA: Sprain, Courtney J.; Renne, Paul R.; Vanderkluysen, Loÿc; Pande, Kanchan; Self, Stephen; Mittal, Tushar (2019). The eruptive tempo of Deccan volcanism in relation to the Cretaceous-Paleogene boundary. Science, 363(6429), 866-870.
+AUTORES   : Sprain, Courtney J.; Renne, Paul R.; Vanderkluysen, Loÿc; Pande, Kanchan; Self, Stephen; Mittal, Tushar
+AÑO       : 2019
+TITULO    : The eruptive tempo of Deccan volcanism in relation to the Cretaceous-Paleogene boundary
+REVISTA   : Science
+VOLUMEN   : 363
+PAGINA    : 866
+DOI       : 10.1126/science.aav1446
+RELACION  : publicado en paralelo con B.33
+NOTA      : Sin PDF de acceso libre localizado. PMID 30792301. Ambos articulos aparecieron en el mismo numero, acompanados de una Perspective de Burgess.
+
+[REG] https://www.science.org/doi/10.1126/science.aav1446
+[REG] https://pubmed.ncbi.nlm.nih.gov/30792301/
+[DOI] https://doi.org/10.1126/science.aav1446
+
+====
+
+ID        : B.34
+REFERENCIA: Gulick, Sean P. S.; Bralower, Timothy J.; Ormö, Jens; Hall, Brendon; Grice, Kliti; Schaefer, Bettina; Lyons, Shelby; Freeman, Katherine H.; Morgan, Joanna V.; Artemieva, Natalia; Kaskes, Pim; de Graaff, Sietze J.; Whalen, Michael T.; Collins, Gareth S.; Tikoo, Sonia M.; Verhagen, Christina; Christeson, Gail L.; Claeys, Philippe; Coolen, Marco J. L.; Goderis, Steven; Goto, Kazuhisa; Grieve, Richard A. F.; McCall, Naoma; Osinski, Gordon R.; Rae, Auriol S. P.; Riller, Ulrich; Smit, Jan; Vajda, Vivi; Wittmann, Axel (2019). The first day of the Cenozoic. Proceedings of the National Academy of Sciences, 116(39), 19342-19351.
+AUTORES   : Gulick, Sean P. S.; Bralower, Timothy J.; Ormö, Jens; Hall, Brendon; Grice, Kliti; Schaefer, Bettina; Lyons, Shelby; Freeman, Katherine H.; Morgan, Joanna V.; Artemieva, Natalia; Kaskes, Pim; de Graaff, Sietze J.; Whalen, Michael T.; Collins, Gareth S.; Tikoo, Sonia M.; Verhagen, Christina; Christeson, Gail L.; Claeys, Philippe; Coolen, Marco J. L.; Goderis, Steven; Goto, Kazuhisa; Grieve, Richard A. F.; McCall, Naoma; Osinski, Gordon R.; Rae, Auriol S. P.; Riller, Ulrich; Smit, Jan; Vajda, Vivi; Wittmann, Axel
+AÑO       : 2019
+TITULO    : The first day of the Cenozoic
+REVISTA   : Proceedings of the National Academy of Sciences
+VOLUMEN   : 116
+PAGINA    : 19342
+DOI       : 10.1073/pnas.1909479116
+RELACION  : —
+NOTA      : Firmado tambien por el colectivo "Expedition 364 Scientists".
+
+[PDF] https://pmc.ncbi.nlm.nih.gov/articles/PMC6765282/
+[REG] https://eprints.gla.ac.uk/192929
+[REG] https://pubmed.ncbi.nlm.nih.gov/31501350/
+[DOI] https://doi.org/10.1073/pnas.1909479116
+
+====
+
+ID        : B.35
+REFERENCIA: Hull, Pincelli M.; et al. (2020). On impact and volcanism across the Cretaceous-Paleogene boundary. Science, 367(6475), 266-272.
+AUTORES   : Hull, Pincelli M.; et al.
+AÑO       : 2020
+TITULO    : On impact and volcanism across the Cretaceous-Paleogene boundary
+REVISTA   : Science
+VOLUMEN   : 367
+PAGINA    : 266
+DOI       : 10.1126/science.aay5055
+RELACION  : —
+NOTA      : No se localizo una URL directa de PDF. PubMed marca el registro como articulo gratuito; el manuscrito aceptado esta depositado en el repositorio de la Universidad de Edimburgo. No se verifico la lista completa de coautores.
+
+[REG] https://pubmed.ncbi.nlm.nih.gov/31949074/
+[REG] https://www.research.ed.ac.uk/en/publications/on-impact-and-volcanism-across-the-cretaceous-paleogene-boundary/
+[REG] https://www.science.org/doi/10.1126/science.aay5055
+[DOI] https://doi.org/10.1126/science.aay5055
+
+====
+
+ID        : B.36
+REFERENCIA: Chiarenza, Alfio Alessandro; Farnsworth, Alexander; Mannion, Philip D.; Lunt, Daniel J.; Valdes, Paul J.; Morgan, Joanna V.; Allison, Peter A. (2020). Asteroid impact, not volcanism, caused the end-Cretaceous dinosaur extinction. Proceedings of the National Academy of Sciences, 117(29), 17084-17093.
+AUTORES   : Chiarenza, Alfio Alessandro; Farnsworth, Alexander; Mannion, Philip D.; Lunt, Daniel J.; Valdes, Paul J.; Morgan, Joanna V.; Allison, Peter A.
+AÑO       : 2020
+TITULO    : Asteroid impact, not volcanism, caused the end-Cretaceous dinosaur extinction
+REVISTA   : Proceedings of the National Academy of Sciences
+VOLUMEN   : 117
+PAGINA    : 17084
+DOI       : 10.1073/pnas.2006087117
+RELACION  : —
+
+[PDF] https://www.pnas.org/doi/pdf/10.1073/pnas.2006087117
+[REG] https://discovery.ucl.ac.uk/id/eprint/10097546/
+[REG] https://research-information.bris.ac.uk/en/publications/asteroid-impact-not-volcanism-caused-the-end-cretaceous-dinosaur-
+[REG] https://pubmed.ncbi.nlm.nih.gov/32601204/
+[DOI] https://doi.org/10.1073/pnas.2006087117
+
+====
+
+# OBRAS EXCLUIDAS POR DATOS INSUFICIENTES: ninguna.
+#
+# OBRAS SIN NINGUNA URL (monografias impresas): B.11, B.22.
+#
+# OBRAS CON [PDF] VERIFICADO (14): B.8, B.12, B.13, B.15, B.15C, B.16, B.18,
+#   B.19, B.21, B.27, B.30, B.32, B.34, B.36.
+#
+# OBRAS SIN [PDF] (16): B.7, B.9, B.10, B.11, B.14, B.17, B.20, B.22, B.23,
+#   B.24, B.25, B.26, B.28, B.29, B.31, B.33, B.33B, B.35.
+#   De estas, B.10, B.14, B.26 y B.35 SI son de acceso libre o gratuito, pero
+#   solo desde la pagina [REG] indicada; no se verifico una URL de archivo.
+#
+# NOTA PARA EL DESCARGADOR:
+#   - B.29 tiene un DOI con caracteres < y > sin codificar.
+#   - Tres PDF estan alojados fuera del editor y fuera de un repositorio
+#     institucional formal: B.19 (pagina personal del autor), B.27 y B.30
+#     (paginas docentes universitarias). Verificar vigencia antes de una
+#     descarga masiva.
