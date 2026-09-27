@@ -1,4 +1,4 @@
-"""Valida la salida de scripts/convertir_bloque_a.py (M30). El conversor no tiene tests propios."""
+"""Valida la salida de scripts/convertir_bloque.py sobre el Bloque A (M30). El conversor no tiene tests propios."""
 
 import json
 from pathlib import Path

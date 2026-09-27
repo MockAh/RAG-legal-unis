@@ -749,6 +749,71 @@ Dos deudas, ambas medidas.
   comprueba el humano, sin red, leyendo la base con `Store.hash_registrado`.
 - Commit: `M34: la idempotencia lee de descargas`
 
+## M36 · Encargos del Bloque B
+- Entrada: `datos/lotes/bloque-b.txt` (commit S12): 32 fichas (31 obras + 1
+  corrección), mismo formato que el Bloque A. Salida:
+  `datos/encargos_bloque_b.json`, con la misma forma que la de M30.
+- **Conversor generalizado.** `scripts/convertir_bloque_a.py` pasa a
+  `scripts/convertir_bloque.py --entrada … --salida …`. Sigue siendo desechable y
+  sigue sin ser el Lector de Lista. Se comprobó regenerando el Bloque A en un
+  directorio temporal: sale idéntico a `datos/encargos_bloque_a.json` salvo por
+  `creado_en` y la clave nueva `vinculos[].relacion`. El JSON de A no se
+  regenera en el repositorio.
+- Reglas de M30 sin cambios: `articulo_id` (`docs/01` l.761–769), orden de
+  puertas por tipo (l.785), `cajon="papers"`, `cruzar_vestibulos=True`,
+  `grupo_alias=articulo_id`.
+- **B.11 y B.22** son monografías sin URL ni DOI: `sin_puertas`, como A.5. Van
+  **30** encargos, no 32.
+- **ResearchGate (B.7, B.9) y DOAJ no son puerta.** Van a `registros`, como
+  PubMed y ADS en M30. B.7 y B.9 se quedan con su oficial y el resolutor.
+- **Suplemento de B.10 (figshare).** Sale de las puertas y queda en `registros`
+  con `"nota": "material suplementario"`. **Por qué:** un suplemento descargado
+  como artículo sería un **falso éxito**. Eso es peor que un fallo porque no se
+  nota: el Descargador lo daría por bueno, y solo lo detectaría el Verificador
+  Académico, que todavía no existe.
+- **B.29: el DOI trae `<` y `>` sin codificar.** Medido:
+  `urlnorm.normalizar` devuelve `…019%3C0867:CCAPCT%3E2.3.CO;2`, codifica solo
+  `<>` y es idempotente. El conversor no codifica nada: `Puerta.url` guarda el
+  enlace crudo (D3, `docs/05` §Normalización) y la normalización ocurre al
+  pedir (`puertas.py`).
+- **B.15C, corrección de B.15.** `articulo_id` = `corr:{articulo_id de B.15}:{h8}`
+  (`docs/01` l.767), con `h8` sacado de la URL normalizada de su primera puerta.
+  Etiqueta `corr-burgess-2014__…` (N10). `relacion` pertenece a `ArticleRef`
+  (N11), no a `Encargo`: vive en `vinculos`, que gana la clave `relacion`
+  (`"correccion"`; `null` si el literal no está en `Relacion`). Es un cambio
+  aditivo en el bloque auxiliar, que no es contrato.
+- **B.33 y B.33B, «publicado en paralelo».** No está en `Relacion`: como A.3S,
+  van sin `relacion` y el vínculo, en los dos sentidos, vive en `vinculos`.
+  Hallazgo para la spec del Lector de Lista, junto con «suplemento». El
+  vínculo se toma ahora con una expresión regular sobre el ID, no con la
+  última palabra; con la última palabra, B.15C daba `"3)"`.
+- **Tipo por host (21 hosts `[REG]` nuevos).** Se clasifican por lo que son,
+  no por su marca:
+  - PMC en sus dos hosts (`www.ncbi…/pmc`, `pmc.ncbi…`) → `copia_libre`. Los
+    `[PDF]` de B.13, B.15, B.15C, B.16 y B.34 son páginas intermedias, no
+    archivos: los cruza la corrida.
+  - Repositorios institucionales (`eprints.*`, `dspace`, `repository.cam`,
+    `archive-ouverte.unige`, `nora.nerc`, `discovery.ucl`, `pure-oai.bham`,
+    `pure.ed`) y páginas de autor o de curso → `copia_libre`.
+  - Editoriales (`science.org`, `pnas.org`, `nature.com`,
+    `pubs.geoscienceworld.org`) → `oficial`. Esto incluye los `[PDF]` de B.8 y
+    B.36, que son PDF del propio editor, como Cambridge en A.7.
+  - **Nueve portales CRIS clasificados `copia_libre` sin evidencia; revisar
+    con M37.** Son `research.ed.ac.uk`, `research.birmingham`,
+    `researchwithrutgers`, `experts.arizona`, `pure.psu`, `research.vu.nl`,
+    `research-information.bris`, `research-portal.st-andrews` y
+    `profiles.wustl`. Es la clasificación menos segura de las tres: muchos solo
+    muestran la ficha del artículo, sin archivo. La corrida debe poder
+    auditarla.
+- **Efecto del orden que la corrida debe mirar:** en B.8 el portal CRIS de
+  WUSTL (`copia_libre`) va antes que el PDF aceptado en `science.org`
+  (`oficial`), que es el único enlace directo verificado de la ficha. Es el
+  mismo caso que A.7 (pregunta abierta 5 de `docs/01`).
+- Verificación: `lote.py --dry-run --encargos datos/encargos_bloque_b.json` da
+  30 encargos, 85 puertas, ninguna construida, y B.11 y B.22 como no
+  descargables. Test de la salida: `tests/test_encargos_bloque_b.py`.
+- Commit: `M36: Encargos del Bloque B y conversor generalizado`
+
 ## Deuda · La idempotencia no mira el disco (regla 5 de `docs/05`)
 - La regla 5 exige, para no pedir ninguna puerta, una descarga exitosa
   registrada **y que su archivo exista con el hash registrado**.

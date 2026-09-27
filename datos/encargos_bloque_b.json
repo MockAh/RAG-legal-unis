@@ -1,0 +1,1111 @@
+{
+  "lote_id": "bloque-b-txt-ba300d3c",
+  "archivo_origen": "bloque-b.txt",
+  "sha256_archivo": "ba300d3ce1014e5b52c57d5baf73b86522511f76d46e91faabc982561a21d4fa",
+  "encargos": [
+    {
+      "encargo_id": "doi:10.1146/annurev.earth.29.1.331",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://www.annualreviews.org/content/journals/10.1146/annurev.earth.29.1.331",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.7",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1146/annurev.earth.29.1.331",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.7",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "sheehan-2001__66ac0411",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1146/annurev.earth.29.1.331",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.1200803",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://profiles.wustl.edu/en/publications/the-magnitude-and-duration-of-late-ordovician-early-silurian-glac/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.8",
+          "construida": false
+        },
+        {
+          "url": "https://www.science.org/cms/asset/14788632-30a2-4c3e-8e93-3e8c8b26958b/pap.pdf",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.8",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.1200803",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.8",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "finnegan-2011__1b715bc9",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.1200803",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1016/j.gr.2012.12.021",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S1342937X13000154",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.9",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1016/j.gr.2012.12.021",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.9",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "harper-2014__ac0691c7",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1016/j.gr.2012.12.021",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1130/g47377.1",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://hull-repository.worktribe.com/output/3480749/late-ordovician-mass-extinction-caused-by-volcanism-warming-and-anoxia-not-cooling-and-glaciation",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.10",
+          "construida": false
+        },
+        {
+          "url": "https://pubs.geoscienceworld.org/gsa/geology/article/48/8/777/586486/Late-Ordovician-mass-extinction-caused-by",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.10",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1130/G47377.1",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.10",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "bond-2020__ac4618a4",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1130/g47377.1",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1016/j.palaeo.2008.02.015",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://eprints.whiterose.ac.uk/id/eprint/3460/1/bondb2.pdf",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.12",
+          "construida": false
+        },
+        {
+          "url": "https://eprints.whiterose.ac.uk/id/eprint/3460/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.12",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1016/j.palaeo.2008.02.015",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.12",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "bond-2008__3070175e",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1016/j.palaeo.2008.02.015",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1038/s41598-018-27847-7",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6014997/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.13",
+          "construida": false
+        },
+        {
+          "url": "https://archive-ouverte.unige.ch/unige:113341",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.13",
+          "construida": false
+        },
+        {
+          "url": "https://www.nature.com/articles/s41598-018-27847-7",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.13",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1038/s41598-018-27847-7",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.13",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "percival-2018__401a09be",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1038/s41598-018-27847-7",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/sciadv.aba0768",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://eprints.soton.ac.uk/441062",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.14",
+          "construida": false
+        },
+        {
+          "url": "https://www.science.org/doi/10.1126/sciadv.aba0768",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.14",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/sciadv.aba0768",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.14",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "marshall-2020__bba0c43f",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/sciadv.aba0768",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1073/pnas.1317692111",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3948271",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.15",
+          "construida": false
+        },
+        {
+          "url": "https://www.pnas.org/doi/10.1073/pnas.1317692111",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.15",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1073/pnas.1317692111",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.15",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "burgess-2014__7c3026ab",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1073/pnas.1317692111",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "corr:doi:10.1073/pnas.1317692111:d1a14a9b",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3977310/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.15C",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "corr-burgess-2014__fe508487",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "corr:doi:10.1073/pnas.1317692111:d1a14a9b",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1038/s41467-017-00083-9",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5537227",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.16",
+          "construida": false
+        },
+        {
+          "url": "https://www.nature.com/articles/s41467-017-00083-9",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.16",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1038/s41467-017-00083-9",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.16",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "burgess-2017__4426a244",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1038/s41467-017-00083-9",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.1224126",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://eprints.whiterose.ac.uk/77504/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.17",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.1224126",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.17",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "sun-2012__822cf2af",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.1224126",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.aaa0193",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://eprints.whiterose.ac.uk/id/eprint/85124/1/Clarkson_Boron_final.pdf",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.18",
+          "construida": false
+        },
+        {
+          "url": "https://www.research.ed.ac.uk/en/publications/ocean-acidification-and-the-permo-triassic-mass-extinction/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.18",
+          "construida": false
+        },
+        {
+          "url": "https://www.repository.cam.ac.uk/items/f828f2dc-a078-4bc9-ae93-d08e70e234d6",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.18",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.aaa0193",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.18",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "clarkson-2015__d749448a",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.aaa0193",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.aat1327",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://jlpenn.github.io/papers/PENN_2018_SCIENCE.pdf",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.19",
+          "construida": false
+        },
+        {
+          "url": "https://www.science.org/doi/10.1126/science.aat1327",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.19",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.aat1327",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.19",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "penn-2018__9628705d",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.aat1327",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1038/s41561-020-00646-4",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://research-portal.st-andrews.ac.uk/en/publications/permiantriassic-mass-extinction-pulses-driven-by-major-marine-car",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.20",
+          "construida": false
+        },
+        {
+          "url": "https://www.nature.com/articles/s41561-020-00646-4",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.20",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1038/s41561-020-00646-4",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.20",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "jurikova-2020__bb5760fc",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1038/s41561-020-00646-4",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1038/s43017-021-00259-4",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://pure-oai.bham.ac.uk/ws/files/158605446/corsoj2022environmental.pdf",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.21",
+          "construida": false
+        },
+        {
+          "url": "https://research.birmingham.ac.uk/en/publications/environmental-crises-at-the-permiantriassic-mass-extinction/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.21",
+          "construida": false
+        },
+        {
+          "url": "https://www.nature.com/articles/s43017-021-00259-4",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.21",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1038/s43017-021-00259-4",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.21",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "dal-corso-2022__60e7e611",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1038/s43017-021-00259-4",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.1199011",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://www.science.org/doi/10.1126/science.1199011",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.23",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.1199011",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.23",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "schaller-2011__5e7375c0",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.1199011",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.1204255",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://dspace.library.uu.nl/handle/1874/208941",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.24",
+          "construida": false
+        },
+        {
+          "url": "https://www.science.org/doi/10.1126/science.1204255",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.24",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.1204255",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.24",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "ruhl-2011__d499752b",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.1204255",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.1234204",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://www.researchwithrutgers.com/en/publications/zircon-u-pb-geochronology-links-the-end-triassic-extinction-with-/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.25",
+          "construida": false
+        },
+        {
+          "url": "https://www.science.org/doi/10.1126/science.1234204",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.25",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.1234204",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.25",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "blackburn-2013__cd19dc1a",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.1234204",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1038/ncomms15596",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://www.nature.com/articles/ncomms15596",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.26",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1038/ncomms15596",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.26",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "davies-2017__27eff3c8",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1038/ncomms15596",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.208.4448.1095",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://ebme.marine.rutgers.edu/HistoryEarthSystems/HistEarthSystems_Fall2010/Week9_Oct29_2009_Alvarez%20.pdf",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.27",
+          "construida": false
+        },
+        {
+          "url": "https://www.science.org/doi/10.1126/science.208.4448.1095",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.27",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.208.4448.1095",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.27",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "alvarez-1980__c708e9b8",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.208.4448.1095",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.224.4651.867",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://www.science.org/doi/10.1126/science.224.4651.867",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.28",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.224.4651.867",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.28",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "bohor-1984__d5d3893f",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.224.4651.867",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1130/0091-7613(1991)019<0867:ccapct>2.3.co;2",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://experts.arizona.edu/en/publications/chicxulub-crater-a-possible-cretaceoustertiary-boundary-impact-cr/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.29",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1130/0091-7613(1991)019<0867:CCAPCT>2.3.CO;2",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.29",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "hildebrand-1991__cac4e3a0",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1130/0091-7613(1991)019<0867:ccapct>2.3.co;2",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.1177265",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://www3.nd.edu/~cneal/CRN_Papers/Schulte10_Sci_Chicxulub.pdf",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.30",
+          "construida": false
+        },
+        {
+          "url": "https://pure.psu.edu/en/publications/the-chicxulub-asteroid-impact-and-mass-extinction-at-the-cretaceo/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.30",
+          "construida": false
+        },
+        {
+          "url": "https://www.science.org/doi/10.1126/science.1177265",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.30",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.1177265",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.30",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "schulte-2010__434d715f",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.1177265",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.1230492",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://research.vu.nl/en/publications/time-scales-of-critical-events-around-the-cretaceous-paleogene-bo",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.31",
+          "construida": false
+        },
+        {
+          "url": "https://www.science.org/doi/10.1126/science.1230492",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.31",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.1230492",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.31",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "renne-2013__04c13445",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.1230492",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.aah6561",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://www.pure.ed.ac.uk/ws/portalfiles/portal/30050008/morgan_science_2016.pdf",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.32",
+          "construida": false
+        },
+        {
+          "url": "https://www.research.ed.ac.uk/en/publications/the-formation-of-peak-rings-in-large-impact-craters/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.32",
+          "construida": false
+        },
+        {
+          "url": "https://nora.nerc.ac.uk/id/eprint/516086/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.32",
+          "construida": false
+        },
+        {
+          "url": "https://www.science.org/doi/10.1126/science.aah6561",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.32",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.aah6561",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.32",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "morgan-2016__0fbabd33",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.aah6561",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.aau2422",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://doi.org/10.1126/science.aau2422",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.33",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "schoene-2019__725a219b",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.aau2422",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.aav1446",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://www.science.org/doi/10.1126/science.aav1446",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.33B",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.aav1446",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.33B",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "sprain-2019__8f10c519",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.aav1446",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1073/pnas.1909479116",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6765282/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.34",
+          "construida": false
+        },
+        {
+          "url": "https://eprints.gla.ac.uk/192929",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.34",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1073/pnas.1909479116",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.34",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "gulick-2019__c5faf526",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1073/pnas.1909479116",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1126/science.aay5055",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://www.research.ed.ac.uk/en/publications/on-impact-and-volcanism-across-the-cretaceous-paleogene-boundary/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.35",
+          "construida": false
+        },
+        {
+          "url": "https://www.science.org/doi/10.1126/science.aay5055",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.35",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1126/science.aay5055",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.35",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "hull-2020__db25960e",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1126/science.aay5055",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    },
+    {
+      "encargo_id": "doi:10.1073/pnas.2006087117",
+      "modo": "academico",
+      "solicitante": "bloque-b-txt-ba300d3c",
+      "puertas": [
+        {
+          "url": "https://discovery.ucl.ac.uk/id/eprint/10097546/",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.36",
+          "construida": false
+        },
+        {
+          "url": "https://research-information.bris.ac.uk/en/publications/asteroid-impact-not-volcanism-caused-the-end-cretaceous-dinosaur-",
+          "tipo": "copia_libre",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.36",
+          "construida": false
+        },
+        {
+          "url": "https://www.pnas.org/doi/pdf/10.1073/pnas.2006087117",
+          "tipo": "oficial",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.36",
+          "construida": false
+        },
+        {
+          "url": "https://doi.org/10.1073/pnas.2006087117",
+          "tipo": "resolutor_doi",
+          "url_base": null,
+          "evidencia": "lista:bloque-b-txt-ba300d3c#B.36",
+          "construida": false
+        }
+      ],
+      "cajon": "papers",
+      "etiqueta": "chiarenza-2020__529dfe74",
+      "cruzar_vestibulos": true,
+      "grupo_alias": "doi:10.1073/pnas.2006087117",
+      "creado_en": "2026-09-27T01:05:00.399483"
+    }
+  ],
+  "no_obtenidos": [
+    {
+      "articulo_id": "ref:mcghee-1996-d0578eb9",
+      "referencia_literal": "McGhee, George R., Jr. (1996). The Late Devonian Mass Extinction: The Frasnian/Famennian Crisis. New York: Columbia University Press.",
+      "motivo": "sin_puertas",
+      "intentos": 0,
+      "ruta_sugerida": "buscar por título o cita"
+    },
+    {
+      "articulo_id": "ref:erwin-2006-a8196595",
+      "referencia_literal": "Erwin, Douglas H. (2006). Extinction: How Life on Earth Nearly Ended 250 Million Years Ago. Princeton: Princeton University Press.",
+      "motivo": "sin_puertas",
+      "intentos": 0,
+      "ruta_sugerida": "buscar por título o cita"
+    }
+  ],
+  "vinculos": [
+    {
+      "articulo_id": "corr:doi:10.1073/pnas.1317692111:d1a14a9b",
+      "relacionado_con": "doi:10.1073/pnas.1317692111",
+      "relacion": "correccion",
+      "literal": "correccion de B.15 (afecta a la Fig. 3)"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.aau2422",
+      "relacionado_con": "doi:10.1126/science.aav1446",
+      "relacion": null,
+      "literal": "publicado en paralelo con B.33B"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.aav1446",
+      "relacionado_con": "doi:10.1126/science.aau2422",
+      "relacion": null,
+      "literal": "publicado en paralelo con B.33"
+    }
+  ],
+  "registros": [
+    {
+      "articulo_id": "doi:10.1146/annurev.earth.29.1.331",
+      "posicion_en_lista": "B.7",
+      "url": "https://www.researchgate.net/publication/257815428_The_Late_Ordovician_Mass_Extinction"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.1200803",
+      "posicion_en_lista": "B.8",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21273448"
+    },
+    {
+      "articulo_id": "doi:10.1016/j.gr.2012.12.021",
+      "posicion_en_lista": "B.9",
+      "url": "https://www.researchgate.net/publication/256938435_End_Ordovician_extinctions_A_coincidence_of_causes"
+    },
+    {
+      "articulo_id": "doi:10.1130/g47377.1",
+      "posicion_en_lista": "B.10",
+      "url": "https://gsapubs.figshare.com/articles/journal_contribution/Supplemental_Material_Late_Ordovician_mass_extinction_caused_by_volcanism_warming_and_anoxia_not_cooling_and_glaciation/12221825",
+      "nota": "material suplementario"
+    },
+    {
+      "articulo_id": "doi:10.1038/s41598-018-27847-7",
+      "posicion_en_lista": "B.13",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/29934550/"
+    },
+    {
+      "articulo_id": "doi:10.1126/sciadv.aba0768",
+      "posicion_en_lista": "B.14",
+      "url": "https://ui.adsabs.harvard.edu/abs/2020SciA....6..768M"
+    },
+    {
+      "articulo_id": "doi:10.1038/s41467-017-00083-9",
+      "posicion_en_lista": "B.16",
+      "url": "https://doaj.org/article/28be87e7332d407280e3bbdbaf062372"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.1224126",
+      "posicion_en_lista": "B.17",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/23087244/"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.aaa0193",
+      "posicion_en_lista": "B.18",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/25859043/"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.1199011",
+      "posicion_en_lista": "B.23",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21330490/"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.1204255",
+      "posicion_en_lista": "B.24",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21778394/"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.1234204",
+      "posicion_en_lista": "B.25",
+      "url": "https://ui.adsabs.harvard.edu/abs/2013Sci...340..941B"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.208.4448.1095",
+      "posicion_en_lista": "B.27",
+      "url": "https://ui.adsabs.harvard.edu/abs/1980Sci...208.1095A"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.224.4651.867",
+      "posicion_en_lista": "B.28",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/17743194/"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.224.4651.867",
+      "posicion_en_lista": "B.28",
+      "url": "https://ui.adsabs.harvard.edu/abs/1984Sci...224..867B"
+    },
+    {
+      "articulo_id": "doi:10.1130/0091-7613(1991)019<0867:ccapct>2.3.co;2",
+      "posicion_en_lista": "B.29",
+      "url": "https://ui.adsabs.harvard.edu/abs/1991Geo....19..867H/abstract"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.1230492",
+      "posicion_en_lista": "B.31",
+      "url": "https://ui.adsabs.harvard.edu/abs/2013Sci...339..684R/abstract"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.aau2422",
+      "posicion_en_lista": "B.33",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/30792300/"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.aav1446",
+      "posicion_en_lista": "B.33B",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/30792301/"
+    },
+    {
+      "articulo_id": "doi:10.1073/pnas.1909479116",
+      "posicion_en_lista": "B.34",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31501350/"
+    },
+    {
+      "articulo_id": "doi:10.1126/science.aay5055",
+      "posicion_en_lista": "B.35",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31949074/"
+    },
+    {
+      "articulo_id": "doi:10.1073/pnas.2006087117",
+      "posicion_en_lista": "B.36",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/32601204/"
+    }
+  ]
+}
