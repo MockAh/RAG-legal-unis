@@ -1561,6 +1561,13 @@ Hay tres explicaciones posibles. **Ninguna está medida:**
 **Pendiente:** que el informe de las corridas futuras registre `rate_limit_s` y el host, para
 que esto sea medible. No está implementado.
 
+> **Nota (2026-09-27) — pendiente cubierto desde M36.1.** El resumen de `cosecha.py`,
+> `cosecha_uam.py` y `lote.py` imprime ahora `rate_limit_s`, `user_agent` y
+> `hosts distintos pedidos`. **Salvedad:** el conteo de hosts sale de la URL pedida de cada
+> puerta y **no incluye** los hosts de las redirecciones ni el del salto de vestíbulo. La
+> anomalía sigue abierta: E14 no se puede re-medir, y hará falta una corrida nueva para
+> distinguir entre las tres explicaciones.
+
 ---
 
 | Versión | Fecha | Cambio |

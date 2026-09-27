@@ -814,6 +814,24 @@ Dos deudas, ambas medidas.
   descargables. Test de la salida: `tests/test_encargos_bloque_b.py`.
 - Commit: `M36: Encargos del Bloque B y conversor generalizado`
 
+## M36.1 · El informe registra los parámetros de la corrida
+- Pendiente de E18.1 de `docs/08`: la anomalía de los 43 s no es medible sin
+  `rate_limit_s` ni los hosts de la corrida.
+- El resumen de `cosecha.py`, `cosecha_uam.py` y `lote.py` imprime al final
+  `rate_limit_s`, `user_agent` y `hosts distintos pedidos`.
+- **Qué cuenta como host pedido:** el host de `IntentoPuerta.url_pedida` de
+  cada puerta que llegó a pedirse, incluidas las que terminan en `http_error`,
+  `timeout` o visor. No cuentan las puertas con `robots_prohibido` (no se
+  piden) ni los encargos omitidos por idempotencia (no piden nada).
+- **Salvedad:** el conteo **no incluye** los hosts que solo aparecen en la
+  cadena de redirecciones (E15.8) ni el del enlace seguido en un vestíbulo.
+  Para E18.1 no importa: es jurídica, con una sola puerta y sin vestíbulos. En
+  una corrida académica el número es un mínimo.
+- Test nuevo en `tests/test_cliente_http.py`, sobre los tres `main()`: un
+  host en la primera corrida y cero en la segunda (omitido). Ningún `assert`
+  existente cambia.
+- Commit: `M36.1: el informe registra los parámetros de la corrida`
+
 ## Deuda · La idempotencia no mira el disco (regla 5 de `docs/05`)
 - La regla 5 exige, para no pedir ninguna puerta, una descarga exitosa
   registrada **y que su archivo exista con el hash registrado**.
