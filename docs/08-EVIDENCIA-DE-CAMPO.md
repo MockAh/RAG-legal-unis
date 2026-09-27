@@ -1573,28 +1573,86 @@ que esto sea medible. No está implementado.
 ## E19 · Corrida del Bloque B (2026-09-27)
 
 **Segunda medición del criterio 18 de `05`.** Entrada: `datos/encargos_bloque_b.json` (M36).
-Es la primera corrida con el resumen de M36.1.
+Hubo dos corridas: una parcial (`--limite 5`) y, justo después, la completa. Son las primeras
+con el resumen de M36.1.
 
-**Fuente.** El operador leyó el log de `scripts/lote.py`, el resumen de una corrida parcial
-anterior y tres consultas a PMC, y resumió lo que encontró. **El log no está en el repositorio y
-aquí no se cita.** A diferencia de E15, ningún número de esta sección se comprobó contra un
-fragmento de log reproducido. Donde el texto interpreta, lo dice.
+**Fuente.** Los logs de las dos corridas, `~/respaldo-acervo/m37-parcial.log` y
+`~/respaldo-acervo/m37-bloque-b.log` (fuera del repo), y tres consultas: una sobre `intentos`
+en `legisuni_v2.db` (solo lectura), un `find` y un `ls` sobre `data/papers/`. Los fragmentos se
+citan en cada subsección. Donde el texto interpreta, lo dice.
 
 ### E19.1 · Qué se corrió: 8 de 30
 
-- **30 encargos, 85 puertas declaradas, 27 hosts pedidos, `rate_limit_s = 1.0`.** Los hosts
+```
+.venv/bin/python scripts/lote.py --encargos datos/encargos_bloque_b.json --limite 5 2>&1 | tee ~/respaldo-acervo/m37-parcial.log
+…
+--- resumen ---
+total: 5
+exitosas: 1
+omitidos: 0
+  puertas_agotadas: 4
+sin puertas (no se piden): 2
+rate_limit_s: 1.0
+user_agent: LegisUni/0.1 (+https://github.com/Mockah/RAG-legal-unis; …)
+hosts distintos pedidos: 8
+
+.venv/bin/python scripts/lote.py --encargos datos/encargos_bloque_b.json 2>&1 | tee ~/respaldo-acervo/m37-bloque-b.log
+…
+01:20:50.553 INFO __main__: pidiendo doi:10.1016/j.palaeo.2008.02.015 (3 puertas)
+01:20:50.553 INFO legisuni.descargador.descargar: omitido: doi:10.1016/j.palaeo.2008.02.015 ya registrado
+…
+--- resumen ---
+total: 30
+exitosas: 8
+omitidos: 1
+  puertas_agotadas: 19
+  vestibulo_sin_pdf: 1
+  http_error: 1
+sin puertas (no se piden): 2
+rate_limit_s: 1.0
+user_agent: LegisUni/0.1 (+https://github.com/Mockah/RAG-legal-unis; …)
+hosts distintos pedidos: 27
+```
+
+```
+find data/papers -type f -newermt '2026-09-27' | wc -l
+9
+```
+
+- **30 encargos, 85 puertas declaradas, 63 pedidas (E19.10), 27 hosts pedidos,
+  `rate_limit_s = 1.0`.** Los hosts
   cuentan con la salvedad de M36.1: no incluyen los de redirecciones ni los de saltos de
   vestíbulo.
 - **Resultado: 8/30, más 1 omitido.** El omitido es B.12, ya descargado en la corrida parcial.
   **Es la primera idempotencia académica en campo.**
 - **2 `sin_puertas`** (B.11 y B.22, monografías). No generan encargo (M36).
-- **9 archivos nuevos en disco.**
+- **9 archivos nuevos en disco:** los 8 éxitos de la completa y el de B.12, de la parcial.
 
 ### E19.2 · El control de Nature: la señal de E15.3 distingue muro de acceso abierto
 
 E15.3 (lectura revisada en M32) dejó como señal candidata de muro que el enlace
 `articles/….pdf` de Nature redirija a la página del artículo en vez de servir el archivo. Esta
 corrida trae **un control positivo y uno negativo**:
+
+```
+# B.16 (acceso abierto), puerta 1
+01:21:04.348 … GET https://www.nature.com/articles/s41467-017-00083-9 "HTTP/1.1 303 See Other"
+01:21:04.793 … GET https://idp.nature.com/authorize?response_type=cookie&client_id=grover&redirect_uri=… "HTTP/1.1 302 Found"
+01:21:05.061 … GET https://idp.nature.com/transit?redirect_uri=…&code=… "HTTP/1.1 302 Found"
+01:21:05.576 … GET https://www.nature.com/articles/s41467-017-00083-9 "HTTP/1.1 200 OK"
+01:21:07.970 … GET https://www.nature.com/articles/s41467-017-00083-9.pdf "HTTP/1.1 200 OK"
+01:21:08.070 INFO __main__: resultado doi:10.1038/s41467-017-00083-9: exito=True puerta=1 motivo=None
+
+# B.26 (acceso abierto), puerta 0
+01:21:27.018 … GET https://www.nature.com/articles/ncomms15596 "HTTP/1.1 200 OK"
+01:21:29.762 … GET https://www.nature.com/articles/ncomms15596.pdf "HTTP/1.1 200 OK"
+01:21:29.866 INFO __main__: resultado doi:10.1038/ncomms15596: exito=True puerta=0 motivo=None
+
+# B.20 (de pago), puerta 1
+01:21:14.107 … GET https://www.nature.com/articles/s41561-020-00646-4 "HTTP/1.1 200 OK"
+01:21:14.780 … GET https://www.nature.com/articles/s41561-020-00646-4.pdf "HTTP/1.1 303 See Other"
+01:21:15.317 … GET https://www.nature.com/articles/s41561-020-00646-4 "HTTP/1.1 200 OK"
+```
 
 - **Acceso abierto: B.16 y B.26.** `articles/….pdf` responde `200`.
 - **De pago: B.20.** `articles/….pdf` responde `303` y vuelve al artículo, **igual que A.6**
@@ -1605,6 +1663,25 @@ implementarse** y sin criterio en `05`.
 
 ### E19.3 · PMC sirve HTML en la ruta del PDF
 
+```
+01:20:58.617 … GET https://pmc.ncbi.nlm.nih.gov/articles/PMC3948271 "HTTP/1.1 301 Moved Permanently"
+01:20:58.862 … GET https://pmc.ncbi.nlm.nih.gov/articles/PMC3948271/ "HTTP/1.1 200 OK"
+01:20:59.642 … GET https://pmc.ncbi.nlm.nih.gov/articles/PMC3948271/pdf/pnas.201317692.pdf "HTTP/1.1 200 OK"
+…
+01:21:00.680 … GET https://pmc.ncbi.nlm.nih.gov/articles/PMC3977310/ "HTTP/1.1 200 OK"
+01:21:01.646 … GET https://pmc.ncbi.nlm.nih.gov/articles/PMC3977310/pdf/pnas.201403228.pdf "HTTP/1.1 200 OK"
+01:21:01.672 INFO __main__: resultado corr:doi:10.1073/pnas.1317692111:d1a14a9b: exito=False puerta=None motivo=vestibulo_sin_pdf
+```
+
+```
+sqlite3 -readonly legisuni_v2.db "SELECT encargo_id, orden, motivo_fallo, http_status, substr(url,1,70) FROM intentos WHERE url LIKE '%pmc%' ORDER BY encargo_id, orden;"
+corr:doi:10.1073/pnas.1317692111:d1a14a9b|0|vestibulo_sin_pdf|200|https://pmc.ncbi.nlm.nih.gov/articles/PMC3977310/
+doi:10.1038/s41467-017-00083-9|0|vestibulo_sin_pdf|200|https://pmc.ncbi.nlm.nih.gov/articles/PMC5537227
+doi:10.1038/s41598-018-27847-7|0|robots_prohibido||https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6014997/
+doi:10.1073/pnas.1317692111|0|vestibulo_sin_pdf|200|https://pmc.ncbi.nlm.nih.gov/articles/PMC3948271
+doi:10.1073/pnas.1909479116|0|vestibulo_sin_pdf|200|https://pmc.ncbi.nlm.nih.gov/articles/PMC6765282/
+```
+
 Cuatro fichas: **B.15, B.15C, B.16 y B.34.** En las cuatro:
 
 1. La página de PMC responde `200` con HTML.
@@ -1612,7 +1689,10 @@ Cuatro fichas: **B.15, B.15C, B.16 y B.34.** En las cuatro:
 3. El salto devuelve **HTML otra vez** → `vestibulo_sin_pdf`.
 
 **Medido:** el diagnóstico del Descargador es correcto. Hubo un solo salto, y la respuesta no
-era un archivo. **Lo que falla es la fuente**, no el cruce.
+era un archivo. **Lo que falla es la fuente**, no el cruce. El log no muestra el tipo de lo que
+devolvió el salto (solo `200`). Que fuera HTML sale del código: `_cruzar_vestibulo` solo
+convierte un salto rechazado en `vestibulo_sin_pdf` si `vestibulo.es_html` lo reconoce. Si no,
+el motivo sería `no_es_pdf`.
 
 **Interpretación, no medición:** parece un bloqueo anti-bot, como los `403` de E15.4, pero
 servido con `200`. Si es así, es el caso que plantea la pregunta 8 de `05`: una página de
@@ -1620,8 +1700,20 @@ desafío que cae en `vestibulo_sin_pdf` sin que el motivo lo diga.
 
 ### E19.4 · `robots_prohibido` en campo por primera vez
 
-La puerta 0 de **B.13** apunta al host viejo de PMC, `www.ncbi.nlm.nih.gov`, cuyo `robots.txt`
-**prohíbe `/pmc/`**. Se respetó: la puerta no se pidió. **La puerta 1 (Ginebra,
+```
+01:20:50.554 INFO __main__: pidiendo doi:10.1038/s41598-018-27847-7 (4 puertas)
+01:20:50.911 … GET https://www.ncbi.nlm.nih.gov/robots.txt "HTTP/1.1 200 OK"
+01:20:51.617 … GET https://archive-ouverte.unige.ch/robots.txt "HTTP/1.1 200 OK"
+01:20:51.832 … GET https://archive-ouverte.unige.ch/unige:113341 "HTTP/1.1 200 OK"
+01:20:53.115 … GET https://access.archive-ouverte.unige.ch/robots.txt "HTTP/1.1 401 Unauthorized"
+01:20:53.116 WARNING legisuni.descargador.robots: status inesperado 401 al pedir https://access.archive-ouverte.unige.ch/robots.txt; fail-open (permitido)
+01:20:53.354 … GET https://access.archive-ouverte.unige.ch/access/metadata/375742d9-…/download "HTTP/1.1 200 OK"
+01:20:54.737 INFO __main__: resultado doi:10.1038/s41598-018-27847-7: exito=True puerta=1 motivo=None
+```
+
+La puerta 0 de **B.13** apunta al host viejo de PMC, `www.ncbi.nlm.nih.gov`. Su `robots.txt`
+se leyó (`200`) y prohibió la puerta: **se respetó y la puerta no se pidió** (`robots_prohibido`
+en `intentos`, E19.3). El log no muestra qué regla la prohíbe. **La puerta 1 (Ginebra,
 `archive-ouverte.unige.ch`) descargó.**
 
 Es la primera vez que un `robots.txt` legible prohíbe algo en una corrida real. Cierra lo que
@@ -1630,33 +1722,164 @@ se respetó de verdad, y el encargo no se perdió porque tenía otra puerta.
 
 ### E19.5 · Un enlace muerto en un día
 
+```
+01:21:30.888 … GET https://ebme.marine.rutgers.edu/HistoryEarthSystems/HistEarthSystems_Fall2010/Week9_Oct29_2009_Alvarez%20.pdf "HTTP/1.1 404 Not Found"
+```
+
 **B.27:** el `[PDF]` de Rutgers (`ebme.marine.rutgers.edu`) se verificó el 2026-09-26 al armar
 el lote y respondió `404` el 2026-09-27. Es el mismo patrón que E15.5 (un `[PDF]` verificado
 que ya no servía), ahora con un intervalo de un día.
 
-### E19.6 · Puertas duplicadas por destino (M33): 10 veces
+### E19.6 · Puertas duplicadas por destino (M33): 11 veces
+
+```
+01:20:50.541 … puertas: puerta 2: destino https://pubs.geoscienceworld.org/gsa/geology/article/48/8/777/… ya pedido por la puerta 1
+01:20:58.257 … puertas: puerta 2: destino https://www.science.org/doi/10.1126/sciadv.aba0768 ya pedido por la puerta 1
+01:21:16.247 … puertas: puerta 2: destino https://www.nature.com/articles/s41561-020-00646-4 ya pedido por la puerta 1
+01:21:18.814 … puertas: puerta 1: destino https://www.science.org/doi/10.1126/science.1199011 ya pedido por la puerta 0
+01:21:24.672 … puertas: puerta 2: destino https://www.science.org/doi/10.1126/science.1204255 ya pedido por la puerta 1
+01:21:26.450 … puertas: puerta 2: destino https://www.science.org/doi/10.1126/science.1234204 ya pedido por la puerta 1
+01:21:31.606 … puertas: puerta 2: destino https://www.science.org/doi/10.1126/science.208.4448.1095 ya pedido por la puerta 1
+01:21:32.510 … puertas: puerta 1: destino https://www.science.org/doi/10.1126/science.224.4651.867 ya pedido por la puerta 0
+01:21:38.802 … puertas: puerta 2: destino https://www.science.org/doi/10.1126/science.1230492 ya pedido por la puerta 1
+01:21:43.881 … puertas: puerta 1: destino https://www.science.org/doi/10.1126/science.aav1446 ya pedido por la puerta 0
+01:21:49.989 … puertas: puerta 2: destino https://www.science.org/doi/10.1126/science.aay5055 ya pedido por la puerta 1
+```
 
 La regla de M33 (no volver a pedir una puerta cuyo destino ya se pidió en el mismo encargo)
-**actuó 10 veces**, casi siempre con `science.org`. Es el caso de la puerta oficial y el
+**actuó 11 veces** en la corrida completa: 9 con `science.org`, 1 con `pubs.geoscienceworld.org`
+(B.10) y 1 con `www.nature.com` (B.20). En la parcial actuó una vez más (B.10). Es el caso de la puerta oficial y el
 resolutor DOI de una misma ficha, que acaban en la misma página del editor.
 
 ### E19.7 · El reloj del sistema retrocede en el log
 
-En el log el tiempo va hacia atrás: `01:21:44.554` → `01:21:43.605`. Hay otro caso en la corrida
-parcial. **Es WSL ajustando la hora del sistema.**
+```
+# corrida completa
+01:21:44.556 INFO legisuni.descargador.ratelimit: cortesia: doi.org espera 0.206s (ultima hace 0.794s)
+01:21:43.605 … GET https://doi.org/10.1126/science.aav1446 "HTTP/1.1 302 Found"
+
+01:21:13.849 … GET https://research-portal.st-andrews.ac.uk/en/publications/permiantriassic-…-car "HTTP/1.1 301 Moved Permanently"
+01:21:13.291 … GET https://research-portal.st-andrews.ac.uk/en/publications/permiantriassic-…-car/ "HTTP/1.1 200 OK"
+
+# corrida parcial
+01:20:43.146 INFO __main__: pidiendo doi:10.1016/j.palaeo.2008.02.015 (3 puertas)
+01:20:42.347 … GET https://eprints.whiterose.ac.uk/robots.txt "HTTP/1.1 200 OK"
+```
+
+En el log el tiempo va hacia atrás **tres veces**: dos en la completa (`01:21:44.554` →
+`01:21:43.605`, unos 0.95 s, y `01:21:13.849` → `01:21:13.291`, unos 0.56 s) y una en la parcial
+(`01:20:43.146` → `01:20:42.347`, unos 0.80 s). **Interpretación, no medición:** es WSL
+ajustando la hora del sistema. El log muestra el retroceso, no su causa.
 
 **Hipótesis nueva para E18.1, no medida:** si el reloj retrocedió durante E14, los **43 s**
 medidos entre el primer archivo y el último podrían ser **46 s reales** o más, y no habría
 anomalía. Se añade como cuarta explicación en E18.1. Nada de esta corrida la confirma para E14.
 
-### E19.8 · Los nueve portales CRIS: cero éxitos
+### E19.8 · Los portales CRIS: siete pedidos, cero éxitos
+
+```
+01:21:48.771 … GET https://www.research.ed.ac.uk/en/publications/on-impact-and-volcanism-across-the-cretaceous-paleogene-boundary/ "HTTP/1.1 200 OK"
+01:21:49.413 … GET https://www.research.ed.ac.uk/files/128873686/2._Dick_Kroon.pdf "HTTP/1.1 403 Forbidden"
+…
+01:21:53.372 … GET https://research-information.bris.ac.uk/en/publications/asteroid-impact-not-volcanism-caused-the-end-cretaceous-dinosaur-/ "HTTP/1.1 200 OK"
+01:21:53.568 … GET https://research-information.bris.ac.uk/files/244251633/2006087117.full.pdf "HTTP/1.1 403 Forbidden"
+```
 
 M36 clasificó `copia_libre` nueve portales CRIS, sin evidencia y a revisar con M37. En esta
-corrida **dieron cero éxitos.** Ninguno entregó archivo. **Dos publicaron un enlace a PDF y
-devolvieron `403` al pedirlo.**
+corrida **se pidieron siete, con cero éxitos.** `research.birmingham.ac.uk` (B.21) y
+`pure.psu.edu` (B.30) no se pidieron: la puerta 0 de su ficha descargó antes. De los siete:
+
+- **dos publicaron un enlace a PDF y devolvieron `403` al pedirlo** (`research.ed.ac.uk` en
+  B.35, `research-information.bris.ac.uk` en B.36);
+- `researchwithrutgers.com` (B.25) respondió `404`;
+- los otros cuatro (`profiles.wustl`, `research-portal.st-andrews`, `experts.arizona`,
+  `research.vu.nl`) respondieron `200` sin enlace a archivo.
 
 **Queda como hallazgo medido para revisar su clasificación, no como decisión tomada.** La
 clasificación de M36 no cambia en esta sección.
+
+### E19.9 · Vestíbulos cruzados con éxito: los primeros en campo
+
+En E15 no se cruzó ningún vestíbulo con éxito (E15.6). Aquí hubo **3**, y los tres acabaron en
+descarga:
+
+- **B.13, puerta 1:** página de `archive-ouverte.unige.ch` → salto a
+  `access.archive-ouverte.unige.ch/…/download` (fragmento en E19.4);
+- **B.16, puerta 1, y B.26, puerta 0:** página del artículo en Nature → salto a
+  `articles/….pdf` (fragmentos en E19.2).
+
+Los otros cinco éxitos son **copias libres con archivo directo**, sin vestíbulo, todas en la
+puerta 0: B.18, B.19, B.21, B.30 (tras un `301` a `academicweb.nd.edu`) y B.32. B.12, bajado en
+la parcial, fue también una copia libre directa.
+
+### E19.10 · Cero `muro_de_pago` en 63 puertas pedidas
+
+```
+sqlite3 -readonly legisuni_v2.db "SELECT motivo_fallo, count(*) FROM intentos WHERE encargo_id IN (SELECT encargo_id FROM descargas WHERE modo='academico' AND capturado_en > '2026-09-26') GROUP BY 1 ORDER BY 2 DESC;"
+http_error|45
+vestibulo_sin_pdf|17
+|9
+url_muerta|2
+robots_prohibido|1
+```
+
+**SQL no puede separar la parcial de la completa:** `intentos` no tiene fecha, y los encargos de
+la parcial (B.7–B.10, B.12) son también encargos de la completa. Esta consulta suma las dos
+(74 intentos). **Los números de la corrida completa salen del log**, reconstruidos puerta por
+puerta. La parcial aporta la diferencia, que cuadra con la consulta:
+
+| motivo | completa (log) | parcial (log) | suma = consulta |
+|---|---|---|---|
+| `http_error` | 37 | 8 | 45 |
+| `vestibulo_sin_pdf` | 15 | 2 | 17 |
+| éxito (NULL) | 8 | 1 | 9 |
+| `url_muerta` | 2 | — | 2 |
+| `robots_prohibido` | 1 | — | 1 |
+| **total** | **63** | **11** | **74** |
+
+- **Cero `muro_de_pago` en las 63 puertas de la completa.** Con las 12 del Bloque A (E15.1),
+  son **75 puertas pedidas en dos corridas sin un solo muro reconocido**.
+- **Los 37 `http_error` son todos `403`** (se ve en el log). **Que sean bloqueo anti-bot es la
+  lectura de E15.4, no una medición:** nada en esta corrida comprueba la causa.
+- **Es un dato sobre el reconocimiento de M27, no sobre las editoriales.** Dice que las reglas
+  de M27 (`401`, `402` y patrones de autenticación en la cadena, M32) no se dispararon. No dice
+  que no haya muros: B.20 es de pago (E19.2) y su recibo dice `vestibulo_sin_pdf`.
+
+### E19.11 · 41 filas académicas para 37 encargos
+
+```
+sqlite3 -readonly legisuni_v2.db "SELECT count(*) FROM descargas WHERE modo='academico';"
+41
+```
+
+Los encargos académicos son **37** (7 del A + 30 del B). Las **4 filas de más** son B.7, B.8, B.9
+y B.10: fallaron en la parcial y otra vez en la completa. Con `sha256` NULL, la PK compuesta
+`(encargo_id, sha256)` no deduplica, porque en SQLite dos NULL de una PK son distintos (anotado
+en **M34**, `PLAN-MIGRACION.md`). B.12 no suma fila: se omitió en la completa, y desde M35 una
+omisión no escribe. **Es la primera medición en campo de ese comportamiento.**
+
+**El error de conteo y el hallazgo son el mismo.** La primera consulta de este desglose unía
+`intentos` con `descargas` por `encargo_id`:
+
+```
+sqlite3 -readonly legisuni_v2.db "SELECT i.motivo_fallo, count(*) FROM intentos i JOIN descargas d USING(encargo_id) WHERE d.modo='academico' AND d.capturado_en > '2026-09-26' GROUP BY 1 ORDER BY 2 DESC;"
+http_error|61
+vestibulo_sin_pdf|21
+|9
+url_muerta|2
+robots_prohibido|1
+```
+
+Cada intento de B.7–B.10 salió dos veces, una por cada una de sus dos filas en `descargas`: 20
+intentos de más (16 `http_error` y 4 `vestibulo_sin_pdf`), 94 en vez de 74. **Toda consulta que
+una `intentos` con `descargas` por `encargo_id` hereda esta duplicación.**
+
+> **Nota (2026-09-27) — contrastada contra el log.** La primera redacción de E19 (commit
+> `184106c`) salió del resumen del operador, sin log. Al contrastarla cambiaron: M33 actuó 11
+> veces, no 10 (E19.6); se pidieron 7 portales CRIS, no 9 (E19.8); el reloj retrocedió tres veces,
+> no dos, y su causa es interpretación (E19.7); el log no muestra la regla de `robots.txt` que
+> prohibió la puerta de B.13 (E19.4); los 9 archivos nuevos suman las dos corridas (E19.1). Se
+> añadieron E19.9–E19.11. Ese commit conserva la versión anterior.
 
 ---
 
@@ -1676,4 +1899,4 @@ clasificación de M36 no cambia en esta sección.
 | **v12** | **2026-09-26** | **Idempotencia en campo (E16), medida el 2026-09-23 y registrada ahora.** Segunda corrida de la UAM sobre los mismos fixtures, cinco días después de E14: `total: 47`, `omitidos: 47`; el disco sigue con 47 archivos de la UAM y `descargas` e `intentos` con 156 filas. Ninguno de los 47 encargos se volvió a pedir ni a escribir. **Primera medición en campo de la regla 5 de `05` (M21) y primer dato sobre C24.** **El resumen cuenta los omitidos también como exitosas** (`exitosas: 47` a la vez que `omitidos: 47`), lo que motiva M33. |
 | **v13** | **2026-09-26** | **Una omisión pisó 47 filas (E17).** Una corrida de verificación del 26, sin red y sobre los mismos fixtures, dejó las 47 filas de la UAM en `descargas` con `bytes`, `content_type`, `http_status`, `url_final` y `puerta_usada` en NULL y `capturado_en` = 2026-09-26; el valor anterior no se conserva en la base. Causa: los scripts persistían el resultado de la omisión y el upsert sobrescribía la fila. **El daño empezó el 23** (el código de E16 ya pisaba) y el 26 lo repitió. Solo modo jurídico; la UJAT y las 7 académicas, intactas; cero alias, así que `duplicado_de` no se perdió. `documentos`, mismo daño, no se repara. **`content_type` es pérdida definitiva**; lo demás es recuperable (M35b, pendiente), y `capturado_en` solo como estimación. Arreglado en M35. **Nota fechada sobre E16:** «las tablas quedaron intactas» solo lo respaldan los recuentos, que siguen siendo correctos; E16 se conserva tal como se escribió. Ningún número de E14 ni de E16 cambia. |
 | **v14** | **2026-09-26** | **Reparación de las 47 filas (E18).** `scripts/reparar_omisiones.py` (M35b), en una transacción: 47 afectadas, 47 reparables, 0 intactas. `url_final` y `http_status` de `intentos`; `bytes` del tamaño del archivo con SHA-256 verificado; `puerta_usada = 0` comprobado contra el `orden` del intento. `capturado_en` es estimación (fecha de modificación): las 47 caen el 2026-09-18, de 13:57:31 a 13:58:14. `content_type` sigue en NULL: pérdida definitiva. Después: 0 filas con `bytes` en NULL; `descargas` 163 e `intentos` 168, sin cambios. Copia previa fuera del repo. **Anomalía abierta (E18.1):** 43 s entre el primer archivo y el último es menos que los 46 s mínimos de un rate limit de 1 s sobre 47 peticiones a un host; hay tres explicaciones y ninguna está medida, porque `rate_limit_s` no se registró en E14 y la fecha de un archivo no es la de su petición. Pendiente: registrar `rate_limit_s` y el host en el informe de las corridas futuras. |
-| **v15** | **2026-09-27** | **Corrida del Bloque B (E19): 8/30, más 1 omitido.** 30 encargos, 85 puertas, 27 hosts pedidos, `rate_limit_s` 1.0; 2 `sin_puertas`; 9 archivos nuevos. Primera idempotencia académica en campo (B.12). Control de Nature: la señal de E15.3 distingue muro de acceso abierto, pero sigue sin implementarse (E19.2). PMC sirve HTML en la ruta del PDF en 4 fichas (E19.3). Primer `robots_prohibido` en campo (E19.4). Un enlace muerto en un día (E19.5). M33 actuó 10 veces (E19.6). El reloj de WSL retrocede: cuarta hipótesis, no medida, para E18.1 (E19.7). Los 9 portales CRIS dieron 0 éxitos (E19.8). **Fuente: resumen del operador; el log no se conserva en el repositorio.** Incluye además la nota de M36.2 en E18.1: el pendiente de registrar `rate_limit_s` y los hosts queda cubierto desde M36.1, con la salvedad de que el conteo no incluye los hosts de las redirecciones ni el del salto de vestíbulo. |
+| **v15** | **2026-09-27** | **Corrida del Bloque B (E19): 8/30, más 1 omitido.** 30 encargos, 85 puertas, 27 hosts pedidos, `rate_limit_s` 1.0; 2 `sin_puertas`; 9 archivos nuevos. Primera idempotencia académica en campo (B.12). Control de Nature: la señal de E15.3 distingue muro de acceso abierto, pero sigue sin implementarse (E19.2). PMC sirve HTML en la ruta del PDF en 4 fichas (E19.3). Primer `robots_prohibido` en campo (E19.4). Un enlace muerto en un día (E19.5). M33 actuó 11 veces (E19.6). El reloj retrocede tres veces en el log (WSL, interpretación): cuarta hipótesis, no medida, para E18.1 (E19.7). Portales CRIS: 7 pedidos, 0 éxitos (E19.8). Primeros 3 vestíbulos cruzados con éxito (E19.9). 63 puertas pedidas, 0 `muro_de_pago`, 37 `http_error` (todos `403`); 75 puertas sin muro con el Bloque A (E19.10). 41 filas académicas para 37 encargos: los fallos con `sha256` NULL no se deduplican (M34); son las filas que inflaron una consulta con JOIN (E19.11). **Fuente: logs en `~/respaldo-acervo/m37-*.log`, fuera del repo; fragmentos citados en E19.** Incluye además la nota de M36.2 en E18.1: el pendiente de registrar `rate_limit_s` y los hosts queda cubierto desde M36.1, con la salvedad de que el conteo no incluye los hosts de las redirecciones ni el del salto de vestíbulo. |

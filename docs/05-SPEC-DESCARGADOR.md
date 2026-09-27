@@ -425,18 +425,21 @@ recién al *leer*. Ya pasó allá.
     - además, **6 `http_error`, todos `403`**, en cuatro hosts; son el primer dato de la
       pregunta 8 (E15.4).
     **Segunda medición el 2026-09-27 (E19 de `08`), Bloque B: 8/30, más 1 omitido.** 30 encargos
-    (M36; B.11 y B.22 sin puertas), 85 puertas declaradas, 27 hosts pedidos, `rate_limit_s`
-    1.0. Fuente: resumen del operador sobre el log, que no está en el repositorio (E19). Lo que
-    registra E19 de los conteos que pide este criterio:
-    - `robots_prohibido`: **1**, el primero en campo. Puerta 0 de B.13 al host viejo de PMC; la
-      puerta 1 descargó (E19.4);
-    - `vestibulo_sin_pdf`: **4** de PMC (B.15, B.15C, B.16, B.34). En las cuatro el salto
-      devolvió HTML otra vez (E19.3). Es el mínimo: E19 no da el total del lote;
-    - vestíbulos cruzados con éxito, `copia_libre` con archivo directo y `muro_de_pago`: **E19
-      no los desglosa**;
-    - además: la primera idempotencia académica en campo (B.12, omitido), la señal de Nature
-      que distingue muro de acceso abierto sin implementar (E19.2), M33 actuando 10 veces
-      (E19.6) y los 9 portales CRIS de M36 con 0 éxitos (E19.8).
+    (M36; B.11 y B.22 sin puertas), **85 puertas declaradas y 63 pedidas**, 27 hosts pedidos,
+    `rate_limit_s` 1.0. Números de la corrida completa, reconstruidos desde el log (E19.10;
+    `intentos` no tiene fecha y SQL no separa la parcial):
+    - `copia_libre` con archivo directo: **5**, todas en la puerta 0 (E19.9);
+    - vestíbulos cruzados con éxito: **3**, los primeros en campo: Ginebra en B.13 y Nature en
+      B.16 y B.26 (E19.9);
+    - `vestibulo_sin_pdf`: **15**, 4 de ellos en PMC, que sirve HTML en la ruta del PDF (E19.3);
+    - `muro_de_pago`: **0**. Con el Bloque A, 75 puertas pedidas sin un muro reconocido; es un
+      dato sobre el reconocimiento de M27, no sobre las editoriales (E19.10);
+    - `robots_prohibido`: **1**, el primero en campo (B.13, E19.4);
+    - además, **37 `http_error`, todos `403`** (bloqueo anti-bot según la lectura de E15.4, no
+      medido), y **2 `url_muerta`** (B.25 y B.27, E19.5).
+    - y fuera de los conteos: la primera idempotencia académica en campo (B.12, omitido), la
+      señal de Nature que distingue muro de acceso abierto, sin implementar (E19.2), M33
+      actuando 11 veces (E19.6) y los portales CRIS de M36: 7 pedidos, 0 éxitos (E19.8).
 
 ---
 
