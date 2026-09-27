@@ -424,6 +424,19 @@ recién al *leer*. Ya pasó allá.
       solo por redirección, sin consultar su `robots.txt` (E15.8);
     - además, **6 `http_error`, todos `403`**, en cuatro hosts; son el primer dato de la
       pregunta 8 (E15.4).
+    **Segunda medición el 2026-09-27 (E19 de `08`), Bloque B: 8/30, más 1 omitido.** 30 encargos
+    (M36; B.11 y B.22 sin puertas), 85 puertas declaradas, 27 hosts pedidos, `rate_limit_s`
+    1.0. Fuente: resumen del operador sobre el log, que no está en el repositorio (E19). Lo que
+    registra E19 de los conteos que pide este criterio:
+    - `robots_prohibido`: **1**, el primero en campo. Puerta 0 de B.13 al host viejo de PMC; la
+      puerta 1 descargó (E19.4);
+    - `vestibulo_sin_pdf`: **4** de PMC (B.15, B.15C, B.16, B.34). En las cuatro el salto
+      devolvió HTML otra vez (E19.3). Es el mínimo: E19 no da el total del lote;
+    - vestíbulos cruzados con éxito, `copia_libre` con archivo directo y `muro_de_pago`: **E19
+      no los desglosa**;
+    - además: la primera idempotencia académica en campo (B.12, omitido), la señal de Nature
+      que distingue muro de acceso abierto sin implementar (E19.2), M33 actuando 10 veces
+      (E19.6) y los 9 portales CRIS de M36 con 0 éxitos (E19.8).
 
 ---
 

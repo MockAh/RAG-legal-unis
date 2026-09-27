@@ -1,7 +1,7 @@
 # 08 · Evidencia de campo
 
 > Hallazgos **medidos**, no supuestos, obtenidos antes de escribir una línea de código.
-> Estado: vivo · **v14** · se amplía con cada universidad nueva que se explore.
+> Estado: vivo · **v15** · se amplía con cada universidad nueva que se explore.
 > Mediciones: UAM, UNAM-70I, UNAM-OAG, UJAT, **UACAM**.
 > **Medido en vivo el 2026-09-06: la UAM (E1) y la UACAM (E10).** Los conteos de UNAM-OAG (E3)
 > y UJAT (E4) son de la captura original y **no se han vuelto a comprobar**; trátalos como
@@ -9,7 +9,7 @@
 > **Descargas reales ejecutadas:** 45/45 documentos de la UAM el **2026-09-06** (E11) y
 > **105/105 de la UJAT el 2026-09-08** (E12). **150 de 150.** Tras la migración a `Encargo`,
 > **156 de 156 (E14)**, medido el 2026-09-18. **Primera corrida académica: 3 de 7 (E15)**, el
-> 2026-09-25. Es la evidencia que no viene de
+> 2026-09-25. **Segunda: 8 de 30 (E19)**, el 2026-09-27. Es la evidencia que no viene de
 > mirar una página, sino de ejercitar código contra servidores reales. Con ella la spec `05`
 > queda cerrada.
 > **v8 (2026-09-10):** al auditar el disco antes de la migración apareció que la UAM se descargó
@@ -1553,10 +1553,12 @@ Dos cosas impiden cerrarla:
 - **`capturado_en` marca cuándo se escribió el archivo, no cuándo se recibió la respuesta.** La
   distancia observada no es la distancia entre peticiones.
 
-Hay tres explicaciones posibles. **Ninguna está medida:**
+Hay tres explicaciones posibles, y una cuarta desde E19.7. **Ninguna está medida:**
 1. La primera respuesta tardó al menos 3 s más que la última.
 2. `rate_limit_s` era menor que 1 en esa corrida.
 3. Los 47 no fueron a un mismo host.
+4. *(Hipótesis nueva, 2026-09-27, E19.7; no medida.)* El reloj del sistema retrocedió durante la
+   corrida (WSL ajustando la hora): los 43 s medidos podrían ser 46 s reales.
 
 **Pendiente:** que el informe de las corridas futuras registre `rate_limit_s` y el host, para
 que esto sea medible. No está implementado.
@@ -1567,6 +1569,94 @@ que esto sea medible. No está implementado.
 > puerta y **no incluye** los hosts de las redirecciones ni el del salto de vestíbulo. La
 > anomalía sigue abierta: E14 no se puede re-medir, y hará falta una corrida nueva para
 > distinguir entre las tres explicaciones.
+
+## E19 · Corrida del Bloque B (2026-09-27)
+
+**Segunda medición del criterio 18 de `05`.** Entrada: `datos/encargos_bloque_b.json` (M36).
+Es la primera corrida con el resumen de M36.1.
+
+**Fuente.** El operador leyó el log de `scripts/lote.py`, el resumen de una corrida parcial
+anterior y tres consultas a PMC, y resumió lo que encontró. **El log no está en el repositorio y
+aquí no se cita.** A diferencia de E15, ningún número de esta sección se comprobó contra un
+fragmento de log reproducido. Donde el texto interpreta, lo dice.
+
+### E19.1 · Qué se corrió: 8 de 30
+
+- **30 encargos, 85 puertas declaradas, 27 hosts pedidos, `rate_limit_s = 1.0`.** Los hosts
+  cuentan con la salvedad de M36.1: no incluyen los de redirecciones ni los de saltos de
+  vestíbulo.
+- **Resultado: 8/30, más 1 omitido.** El omitido es B.12, ya descargado en la corrida parcial.
+  **Es la primera idempotencia académica en campo.**
+- **2 `sin_puertas`** (B.11 y B.22, monografías). No generan encargo (M36).
+- **9 archivos nuevos en disco.**
+
+### E19.2 · El control de Nature: la señal de E15.3 distingue muro de acceso abierto
+
+E15.3 (lectura revisada en M32) dejó como señal candidata de muro que el enlace
+`articles/….pdf` de Nature redirija a la página del artículo en vez de servir el archivo. Esta
+corrida trae **un control positivo y uno negativo**:
+
+- **Acceso abierto: B.16 y B.26.** `articles/….pdf` responde `200`.
+- **De pago: B.20.** `articles/….pdf` responde `303` y vuelve al artículo, **igual que A.6**
+  en E15.
+
+**La señal distingue un muro de un acceso abierto** en el mismo host. **Sigue sin
+implementarse** y sin criterio en `05`.
+
+### E19.3 · PMC sirve HTML en la ruta del PDF
+
+Cuatro fichas: **B.15, B.15C, B.16 y B.34.** En las cuatro:
+
+1. La página de PMC responde `200` con HTML.
+2. El vestíbulo (M28) encuentra el enlace al PDF y salta.
+3. El salto devuelve **HTML otra vez** → `vestibulo_sin_pdf`.
+
+**Medido:** el diagnóstico del Descargador es correcto. Hubo un solo salto, y la respuesta no
+era un archivo. **Lo que falla es la fuente**, no el cruce.
+
+**Interpretación, no medición:** parece un bloqueo anti-bot, como los `403` de E15.4, pero
+servido con `200`. Si es así, es el caso que plantea la pregunta 8 de `05`: una página de
+desafío que cae en `vestibulo_sin_pdf` sin que el motivo lo diga.
+
+### E19.4 · `robots_prohibido` en campo por primera vez
+
+La puerta 0 de **B.13** apunta al host viejo de PMC, `www.ncbi.nlm.nih.gov`, cuyo `robots.txt`
+**prohíbe `/pmc/`**. Se respetó: la puerta no se pidió. **La puerta 1 (Ginebra,
+`archive-ouverte.unige.ch`) descargó.**
+
+Es la primera vez que un `robots.txt` legible prohíbe algo en una corrida real. Cierra lo que
+`05` §Cortesía de red daba como «todavía NO probado en campo» (E6.15): un `robots.txt` legible
+se respetó de verdad, y el encargo no se perdió porque tenía otra puerta.
+
+### E19.5 · Un enlace muerto en un día
+
+**B.27:** el `[PDF]` de Rutgers (`ebme.marine.rutgers.edu`) se verificó el 2026-09-26 al armar
+el lote y respondió `404` el 2026-09-27. Es el mismo patrón que E15.5 (un `[PDF]` verificado
+que ya no servía), ahora con un intervalo de un día.
+
+### E19.6 · Puertas duplicadas por destino (M33): 10 veces
+
+La regla de M33 (no volver a pedir una puerta cuyo destino ya se pidió en el mismo encargo)
+**actuó 10 veces**, casi siempre con `science.org`. Es el caso de la puerta oficial y el
+resolutor DOI de una misma ficha, que acaban en la misma página del editor.
+
+### E19.7 · El reloj del sistema retrocede en el log
+
+En el log el tiempo va hacia atrás: `01:21:44.554` → `01:21:43.605`. Hay otro caso en la corrida
+parcial. **Es WSL ajustando la hora del sistema.**
+
+**Hipótesis nueva para E18.1, no medida:** si el reloj retrocedió durante E14, los **43 s**
+medidos entre el primer archivo y el último podrían ser **46 s reales** o más, y no habría
+anomalía. Se añade como cuarta explicación en E18.1. Nada de esta corrida la confirma para E14.
+
+### E19.8 · Los nueve portales CRIS: cero éxitos
+
+M36 clasificó `copia_libre` nueve portales CRIS, sin evidencia y a revisar con M37. En esta
+corrida **dieron cero éxitos.** Ninguno entregó archivo. **Dos publicaron un enlace a PDF y
+devolvieron `403` al pedirlo.**
+
+**Queda como hallazgo medido para revisar su clasificación, no como decisión tomada.** La
+clasificación de M36 no cambia en esta sección.
 
 ---
 
@@ -1586,3 +1676,4 @@ que esto sea medible. No está implementado.
 | **v12** | **2026-09-26** | **Idempotencia en campo (E16), medida el 2026-09-23 y registrada ahora.** Segunda corrida de la UAM sobre los mismos fixtures, cinco días después de E14: `total: 47`, `omitidos: 47`; el disco sigue con 47 archivos de la UAM y `descargas` e `intentos` con 156 filas. Ninguno de los 47 encargos se volvió a pedir ni a escribir. **Primera medición en campo de la regla 5 de `05` (M21) y primer dato sobre C24.** **El resumen cuenta los omitidos también como exitosas** (`exitosas: 47` a la vez que `omitidos: 47`), lo que motiva M33. |
 | **v13** | **2026-09-26** | **Una omisión pisó 47 filas (E17).** Una corrida de verificación del 26, sin red y sobre los mismos fixtures, dejó las 47 filas de la UAM en `descargas` con `bytes`, `content_type`, `http_status`, `url_final` y `puerta_usada` en NULL y `capturado_en` = 2026-09-26; el valor anterior no se conserva en la base. Causa: los scripts persistían el resultado de la omisión y el upsert sobrescribía la fila. **El daño empezó el 23** (el código de E16 ya pisaba) y el 26 lo repitió. Solo modo jurídico; la UJAT y las 7 académicas, intactas; cero alias, así que `duplicado_de` no se perdió. `documentos`, mismo daño, no se repara. **`content_type` es pérdida definitiva**; lo demás es recuperable (M35b, pendiente), y `capturado_en` solo como estimación. Arreglado en M35. **Nota fechada sobre E16:** «las tablas quedaron intactas» solo lo respaldan los recuentos, que siguen siendo correctos; E16 se conserva tal como se escribió. Ningún número de E14 ni de E16 cambia. |
 | **v14** | **2026-09-26** | **Reparación de las 47 filas (E18).** `scripts/reparar_omisiones.py` (M35b), en una transacción: 47 afectadas, 47 reparables, 0 intactas. `url_final` y `http_status` de `intentos`; `bytes` del tamaño del archivo con SHA-256 verificado; `puerta_usada = 0` comprobado contra el `orden` del intento. `capturado_en` es estimación (fecha de modificación): las 47 caen el 2026-09-18, de 13:57:31 a 13:58:14. `content_type` sigue en NULL: pérdida definitiva. Después: 0 filas con `bytes` en NULL; `descargas` 163 e `intentos` 168, sin cambios. Copia previa fuera del repo. **Anomalía abierta (E18.1):** 43 s entre el primer archivo y el último es menos que los 46 s mínimos de un rate limit de 1 s sobre 47 peticiones a un host; hay tres explicaciones y ninguna está medida, porque `rate_limit_s` no se registró en E14 y la fecha de un archivo no es la de su petición. Pendiente: registrar `rate_limit_s` y el host en el informe de las corridas futuras. |
+| **v15** | **2026-09-27** | **Corrida del Bloque B (E19): 8/30, más 1 omitido.** 30 encargos, 85 puertas, 27 hosts pedidos, `rate_limit_s` 1.0; 2 `sin_puertas`; 9 archivos nuevos. Primera idempotencia académica en campo (B.12). Control de Nature: la señal de E15.3 distingue muro de acceso abierto, pero sigue sin implementarse (E19.2). PMC sirve HTML en la ruta del PDF en 4 fichas (E19.3). Primer `robots_prohibido` en campo (E19.4). Un enlace muerto en un día (E19.5). M33 actuó 10 veces (E19.6). El reloj de WSL retrocede: cuarta hipótesis, no medida, para E18.1 (E19.7). Los 9 portales CRIS dieron 0 éxitos (E19.8). **Fuente: resumen del operador; el log no se conserva en el repositorio.** Incluye además la nota de M36.2 en E18.1: el pendiente de registrar `rate_limit_s` y los hosts queda cubierto desde M36.1, con la salvedad de que el conteo no incluye los hosts de las redirecciones ni el del salto de vestíbulo. |
