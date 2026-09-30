@@ -103,6 +103,14 @@ class Store:
         self._conn.commit()
 
     def guardar_descarga(self, resultado: DownloadResult, grupo_alias: str) -> None:
+        if resultado.sha256 is None:
+            # M39, E19.11 de docs/08: en SQLite dos NULL de la PK son distintos, así que cada
+            # fallo repetido añadía una fila. El nuevo reemplaza al anterior; borrar e insertar
+            # (no UPDATE) da un rowid nuevo y deja intacto el desempate de _fila_vigente.
+            self._conn.execute(
+                "DELETE FROM descargas WHERE encargo_id = ? AND sha256 IS NULL",
+                (resultado.encargo_id,),
+            )
         self._conn.execute(
             """
             INSERT INTO descargas (

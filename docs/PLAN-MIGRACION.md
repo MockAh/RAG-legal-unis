@@ -885,6 +885,59 @@ Dos deudas, ambas medidas.
 - **Precede a M34:** ya pasaba cuando la lectura era contra `documentos`. M34
   no la introduce y no la arregla. Queda para una micro-tarea propia.
 
+## M39 · Un fallo repetido no añade fila
+- Motivo: E19.11 de `docs/08`, medido en campo. `descargas` tiene 41 filas
+  académicas para 37 encargos: B.7–B.10 fallaron en la parcial y otra vez en
+  la completa. Con `sha256` NULL, la PK `(encargo_id, sha256)` no deduplica,
+  porque en SQLite dos NULL de una PK son distintos (anotado en M34 como
+  comportamiento).
+- **Mecanismo: borrar e insertar, sin cambiar el esquema.** En
+  `Store.guardar_descarga`, solo si `resultado.sha256 is None`, y en la misma
+  transacción: `DELETE FROM descargas WHERE encargo_id = ? AND sha256 IS
+  NULL` y después el `INSERT` de siempre. Las filas con hash siguen entrando
+  por el upsert sobre `(encargo_id, sha256)`: **dos versiones con hashes
+  distintos siguen conviviendo** (criterio 5 de `docs/05`, M20). Un éxito
+  posterior a un fallo añade su fila y deja la del fallo, como antes.
+- **Por qué no `UPDATE`:** el fallo actualizado conservaría su `rowid` viejo.
+  Con un empate exacto de `capturado_en` entre ese fallo y un éxito escrito en
+  medio, `_fila_vigente` (`capturado_en DESC, rowid DESC`) elegiría el éxito,
+  y hoy elige el fallo. Parece improbable, pero los tests usan `ahora` fijo y
+  el reloj de WSL retrocede (E19.7). **Borrar e insertar da un `rowid` nuevo:
+  la fila vigente de M34 es la misma en todos los casos.** Lo único que
+  desaparece son otras filas NULL del mismo encargo; si la vigente era una de
+  ellas, la nueva gana igual que hoy, porque se escribe después.
+- **Por qué no un índice único parcial** (`UNIQUE (encargo_id) WHERE sha256 IS
+  NULL`): `Store()` ejecuta el esquema al abrir. Sobre `legisuni_v2.db`, con
+  los 4 pares duplicados, `CREATE UNIQUE INDEX` fallaría y ningún script
+  podría abrir la base hasta limpiarla: el código quedaría atado al estado de
+  los datos. Además es un índice que `docs/07` no declara.
+- **Qué se pierde:** la fila del fallo anterior desaparece de `descargas`, con
+  su `capturado_en` y su `motivo_fallo`. Es inherente a no añadir fila.
+- **Límites, escritos a propósito:**
+  - Tras M39, `descargas` guarda **una fila de fallo por encargo**, mientras
+    `intentos` sigue acumulando **una por corrida**, porque esos intentos
+    ocurrieron. La asimetría es correcta, pero **un conteo de `intentos`
+    mezcla corridas y no se puede separar por fecha**: `intentos` no tiene
+    fecha (E19.1).
+  - Unir `intentos` con `descargas` por `encargo_id` sigue duplicando en
+    cuanto un encargo tiene a la vez fila de fallo y de éxito, o dos
+    versiones. Es un problema de la consulta, no de la tabla; M39 no lo toca.
+- **Las 4 filas existentes** se limpian aparte, con M39b (script que ejecuta el
+  humano). Sin eso solo se corregirían si B.7–B.10 vuelven a fallar; si
+  alguna tiene éxito, un éxito no borra fallos, y sus dos filas quedarían para
+  siempre.
+- Criterio 11: **ninguna aserción existente cambia** (la suite pasó con el
+  cambio antes de añadir tests). Contratos sin cambios; `docs/07` sin cambios.
+- Tests nuevos en `tests/test_store.py`: dos fallos → una fila con los datos
+  del segundo; fallo, éxito, fallo → dos filas y la vigente es el último
+  fallo; empate de `capturado_en` → gana el fallo escrito después (protege
+  contra un `UPDATE`); dos versiones más dos fallos → tres filas; con dos NULL
+  preexistentes, un fallo nuevo deja una; el fallo de otro encargo no se toca;
+  `intentos` acumula una fila por corrida. Seis de siete fallan con la lógica
+  anterior; el del empate pasa en ambas, como se espera.
+- Nota en E19.11 de `docs/08`.
+- Commit: `M39: un fallo repetido no añade fila`
+
 ## M40 · La idempotencia comprueba el archivo en disco
 - Motivo: la deuda anterior, anotada en M34. La regla 5 de `docs/05` exige,
   para no pedir ninguna puerta, una descarga exitosa registrada **y su archivo

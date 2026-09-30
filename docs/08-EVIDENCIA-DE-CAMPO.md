@@ -1874,6 +1874,13 @@ Cada intento de B.7–B.10 salió dos veces, una por cada una de sus dos filas e
 intentos de más (16 `http_error` y 4 `vestibulo_sin_pdf`), 94 en vez de 74. **Toda consulta que
 una `intentos` con `descargas` por `encargo_id` hereda esta duplicación.**
 
+> **Nota (2026-09-30) — M39.** Desde M39, un fallo repetido del mismo encargo reemplaza su fila
+> de fallo en vez de añadir otra; las filas con hash no cambian. Las 4 filas de más de B.7–B.10
+> se limpian aparte, con M39b. Aun así, `descargas` queda con una fila de fallo por encargo y
+> `intentos` sigue acumulando una por corrida: un conteo de `intentos` mezcla corridas y no se
+> puede separar por fecha (E19.1). Y unir ambas tablas por `encargo_id` sigue duplicando cuando
+> un encargo tiene fila de fallo y de éxito, o dos versiones.
+
 ### E19.12 · Un `robots.txt` que acaba en un login SAML
 
 ```

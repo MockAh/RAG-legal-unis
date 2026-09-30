@@ -344,3 +344,107 @@ def test_fila_solo_en_documentos_ya_no_cuenta(tmp_path: Path) -> None:
         store.guardar(resultado)
         assert store.hash_registrado(resultado.encargo_id) is None
         assert store.ruta_registrada(resultado.encargo_id) is None
+
+
+# M39: un fallo repetido del mismo encargo no añade fila (E19.11 de docs/08). En SQLite
+# dos NULL de la PK (encargo_id, sha256) son distintos; el fallo nuevo reemplaza al
+# anterior. Las filas con hash no se tocan: dos versiones siguen conviviendo (criterio 5).
+
+
+def _filas_descargas(store: Store) -> list[sqlite3.Row]:
+    return store._conn.execute(
+        "SELECT sha256, exito, motivo_fallo, capturado_en FROM descargas ORDER BY rowid"
+    ).fetchall()
+
+
+def _intento_fallido(orden: int = 0) -> IntentoPuerta:
+    return IntentoPuerta(
+        orden=orden,
+        url="http://example.org/doc.pdf",
+        url_pedida="http://example.org/doc.pdf",
+        url_final="http://example.org/doc.pdf",
+        enlace_vestibulo=None,
+        http_status=403,
+        exito=False,
+        motivo_fallo="http_error",
+    )
+
+
+def test_dos_fallos_dejan_una_fila_con_los_datos_del_segundo(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 1), motivo_fallo="timeout"), "g1")
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 2), motivo_fallo="http_error"), "g1")
+
+        filas = _filas_descargas(store)
+        assert len(filas) == 1
+        assert filas[0]["motivo_fallo"] == "http_error"
+        assert filas[0]["capturado_en"] == datetime(2026, 1, 2).isoformat()
+
+
+def test_fallo_exito_y_fallo_dejan_dos_filas_y_la_vigente_es_el_ultimo_fallo(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 1)), "g1")
+        store.guardar_descarga(_resultado_exitoso(capturado_en=datetime(2026, 1, 2)), "g1")
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 3)), "g1")
+
+        assert [(f["sha256"], f["exito"]) for f in _filas_descargas(store)] == [("a" * 64, 1), (None, 0)]
+        assert store.hash_registrado("uam:reglamento-organico") is None
+
+
+def test_empate_de_capturado_en_lo_sigue_ganando_el_fallo_escrito_despues(tmp_path: Path) -> None:
+    # borrar e insertar da rowid nuevo: con UPDATE el fallo conservaría el rowid viejo y ganaría el éxito
+    mismo_instante = datetime(2026, 1, 2)
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 1)), "g1")
+        store.guardar_descarga(_resultado_exitoso(capturado_en=mismo_instante), "g1")
+        store.guardar_descarga(_fallo(capturado_en=mismo_instante), "g1")
+
+        assert store.hash_registrado("uam:reglamento-organico") is None
+
+
+def test_dos_versiones_y_un_fallo_conviven_las_tres(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(_resultado_exitoso(sha256="a" * 64, capturado_en=datetime(2026, 1, 1)), "g1")
+        store.guardar_descarga(_resultado_exitoso(sha256="b" * 64, capturado_en=datetime(2026, 1, 2)), "g1")
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 3)), "g1")
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 4)), "g1")
+
+        assert [f["sha256"] for f in _filas_descargas(store)] == ["a" * 64, "b" * 64, None]
+
+
+def test_fallo_nuevo_reemplaza_nulos_preexistentes(tmp_path: Path) -> None:
+    # la forma de B.7–B.10 en la base v2: dos filas NULL de antes de M39
+    with Store(tmp_path / "test.db") as store:
+        for dia in (1, 2):
+            store._conn.execute(
+                "INSERT INTO descargas (encargo_id, modo, sha256, exito, capturado_en, grupo_alias) "
+                "VALUES (?, 'juridico', NULL, 0, ?, 'g1')",
+                ("uam:reglamento-organico", datetime(2026, 1, dia).isoformat()),
+            )
+        store._conn.commit()
+
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 3)), "g1")
+
+        filas = _filas_descargas(store)
+        assert len(filas) == 1
+        assert filas[0]["capturado_en"] == datetime(2026, 1, 3).isoformat()
+
+
+def test_un_fallo_de_otro_encargo_no_se_toca(tmp_path: Path) -> None:
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(_fallo(encargo_id="uam:otro"), "g2")
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 1)), "g1")
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 2)), "g1")
+
+        encargos = store._conn.execute("SELECT encargo_id FROM descargas ORDER BY encargo_id").fetchall()
+        assert [f["encargo_id"] for f in encargos] == ["uam:otro", "uam:reglamento-organico"]
+
+
+def test_intentos_acumulan_una_fila_por_corrida(tmp_path: Path) -> None:
+    # asimetría a propósito: descargas guarda un fallo por encargo, intentos lo que ocurrió
+    with Store(tmp_path / "test.db") as store:
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 1), intentos=[_intento_fallido()]), "g1")
+        store.guardar_descarga(_fallo(capturado_en=datetime(2026, 1, 2), intentos=[_intento_fallido()]), "g1")
+
+        assert len(_filas_descargas(store)) == 1
+        assert store._conn.execute("SELECT COUNT(*) FROM intentos").fetchone()[0] == 2
