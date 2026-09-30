@@ -938,6 +938,40 @@ Dos deudas, ambas medidas.
 - Nota en E19.11 de `docs/08`.
 - Commit: `M39: un fallo repetido no añade fila`
 
+## M39b · Limpieza de las 4 filas de fallo duplicadas (la aplica el humano)
+- Es un script de limpieza de datos, no una corrección de código. Motivo:
+  E19.11 de `docs/08`; M39 impide nuevas duplicaciones, pero no corrige las
+  que ya existen. Nuevo `scripts/deduplicar_fallos.py`, con `--db`
+  obligatorio; no lee `Settings` ni `.env`.
+- Por defecto solo muestra, y abre la base en solo lectura (`mode=ro`).
+  Escribe únicamente con `--aplicar`, en una transacción (`BEGIN IMMEDIATE`).
+- **Qué borra:** para cada `encargo_id` con más de una fila con `sha256` NULL,
+  todas salvo la más reciente (`capturado_en DESC, rowid DESC`). Es lo que
+  habría dejado M39.
+- **Guardas; aborta sin escribir si falla cualquiera:**
+  - las filas a borrar son exactamente 4 (constante `FILAS_ESPERADAS`, no
+    argumento);
+  - la fila que se conserva de cada encargo es su **fila vigente de M34** (la
+    última del encargo, con el mismo orden que `Store._fila_vigente`). Así la
+    limpieza no cambia lo que devuelven `hash_registrado` ni
+    `ruta_registrada`;
+  - cada `DELETE` repite `encargo_id` y `sha256 IS NULL` en su `WHERE` y debe
+    tocar exactamente una fila. Una segunda aplicación aborta (0 a borrar).
+- `intentos` y `documentos` no se tocan: esos intentos ocurrieron. La
+  asimetría de M39 queda igual (un conteo de `intentos` mezcla corridas).
+- **La copia de seguridad va fuera del repo:**
+  `cp legisuni_v2.db ~/respaldo-acervo/legisuni_v2.antes-M39b.db`.
+- Tests en `tests/test_deduplicar_fallos.py`. Los duplicados se fabrican con
+  `INSERT` directo, porque desde M39 `Store` ya no los deja (la forma de
+  B.7–B.10: un fallo de la parcial y otro de la completa). La vista previa deja
+  la base idéntica byte a byte; si las filas a borrar no son las esperadas,
+  aborta sin escribir; si la conservada no es la vigente (fallo, fallo, éxito
+  posterior), aborta sin escribir; `--aplicar` deja el fallo más reciente, no
+  toca un fallo único ni un éxito, y deja `intentos` y `documentos` iguales;
+  una segunda aplicación aborta.
+- Criterio 11: ninguna aserción existente cambia. Contratos sin cambios.
+- Commit: `M39b: script de deduplicación de las 4 filas de fallo`
+
 ## M40 · La idempotencia comprueba el archivo en disco
 - Motivo: la deuda anterior, anotada en M34. La regla 5 de `docs/05` exige,
   para no pedir ninguna puerta, una descarga exitosa registrada **y su archivo
