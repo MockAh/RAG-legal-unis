@@ -1899,6 +1899,15 @@ tomó sobre un documento que no es un `robots.txt`:** una página de inicio de s
 Toca **D8**: una política de `robots.txt` que se obedece si es legible supone que lo leído es un
 `robots.txt`. **Merece una micro-tarea propia.** E19 no propone el arreglo.
 
+> **Nota (2026-09-30) — M38.** Un `200` con `Content-Type` de marcado o cuyo cuerpo empieza por
+> `<` ya no se obedece: se permite con un warning propio de fail-open (D8). **M38 corrige la
+> clasificación, no el acceso:** `RobotFileParser` sobre HTML casi siempre da cero reglas, así que
+> sobre Pure la decisión práctica habría sido la misma. Lo que cambia es que ahora queda
+> registrada como fail-open y no como un `robots.txt` legible. El modo jurídico no entra en esa
+> rama: UAM y UJAT sirvieron `403` y `404`, nunca `200` (E14). Riesgo residual: los logs no
+> guardan `Content-Type` ni cuerpo; si alguno de los 24 hosts que respondieron `200` en E15 y E19
+> sirvió HTML, su clasificación cambia, y sería el mismo fallo, no un `robots.txt` legítimo.
+
 ### E19.13 · B.16 pasó por el IdP de Nature y descargó
 
 ```

@@ -832,6 +832,51 @@ Dos deudas, ambas medidas.
   existente cambia.
 - Commit: `M36.1: el informe registra los parámetros de la corrida`
 
+## M38 · Un `200` que no parece `robots.txt`
+- Motivo: E19.12 de `docs/08`. `www.pure.ed.ac.uk/robots.txt` siguió cuatro
+  `302` hasta un login SAML en `login.microsoftonline.com`, que respondió
+  `200`. `RobotsCache._cargar` pasó ese HTML a `RobotFileParser` como si fuera
+  un `robots.txt` legible, sin warning. Toca D8.
+- **Criterio negativo:** no se exige que parezca un `robots.txt`; se rechaza lo
+  que claramente es otra cosa. Un `200` no se acepta si su `Content-Type`
+  declarado es de marcado (`text/html`, `application/xhtml+xml`, `*xml`) **o**
+  si su cuerpo, sin BOM ni espacios iniciales, empieza por `<`. Todo lo demás
+  se acepta como hoy: cuerpo vacío, solo comentarios, `text/plain`,
+  `application/octet-stream` o sin `Content-Type`.
+- **Descartados:** exigir al menos una directiva rechazaría un `robots.txt`
+  vacío, que es legítimo (todo permitido). Exigir que la URL final termine en
+  `/robots.txt` sería una regla sin medir, y el de `www3.nd.edu` ya redirigió
+  con query. Tampoco sirve el cambio de host: `doi.org`,
+  `pdfs.semanticscholar.org` y `www3.nd.edu` redirigieron su `robots.txt` a
+  otro host (todos acabaron en `404`).
+- **Qué se hace cuando no lo parece:** permitido, con un warning propio
+  («no parece robots.txt … fail-open (permitido)»), y `None` en caché. Es el
+  caso literal de D8: «si no se puede leer, se permite y se registra un
+  warning». Una página de login es una política ilegible, no una prohibición.
+  `robots_prohibido` afirmaría algo que nadie declaró, y un motivo nuevo sería
+  cambiar N5.
+- **M38 corrige la clasificación, no el acceso.** `RobotFileParser` sobre HTML
+  casi siempre da cero reglas: sobre Pure la decisión práctica habría sido la
+  misma. Lo que cambia es que ahora queda registrada como fail-open.
+- **Modo jurídico y criterio 11:** UAM y UJAT sirvieron **`403` y `404`**, nunca
+  `200` (`m24-uam.log`, `m24-ujat.log`; E14). El modo jurídico no entra en la
+  rama que toca M38, así que E14 no puede cambiar. (Se había dado por hecho lo
+  contrario al plantear la tarea.)
+- **Riesgo residual, no cerrable con los logs:** los logs guardan solo la línea
+  de estado, no `Content-Type` ni cuerpo. En E15 y E19, 24 hosts distintos
+  respondieron `200` a `robots.txt`. Si alguno sirvió HTML con `200`, su
+  clasificación cambia; sería el mismo fallo de E19.12, no un `robots.txt`
+  legítimo. No se sondean hoy: medirían el día de hoy, no el de la corrida.
+- Tests nuevos en `tests/test_robots.py` (ninguna aserción existente cambia;
+  `FetcherFalso` no se toca): HTML `text/html` → permitido con el warning
+  nuevo; HTML servido como `text/plain` → ídem; la cadena de E19.12 (`302` ×4
+  a otro host, `200` HTML) → ídem, una sola carga por host. Controles sin
+  warning: `200` vacío; solo comentarios sin `Content-Type`; `Disallow` como
+  `application/octet-stream`, que se sigue obedeciendo.
+- Documentación: viñeta en `docs/05` §Cortesía de red; nota en E19.12 de
+  `docs/08`. `docs/01` no se toca; D8 en `docs/00` ya lo cubre.
+- Commit: `M38: un 200 que no parece robots.txt no se obedece`
+
 ## Deuda · La idempotencia no mira el disco (regla 5 de `docs/05`)
 - La regla 5 exige, para no pedir ninguna puerta, una descarga exitosa
   registrada **y que su archivo exista con el hash registrado**.

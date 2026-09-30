@@ -8,6 +8,16 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
+_TIPOS_DE_MARCADO = ("text/html", "application/xhtml+xml")
+
+
+def _parece_robots(respuesta: httpx.Response) -> bool:
+    """Criterio negativo (M38): rechaza solo lo que claramente es marcado."""
+    tipo = respuesta.headers.get("content-type", "").split(";")[0].strip().lower()
+    if tipo in _TIPOS_DE_MARCADO or tipo.endswith("xml"):
+        return False
+    return not respuesta.text.lstrip("﻿ \t\r\n").startswith("<")
+
 
 class RobotsCache:
     def __init__(self, user_agent: str, cliente: httpx.Client) -> None:
@@ -34,6 +44,16 @@ class RobotsCache:
             return None
         status = respuesta.status_code
         if status == 200:
+            if not _parece_robots(respuesta):
+                # M38, E19.12 de docs/08: un login SAML con 200 no es una política legible
+                logger.warning(
+                    "200 en %s no parece robots.txt (Content-Type %r, URL final %s); "
+                    "fail-open (permitido)",
+                    robots_url,
+                    respuesta.headers.get("content-type"),
+                    respuesta.url,
+                )
+                return None
             parser = RobotFileParser()
             parser.parse(respuesta.text.splitlines())
             return parser

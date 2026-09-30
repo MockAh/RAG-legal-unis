@@ -241,6 +241,11 @@ consolidación y mueren en bloque cada vez que la universidad reconsolida.
 - **`robots.txt`: se consulta por dominio, se cachea, y su política es FAIL-OPEN.**
   - `200` → se parsea y se obedece. Si prohíbe, `motivo_fallo="robots_prohibido"`, el ítem va
     a cola manual y **no se fuerza**.
+  - **`200` que no parece un `robots.txt`** (M38, E19.12 de `08`) → permitido, con
+    `logging.warning` propio. Criterio negativo: `Content-Type` de marcado (`text/html`,
+    `application/xhtml+xml`, `*xml`) o cuerpo que, sin BOM ni espacios, empieza por `<`. Un
+    cuerpo vacío, solo con comentarios, o servido como `text/plain`, `octet-stream` o sin
+    `Content-Type` se sigue parseando. Es un `robots.txt` ilegible, no una prohibición.
   - `404` / `410` → permitido. No hay archivo de política; el estándar dice que todo está
     permitido.
   - **Cualquier otro status, o error de red → permitido, con `logging.warning`.**
