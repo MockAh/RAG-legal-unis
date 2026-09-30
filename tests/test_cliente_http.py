@@ -341,3 +341,39 @@ def test_los_scripts_ya_no_escriben_en_documentos(
     descargas, documentos = _filas(db_path)
     assert len(descargas) == 1
     assert documentos == []
+
+
+# M40: el resumen usa la misma decisión que descargar() (ya_descargado). Con el archivo
+# borrado, la segunda corrida vuelve a pedirlo y no lo cuenta como omitido.
+
+
+@pytest.mark.parametrize("modulo", [cosecha, cosecha_uam, lote], ids=["cosecha", "cosecha_uam", "lote"])
+def test_archivo_borrado_no_cuenta_como_omitido(
+    modulo: object,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    httpx_mock: HTTPXMock,
+) -> None:
+    monkeypatch.setenv("LEGISUNI_USER_AGENT", _USER_AGENT)
+    monkeypatch.setenv("LEGISUNI_DB_PATH", str(tmp_path / "prueba.db"))
+    monkeypatch.setenv("LEGISUNI_DATA_ROOT", str(tmp_path / "data"))
+    monkeypatch.setenv("LEGISUNI_RATE_LIMIT_S", "0")
+    httpx_mock.add_callback(_servir_pdf, is_reusable=True)
+    if modulo is lote:
+        argumentos = _lote_de_un_encargo(tmp_path)
+    else:
+        argumentos = {**(_UJAT if modulo is cosecha else _UAM), "limite": 1}
+
+    modulo.main(dry_run=False, **argumentos)
+    capsys.readouterr()
+    archivos = [p for p in (tmp_path / "data").rglob("*") if p.is_file()]
+    assert len(archivos) == 1
+    archivos[0].unlink()  # solo el test borra: simula un disco que perdió el archivo
+    peticiones_primera = len(httpx_mock.get_requests())
+    modulo.main(dry_run=False, **argumentos)
+    segunda = capsys.readouterr().out
+
+    assert "total: 1\nexitosas: 1\nomitidos: 0\n" in segunda
+    assert len(httpx_mock.get_requests()) > peticiones_primera
+    assert archivos[0].exists()

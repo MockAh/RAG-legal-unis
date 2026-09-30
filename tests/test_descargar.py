@@ -8,7 +8,7 @@ from pytest_httpx import HTTPXMock
 
 from legisuni.config import Settings
 from legisuni.contracts import DownloadResult, Encargo, Puerta
-from legisuni.descargador.descargar import descargar
+from legisuni.descargador.descargar import descargar, ya_descargado
 from legisuni.descargador.fetch import Fetcher
 from legisuni.descargador.store import Store
 
@@ -239,6 +239,10 @@ def test_omite_encargo_id_ya_registrado_con_exito(tmp_path: Path) -> None:
     encargo = _encargo()
     fetcher = FetcherContador()
 
+    # M40, regla 5 de docs/05: omitir exige el archivo en disco con el hash registrado
+    archivo = tmp_path / "reglamento-organico.pdf"
+    archivo.write_bytes(_PDF_BYTES)
+
     with Store(tmp_path / "store.db") as store:
         store.guardar_descarga(
             DownloadResult(
@@ -246,8 +250,8 @@ def test_omite_encargo_id_ya_registrado_con_exito(tmp_path: Path) -> None:
                 modo="juridico",
                 exito=True,
                 capturado_en=datetime(2026, 1, 1),
-                ruta_local=tmp_path / "reglamento-organico.pdf",
-                sha256="abc123",
+                ruta_local=archivo,
+                sha256=hashlib.sha256(_PDF_BYTES).hexdigest(),
                 intentos=[],
             ),
             encargo.grupo_alias,
@@ -421,6 +425,10 @@ def test_ya_registrado_no_toca_la_red_sin_ninguna_respuesta_mockeada(
     settings = _settings(tmp_path)
     encargo = _encargo()
 
+    # M40, regla 5 de docs/05: omitir exige el archivo en disco con el hash registrado
+    archivo = tmp_path / "reglamento-organico.pdf"
+    archivo.write_bytes(_PDF_BYTES)
+
     with Store(tmp_path / "store.db") as store:
         store.guardar_descarga(
             DownloadResult(
@@ -428,8 +436,8 @@ def test_ya_registrado_no_toca_la_red_sin_ninguna_respuesta_mockeada(
                 modo="juridico",
                 exito=True,
                 capturado_en=datetime(2026, 1, 1),
-                ruta_local=tmp_path / "reglamento-organico.pdf",
-                sha256="abc123",
+                ruta_local=archivo,
+                sha256=hashlib.sha256(_PDF_BYTES).hexdigest(),
                 intentos=[],
             ),
             encargo.grupo_alias,
@@ -896,3 +904,137 @@ def test_una_omision_no_escribe_nada(tmp_path: Path, httpx_mock: HTTPXMock) -> N
         assert [tuple(f) for f in store._conn.execute("SELECT * FROM intentos").fetchall()] == [
             tuple(f) for f in intentos_antes
         ]
+
+
+# M40, regla 5 de docs/05: omitir exige la descarga registrada **y** su archivo en disco
+# con el hash registrado. Store solo mira la base; ya_descargado mira además el disco.
+
+
+def _registrar_con_archivo(tmp_path: Path, store: Store, httpx_mock: HTTPXMock) -> DownloadResult:
+    httpx_mock.add_response(url="https://a.mx/x.pdf", status_code=200, content=_PDF_BYTES, is_reusable=True)
+    settings = _settings(tmp_path)
+    resultado = descargar(_encargo(), _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+    assert resultado.exito is True and resultado.ruta_local is not None
+    return resultado
+
+
+def test_ya_descargado_sin_fila_es_none(tmp_path: Path) -> None:
+    with Store(tmp_path / "store.db") as store:
+        assert ya_descargado(store, "uam:reglamento-organico") is None
+
+
+def test_ya_descargado_con_archivo_y_hash_devuelve_hash_y_ruta(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    with Store(tmp_path / "store.db") as store:
+        resultado = _registrar_con_archivo(tmp_path, store, httpx_mock)
+
+        assert ya_descargado(store, resultado.encargo_id) == (resultado.sha256, resultado.ruta_local)
+
+
+def test_ya_descargado_archivo_ausente_es_none(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    with Store(tmp_path / "store.db") as store:
+        resultado = _registrar_con_archivo(tmp_path, store, httpx_mock)
+        resultado.ruta_local.unlink()
+
+        assert store.hash_registrado(resultado.encargo_id) == resultado.sha256
+        assert ya_descargado(store, resultado.encargo_id) is None
+
+
+def test_ya_descargado_bytes_distintos_es_none(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    with Store(tmp_path / "store.db") as store:
+        resultado = _registrar_con_archivo(tmp_path, store, httpx_mock)
+        resultado.ruta_local.write_bytes(_PDF_BYTES_V2)
+
+        assert ya_descargado(store, resultado.encargo_id) is None
+
+
+def test_archivo_borrado_se_vuelve_a_pedir_y_se_reescribe(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    settings = _settings(tmp_path)
+    with Store(tmp_path / "store.db") as store:
+        primera = _registrar_con_archivo(tmp_path, store, httpx_mock)
+        primera.ruta_local.unlink()  # solo el test borra: simula un disco que perdió el archivo
+
+        segunda = descargar(_encargo(), _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+
+    assert len(httpx_mock.get_requests()) == 2
+    assert segunda.exito is True
+    assert len(segunda.intentos) == 1
+    assert segunda.ruta_local == primera.ruta_local
+    assert segunda.ruta_local.read_bytes() == _PDF_BYTES
+
+
+def test_archivo_con_otros_bytes_se_pide_y_conviven_ambos(tmp_path: Path, httpx_mock: HTTPXMock) -> None:
+    # regla 2 y 3: no se pisa el archivo alterado; el bueno va al nombre con sufijo de hash
+    settings = _settings(tmp_path)
+    with Store(tmp_path / "store.db") as store:
+        primera = _registrar_con_archivo(tmp_path, store, httpx_mock)
+        primera.ruta_local.write_bytes(_PDF_BYTES_V2)
+
+        segunda = descargar(_encargo(), _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+
+    assert len(httpx_mock.get_requests()) == 2
+    assert segunda.exito is True
+    assert segunda.ruta_local != primera.ruta_local
+    assert segunda.ruta_local.read_bytes() == _PDF_BYTES
+    assert primera.ruta_local.read_bytes() == _PDF_BYTES_V2
+
+
+def _original_y_alias_con_original_borrado(
+    tmp_path: Path, store: Store, httpx_mock: HTTPXMock
+) -> tuple[Encargo, Encargo, DownloadResult]:
+    httpx_mock.add_response(url="https://a.mx/2024/ro.pdf", status_code=200, content=_PDF_BYTES, is_reusable=True)
+    httpx_mock.add_response(url="https://a.mx/2026/ro.pdf", status_code=200, content=_PDF_BYTES, is_reusable=True)
+    settings = _settings(tmp_path)
+    original = _encargo_del_grupo("uam:ro:aaaaaaaaaaaa", "ro__2026-09-06", "uam:ro", "https://a.mx/2024/ro.pdf")
+    alias = _encargo_del_grupo("uam:ro:bbbbbbbbbbbb", "ro__2026-09-08", "uam:ro", "https://a.mx/2026/ro.pdf")
+    resultado_original = descargar(original, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+    resultado_alias = descargar(alias, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+    assert resultado_alias.duplicado_de == original.encargo_id
+    assert resultado_original.ruta_local is not None
+    resultado_original.ruta_local.unlink()
+    # el alias apunta al archivo del original: sin él, ninguno de los dos está descargado
+    assert ya_descargado(store, original.encargo_id) is None
+    assert ya_descargado(store, alias.encargo_id) is None
+    return original, alias, resultado_original
+
+
+def test_alias_con_original_borrado_original_primero_restaura_los_papeles(
+    tmp_path: Path, httpx_mock: HTTPXMock
+) -> None:
+    settings = _settings(tmp_path)
+    with Store(tmp_path / "store.db") as store:
+        original, alias, resultado_original = _original_y_alias_con_original_borrado(tmp_path, store, httpx_mock)
+        peticiones_antes = len(httpx_mock.get_requests())
+
+        de_nuevo_original = descargar(original, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+        de_nuevo_alias = descargar(alias, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+
+        fila_alias = store._conn.execute(
+            "SELECT duplicado_de FROM descargas WHERE encargo_id = ?", (alias.encargo_id,)
+        ).fetchone()
+
+    assert len(httpx_mock.get_requests()) == peticiones_antes + 1
+    assert de_nuevo_original.duplicado_de is None
+    assert de_nuevo_original.ruta_local == resultado_original.ruta_local
+    assert de_nuevo_alias.intentos == []  # omitido: su ruta vuelve a tener los bytes
+    assert de_nuevo_alias.ruta_local == resultado_original.ruta_local
+    assert fila_alias["duplicado_de"] == original.encargo_id
+    assert list((tmp_path / "norm").rglob("*.pdf")) == [resultado_original.ruta_local]
+
+
+def test_alias_con_original_borrado_alias_primero_invierte_los_papeles(
+    tmp_path: Path, httpx_mock: HTTPXMock
+) -> None:
+    # limitación conocida, heredada de M29: si falta el original, el alias escribe el suyo y
+    # pasa a ser dueño; después el original encuentra esos bytes y queda como su alias
+    settings = _settings(tmp_path)
+    with Store(tmp_path / "store.db") as store:
+        original, alias, resultado_original = _original_y_alias_con_original_borrado(tmp_path, store, httpx_mock)
+
+        de_nuevo_alias = descargar(alias, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+        de_nuevo_original = descargar(original, _fetcher(settings), RobotsPermiteTodo(), settings, store=store)
+
+    assert de_nuevo_alias.duplicado_de is None
+    assert de_nuevo_alias.ruta_local != resultado_original.ruta_local
+    assert de_nuevo_original.duplicado_de == alias.encargo_id
+    assert de_nuevo_original.ruta_local == de_nuevo_alias.ruta_local
+    assert list((tmp_path / "norm").rglob("*.pdf")) == [de_nuevo_alias.ruta_local]

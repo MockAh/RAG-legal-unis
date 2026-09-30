@@ -27,15 +27,16 @@ def descargar(
     capturado_en = ahora if ahora is not None else datetime.now()
 
     if store is not None:
-        sha256_previo = store.hash_registrado(encargo.encargo_id)
-        if sha256_previo is not None:
+        previo = ya_descargado(store, encargo.encargo_id)
+        if previo is not None:
+            sha256_previo, ruta_previa = previo
             logger.info("omitido: %s ya registrado", encargo.encargo_id)
             return DownloadResult(
                 encargo_id=encargo.encargo_id,
                 modo=encargo.modo,
                 exito=True,
                 capturado_en=capturado_en,
-                ruta_local=store.ruta_registrada(encargo.encargo_id),
+                ruta_local=ruta_previa,
                 sha256=sha256_previo,
                 intentos=[],
             )
@@ -45,6 +46,26 @@ def descargar(
     if store is not None:
         store.guardar_descarga(resultado, encargo.grupo_alias)
     return resultado
+
+
+def ya_descargado(store: Store, encargo_id: str) -> tuple[str, Path] | None:
+    """Regla 5 de docs/05 (M40): descarga exitosa registrada **y** su archivo en disco con ese hash.
+
+    `Store` solo mira la base; el disco se comprueba aquí, como en `_original_por_hash`. Los
+    scripts la usan para su resumen, así que omitir y contar un omitido son la misma decisión.
+    Un archivo ausente, ilegible o con otros bytes → None, nunca excepción.
+    """
+    sha256 = store.hash_registrado(encargo_id)
+    ruta = store.ruta_registrada(encargo_id)
+    if sha256 is None or ruta is None:
+        return None
+    try:
+        with ruta.open("rb") as archivo:
+            if hashlib.file_digest(archivo, "sha256").hexdigest() != sha256:
+                return None
+    except OSError:
+        return None
+    return sha256, ruta
 
 
 def _pedir_y_escribir(

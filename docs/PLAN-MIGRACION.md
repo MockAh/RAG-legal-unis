@@ -877,10 +877,86 @@ Dos deudas, ambas medidas.
   `docs/08`. `docs/01` no se toca; D8 en `docs/00` ya lo cubre.
 - Commit: `M38: un 200 que no parece robots.txt no se obedece`
 
-## Deuda · La idempotencia no mira el disco (regla 5 de `docs/05`)
+## ~~Deuda · La idempotencia no mira el disco (regla 5 de `docs/05`)~~ · **cerrada por M40**
 - La regla 5 exige, para no pedir ninguna puerta, una descarga exitosa
   registrada **y que su archivo exista con el hash registrado**.
   `Store.hash_registrado` solo mira la base, no el disco: **si alguien borra un
   archivo, la idempotencia lo dará por descargado** y no se vuelve a pedir.
 - **Precede a M34:** ya pasaba cuando la lectura era contra `documentos`. M34
   no la introduce y no la arregla. Queda para una micro-tarea propia.
+
+## M40 · La idempotencia comprueba el archivo en disco
+- Motivo: la deuda anterior, anotada en M34. La regla 5 de `docs/05` exige,
+  para no pedir ninguna puerta, una descarga exitosa registrada **y su archivo
+  en disco con el hash registrado**. `Store.hash_registrado` solo consulta la
+  base: un PDF borrado se daba por descargado y no se volvía a pedir nunca.
+- **M39 queda reservada** para la deduplicación de fallos; no se numera aquí.
+- **Dónde: en `descargar.py`, no en `Store`.** `ya_descargado(store,
+  encargo_id) -> (sha256, ruta) | None` toma la fila vigente de M34
+  (`hash_registrado` + `ruta_registrada`) y comprueba que el archivo exista y
+  que su SHA-256 coincida; un `OSError` da `None`, nunca excepción. Razones:
+  `Store` es persistencia SQLite y no conoce `data_root`; `tests/test_store.py`
+  afirma `hash_registrado(...) == …` con rutas inventadas (`/datos/b.pdf`) en
+  al menos cinco sitios, que cambiarían si la comprobación viviera en `Store`;
+  y `descargar.py` ya verifica archivos contra un hash (regla 1 y
+  `_original_por_hash` de M29).
+- **Una sola decisión para omitir y para contar.** `cosecha.py`,
+  `cosecha_uam.py` y `lote.py` calculan `omitido` con `ya_descargado`, no con
+  `hash_registrado`. Si no, con un PDF borrado el resumen diría «omitidos: 1»
+  mientras `descargar()` lo pide de nuevo.
+- **Coste: hash completo, con `hashlib.file_digest`** (lee por bloques; los
+  escaneos de la UJAT llegan a 33.7 MB). **Corrección de cifras:** la UAM son
+  **12.6 MB** (E11), no 297; 297 MB es el total jurídico, UAM 12.6 + UJAT 285
+  (E12.6). **Medido, no supuesto:** SHA-256 en memoria en esta máquina, ~483
+  MB/s → 297 MB en ~0,6 s, la UAM en ~26 ms. Como scripts y `descargar()`
+  llaman ambos a `ya_descargado`, cada archivo se hashea dos veces: ~1,2 s por
+  corrida jurídica completa, contra ~2 min de red por universidad solo por el
+  rate limit. La lectura de disco en frío será algo más lenta; sigue siendo
+  segundos contra minutos. Solo el tamaño no basta: reescribiría la regla 5
+  («con el hash registrado») y no detecta un archivo sustituido por otro del
+  mismo peso. Un hash que no coincide no se pierde: se piden las puertas y la
+  regla 2 escribe con sufijo `__sha8`, conservando ambos (regla 3).
+- **Alias por hash (M29).** La fila vigente de un alias lleva la `ruta_local`
+  del original. Si falta ese archivo, **ninguno de los dos está descargado** y
+  se piden ambos. No se pierde nada; el orden decide los papeles:
+  - original antes que alias (el orden en que se crearon): el original
+    reescribe su archivo y el alias se omite. Todo queda como estaba;
+  - alias antes que original: por la regla de M29 (original ausente → no hay
+    alias) el alias escribe su propio archivo y el upsert sobre `(encargo_id,
+    sha256)` le pone `duplicado_de = NULL`; luego el original encuentra esos
+    bytes y queda como su alias. Una sola copia en disco, **papeles
+    invertidos**, y el upsert pisa la marca anterior. **Limitación conocida,
+    heredada de M29, aceptada y no corregida aquí.**
+- **Ruta relativa:** `data_root` por defecto es `Path("data")`; la comprobación
+  depende de ejecutar desde la raíz del repo, igual que `_original_por_hash`.
+  No es nuevo.
+- **Excepción al criterio 11, autorizada por la regla 5** (como M21 con el
+  criterio 4). Dos tests de `tests/test_descargar.py`
+  (`test_omite_encargo_id_ya_registrado_con_exito` y
+  `test_ya_registrado_no_toca_la_red_sin_ninguna_respuesta_mockeada`)
+  registraban un archivo **inexistente** con un hash **inventado**
+  (`"abc123"`) y afirmaban que se omitía: codificaban el hueco. **Cambia su
+  preparación** (escriben el archivo y registran su SHA-256 real); **ningún
+  `assert` cambia.** No es un cambio mecánico: el comportamiento que
+  documentaban deja de existir.
+- Tests nuevos: en `tests/test_descargar.py`, `ya_descargado` sin fila, con
+  archivo y hash, con archivo ausente y con bytes distintos; archivo borrado →
+  se pide y se reescribe; archivo con otros bytes → se pide y conviven ambos;
+  alias con original borrado en los dos órdenes, afirmando los papeles. En
+  `tests/test_cliente_http.py`, sobre los tres `main()`: archivo borrado →
+  «exitosas: 1, omitidos: 0» y hay peticiones nuevas (falla con la lógica
+  anterior).
+- **Efecto en campo, medido antes del commit** (2026-09-30, por el humano, sin
+  red): un comando de solo lectura abrió `legisuni_v2.db` con `mode=ro`, sin
+  `Store.__init__`, y aplicó `ya_descargado` a cada `encargo_id` de
+  `descargas`:
+  ```
+  {'sin descarga vigente': 25, 'ya descargado': 168}
+  ```
+  **Cero `VIGENTE SIN ARCHIVO VÁLIDO`.** Los 168 son 156 jurídicos + 12
+  académicos (3 del Bloque A y 9 del B); los 25 son fichas académicas cuya fila
+  vigente es un fallo, que M40 no toca. 168 + 25 = 193 = 156 + 37 encargos
+  académicos. **Una corrida repetida da el mismo resultado que antes de M40.**
+  (La estimación previa de «9 académicos» olvidaba los 3 del Bloque A.)
+- `docs/05`: sin cambios; la regla 5 ya dice esto.
+- Commit: `M40: la idempotencia comprueba el archivo en disco`

@@ -16,7 +16,7 @@ from selectolax.parser import HTMLParser
 from legisuni.config import Settings
 from legisuni.contracts import CatalogEntry
 from legisuni.descargador import paths
-from legisuni.descargador.descargar import descargar
+from legisuni.descargador.descargar import descargar, ya_descargado
 from legisuni.descargador.fetch import Fetcher, construir_cliente
 from legisuni.descargador.ratelimit import RateLimiter
 from legisuni.descargador.robots import RobotsCache
@@ -119,7 +119,7 @@ def main(
     with Store(settings.db_path) as store:
         for entrada, encargo in zip(entradas, encargos, strict=True):
             logger.info("pidiendo %s (%s)", encargo.encargo_id, entrada.url_documento)
-            omitido = store.hash_registrado(encargo.encargo_id) is not None
+            omitido = ya_descargado(store, encargo.encargo_id) is not None
             resultado = descargar(encargo, fetcher, robots, settings, store=store)
             # E18.1 de docs/08: una puerta con robots_prohibido no llega a pedirse
             hosts_pedidos.update(
