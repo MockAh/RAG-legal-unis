@@ -3,7 +3,7 @@
 > **El documento más importante del Proyecto.** Las conversaciones no se ven entre sí;
 > estos esquemas son su única frontera común. Cualquier cambio aquí debe propagarse
 > a todas las conversaciones activas y anotarse en el changelog de abajo.
-> Estado: **v2.5** · esquemas en pseudocódigo Pydantic v2. **Primera versión que rompe
+> Estado: **v2.6** · esquemas en pseudocódigo Pydantic v2. **Primera versión que rompe
 > compatibilidad** (ver §"Qué rompe la v2.0 y cómo se migra"). Desde aquí vuelve a regir la
 > regla de siempre: las specs refinan sin romper; los cambios aditivos son libres; renombrar o
 > quitar campos exige actualizar aquí primero.
@@ -318,7 +318,7 @@ se deriva del título del instrumento.
 
 ## N3 · Catalog — el catálogo completo de una institución
 
-*Cambia en v2.3: campos de fecha de corte (aditivo).*
+*Cambia en v2.3: campos de fecha de corte (aditivo). Cambia en v2.6: contabilidad de la lectura (aditivo).*
 
 ```python
 class Catalog(BaseModel):
@@ -332,6 +332,12 @@ class Catalog(BaseModel):
     fecha_corte_declarada: date | None = None   # la que declara la página
     fecha_corte_texto: str | None = None        # declaración literal: «Fecha de corte: Diciembre del 2016»
     catalogo_caducado: bool = False             # fecha_corte_declarada más vieja que el umbral
+    # --- v2.6 · contabilidad de la lectura (C13: no mentir sin errores) ---
+    enlaces_vistos: int | None = None          # enlaces únicos (URL normalizada) entregados al agente, tras classify.py; None = no hubo lectura
+    enlaces_descartados: list[str] = []        # hrefs que el agente declaró explícitamente no normativos
+    enlaces_sin_cuenta: list[str] = []         # vistos − (url_documento de entries) − descartados; lo calcula código, nunca el agente
+    lectura_incompleta: bool = False           # enlaces_sin_cuenta no vacío (derivado, como catalogo_caducado)
+    fallo_lector: Literal["salida_invalida"] | None = None   # el agente respondió, pero su JSON no validó
 ```
 
 **Nota sobre la fecha de corte (v2.3).** Medido en la UACAM (E10.1 de `08`): un índice HTML
@@ -347,6 +353,27 @@ impecable declara al pie «Fecha de corte: Diciembre del 2016». Nada aguas abaj
 - **No es `CatalogEntry.estado`.** Un índice caducado puede contener instrumentos vigentes: lo que
   caduca es la afirmación del índice sobre qué existe y qué está al día.
 - **Qué se hace con un catálogo caducado** sigue abierto (`00` §8, pregunta 8).
+
+**Nota sobre la contabilidad de la lectura (v2.6).** Hasta la v2.5, tres situaciones muy
+distintas caían en `lector_agotado` + `notas`: la página es una rejilla JS y no trae nada; el
+agente devolvió JSON inválido; el agente emitió 40 entradas de 47. Solo la primera es
+agotamiento. La tercera es C13 otra vez: el sistema miente con confianza y sin errores, y el
+Corroborador atribuiría a la universidad huecos que son del Lector.
+
+| Caso | `lector_agotado` | `fallo_lector` | `lectura_incompleta` |
+|---|---|---|---|
+| Rejilla JS | `True` | `None` | `False` (0 vistos) |
+| JSON inválido | `False`: no se salta de eslabón en D1 | `"salida_invalida"` | `True`: todo queda sin cuenta |
+| 40 de 47 | `False` | `None` | `True`, y la lista dice cuáles faltan |
+
+- **Vistos contra emitidos no basta.** En la UACAM, 81 enlaces a PDF (E20.5) contra los ~27
+  instrumentos propios que estima E10, aún sin medir: casi toda la diferencia es descarte
+  legítimo. Por eso el agente **declara** lo
+  que descarta (`enlaces_descartados`), y la resta la hace código (regla de reparto de `00` §2).
+- **`lector_agotado` y `fallo_lector` son excluyentes.** Regla dura en `03`.
+- **Listas, no conteos** (D5): el Corroborador necesita saber qué hueco es del Lector.
+- **Qué hace la orquestación ante `salida_invalida`** (¿reintentar?) no se decide aquí: queda
+  pendiente en `07`.
 
 ---
 
@@ -1027,6 +1054,14 @@ Lector de Índice produzca slugs correctos. Son minutos.
 | README | Nombre y versiones |
 | Specs nuevas | **Lector de Lista**, **Verificador Académico**, **Auditor de Lote**. Y la ya pendiente de **extracción de texto con OCR**, que ahora comparten ambos verificadores |
 
+**v2.6 · contabilidad de la lectura (N3):**
+
+| Documento | Qué cambia |
+|---|---|
+| `03` | El agente declara sus descartes; código calcula `enlaces_sin_cuenta` y `lectura_incompleta`; **regla dura: `lector_agotado` y `fallo_lector` son excluyentes**, y un JSON inválido marca `fallo_lector="salida_invalida"`, nunca `lector_agotado`; criterio de aceptación nuevo con salida truncada |
+| `04` | No tratar `lectura_incompleta` como hueco de la institución |
+| `07` | Pregunta abierta: qué hace la orquestación ante `salida_invalida` (¿reintento?). **Pendiente de su propia conversación; no se decide en `01`** |
+
 ---
 
 ## Preguntas abiertas (no bloquean este contrato)
@@ -1058,3 +1093,4 @@ Lector de Índice produzca slugs correctos. Son minutos.
 | v2.3 | 2026-09-10 | Propagación de `03` v3, ratificada: `Catalog` (N3) gana `fecha_corte_declarada`, `fecha_corte_texto` y `catalogo_caducado` (D12, C13); `CatalogEntry` (N2) gana `titulo_derivado` (C9); parámetro nuevo "Umbral de caducidad del índice" (18 meses). Cierra la propagación de la v2.0. **Compatible con v2.2.** |
 | **v2.4** | **2026-09-11** | **Criterios de migración, corregidos contra medición.** El criterio 2 deja de pedir «150/150» y pasa a «todo enlace publicado produce descarga», con **N medido = 156** (UAM 47, UJAT 109): el 150 venía de una heurística de slug que perdía 2 documentos en la UAM y de un filtro por extensión que ignoraba 4 enlaces de la UJAT con salto de línea. El criterio 3 admite `muro_de_pago` en modo jurídico, porque el reconocimiento de muros de `05` v3 no distingue modo (D8) y ninguna aserción de v1.4 lo contradice. **Sin cambios de esquema: ningún contrato N0–N14 se toca. Compatible con v2.3.** |
 | **v2.5** | **2026-09-25** | **Aclaración sobre la lista de origen, sin cambios de esquema.** `Geologia_dois_.docx`, la lista contra la que se diseñó §Modo académico, **nunca llegó al repositorio**: sus tres hallazgos (§Evidencia de partida) y las «17 fichas» (N11) se conservan como historia de diseño, con nota de que no son verificables. La primera corrida académica usó `datos/lotes/bloque-a.txt` (E15 de `08`). La razón del orden de puertas (§Nota sobre `puertas` y su orden) cita E15, con datos a favor y en contra. El registro de v2.0 no se toca. **Ningún contrato N0–N14 se toca. Compatible con v2.4.** |
+| **v2.6** | **2026-10-01** | **Contabilidad de la lectura, aditivo.** `Catalog` (N3) gana `enlaces_vistos`, `enlaces_descartados`, `enlaces_sin_cuenta`, `lectura_incompleta` y `fallo_lector`: distingue rejilla vacía, salida inválida del agente y lectura truncada, que antes caían todas en `lector_agotado` + `notas`. `lector_agotado` y `fallo_lector` son excluyentes. Propaga a `03`, `04` y `07`. **Ningún campo existente cambia. Compatible con v2.5.** |
