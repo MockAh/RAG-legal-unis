@@ -353,7 +353,7 @@ marco jurídico — señal aprovechable por el Localizador.
 | E6.5 | El 70-I accedido programáticamente | Sigue siendo el respaldo de D1 y sigue sin ruta conocida |
 | E6.6 | Tasa de PDFs escaneados sin capa de texto | Decide si el OCR entra en v1 (spec `06`). Sospecha: alta en leyes orgánicas viejas |
 | E6.7 | Si los PDF de la UJAT de 2012 abren realmente | Rutas viejas con espacios: candidatas a enlace muerto |
-| E6.8 | **Recontar UNAM-OAG y UJAT en vivo** | Sus cifras son de la captura original. La re-medición de la UAM corrigió dos conteos; es razonable esperar lo mismo allí |
+| E6.8 | **Recontar UNAM-OAG y UJAT en vivo** | Sus cifras son de la captura original. La re-medición de la UAM corrigió dos conteos; es razonable esperar lo mismo allí. **Nota (2026-10-01) — parcialmente satisfecha.** Ambas se recontaron con herramienta, pero sobre fixtures: la UJAT en M23b (109 enlaces) y la UNAM-OAG en E20.5 (84 enlaces a PDF, que no son 84 instrumentos). **Sigue abierta en lo que pedía: recontar en vivo.** La cabecera dejó de remitir aquí al reescribirse; esta nota lo compensa |
 | ~~E6.9~~ | ~~¿Hay más enlaces sin texto de ancla?~~ | **CERRADA, en contra (E10.3): sí los hay.** 2 de 4 instituciones. Es requisito firme del Lector, no caso raro |
 | E6.10 | **Las obligaciones de transparencia VIGENTES de la UACAM** (`/view/paginas/49`) | E10 midió la rama histórica. La rama actual no se ha abierto: puede que el catálogo bueno esté ahí y el hallazgo de E10.1 sea menos grave de lo que parece — o que no exista, y sea peor |
 | E6.11 | ¿Cuántos índices más declaran fecha de corte? | Si C13 se repite, el Lector necesita esa comprobación **antes** que ninguna otra |
