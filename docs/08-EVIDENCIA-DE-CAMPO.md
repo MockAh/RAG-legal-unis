@@ -3,9 +3,11 @@
 > Hallazgos **medidos**, no supuestos, obtenidos antes de escribir una línea de código.
 > Estado: vivo · **v16** · se amplía con cada universidad nueva que se explore.
 > Mediciones: UAM, UNAM-70I, UNAM-OAG, UJAT, **UACAM**.
-> **Medido en vivo el 2026-09-06: la UAM (E1) y la UACAM (E10).** Los conteos de UNAM-OAG (E3)
-> y UJAT (E4) son de la captura original y **no se han vuelto a comprobar**; trátalos como
-> aproximados hasta que se recapturen (E6.8).
+> **Medido en vivo el 2026-09-06: la UAM (E1) y la UACAM (E10).** Recontados con herramienta:
+> la **UJAT** en M23b (109 enlaces, sobre sus fixtures) y la **UNAM-OAG** en E20.5 (84 enlaces
+> a PDF, que **no** son 84 instrumentos). **Sigue sin recontar:** cuántos de esos enlaces son
+> instrumentos de la UNAM (el «~60» de E3) y el «27 propios» de la UACAM (E10). Ninguno de los
+> dos sale de un grep; ver E20.5.
 > **Descargas reales ejecutadas:** 45/45 documentos de la UAM el **2026-09-06** (E11) y
 > **105/105 de la UJAT el 2026-09-08** (E12). **150 de 150.** Tras la migración a `Encargo`,
 > **156 de 156 (E14)**, medido el 2026-09-18. **Primera corrida académica: 3 de 7 (E15)**, el
