@@ -5,7 +5,7 @@
 > (`01` v2.0). **El sistema tiene ahora dos modos:** el jurídico, que conserva el nombre
 > **LegisUni**, y el académico.
 > **Cuatro universidades medidas** (UAM, UNAM, UJAT, UACAM) y **dos corridas reales**:
-> 150 documentos descargados, 150/150. La spec `05` está cerrada.
+> 156 documentos descargados, 156/156 (E14 de `08`). La spec `05` está cerrada.
 > Si una decisión cambia, se actualiza AQUÍ y en el contrato afectado.
 > Proyecto hermano: `RAG_publish` (sistema multiagente de escritura científica). Acervo
 > hereda su método de trabajo y varias de sus lecciones operativas, pero es un sistema aparte.
@@ -68,9 +68,9 @@ completitud, comparar un PDF contra su entrada de catálogo) es de agentes. La m
 (pedir URLs, verificar bytes, guardar, deduplicar, contar) es código. Ningún agente escribe
 en disco ni decide idempotencia.
 
-> **Confirmado en campo:** el Descargador es código puro, sin un solo agente, y bajó 150
-> documentos de dos universidades con 150/150 de éxito (E11 y E12 de `08`). El reparto
-> funciona.
+> **Confirmado en campo:** el Descargador es código puro, sin un solo agente, y bajó 156
+> documentos de dos universidades con 156/156 de éxito, sobre disco y base vacíos (E14 de
+> `08`). El reparto funciona.
 
 **En modo académico la regla es la misma.** Leer una lista escrita a mano (renglones sin
 título, DOIs dentro de enlaces, extras y correcciones mezclados) y juzgar si un PDF es el
@@ -160,7 +160,7 @@ del estado publicado contra el estado en disco. Ese cotejo es también el detect
 | **D9** | **Autenticidad se decide por dominio, no por contenido.** Un PDF es oficial si vino de un dominio institucional verificado; el contenido solo confirma identidad y vigencia. **Rige el modo jurídico; el académico se rige por D13.** | Un PDF puede decir cualquier cosa. El dominio es el ancla dura. |
 | **D10** | **Alcance v1.** Modo jurídico: **universidades públicas mexicanas**; privadas fuera (no son sujetos obligados; su normativa interna no es necesariamente pública). Modo académico (v2.0): **artículos científicos de una lista dada por el usuario, solo en copias de acceso abierto.** | Frontera de alcance honesta, no limitación técnica. En el académico, la frontera es legal y de diseño: lo que está tras un muro va al informe con una ruta sugerida (biblioteca, autor), no a la carpeta. |
 | **D13** | **Modo académico: la confiabilidad se decide por contenido, no por dominio.** El DOI es evidencia; el título desempata. Candidatos DOI solo de metadatos y primera página, nunca de la bibliografía. Sin DOI utilizable, deciden título, primer autor y año. Un artículo cuenta como obtenido solo con veredicto `correcto` u `otra_edicion` (`01`, N13). | Una copia legítima puede vivir en GitHub, en un repositorio o en la página de un autor: no hay dominio que acredite. Lo que sí hay es un identificador impreso en el propio documento. *Diseñado contra la primera lista real (`01`, §Modo académico):* 13 de 15 artículos traían DOI escrito y ninguno traía título, de ahí que el título desempate pero no sea obligatorio. |
-| **D14** | **Un solo Descargador para ambos modos. Recibe `Encargo` (N10) y no sabe más.** Cada modo traduce su ficha a un `Encargo`; la traducción jurídica reproduce exactamente el comportamiento de v1.4. | Es la pieza medida y cerrada (150/150). Duplicarla por modo duplicaría también su costo de mantenimiento. La diferencia real entre modos está en leer los pedidos y en juzgar lo recibido, que son trabajo de agentes. |
+| **D14** | **Un solo Descargador para ambos modos. Recibe `Encargo` (N10) y no sabe más.** Cada modo traduce su ficha a un `Encargo`; la traducción jurídica reproduce exactamente el comportamiento de v1.4. | Es la pieza medida y cerrada (156/156, E14 de `08`). Duplicarla por modo duplicaría también su costo de mantenimiento. La diferencia real entre modos está en leer los pedidos y en juzgar lo recibido, que son trabajo de agentes. |
 | **D15** | **Cada publicación de un instrumento tiene identidad propia: `entry_id` incorpora su dirección de origen normalizada.** Antes de dar por nueva una descarga, se compara su hash con lo ya registrado (alias por hash). Nunca se borra un archivo. | Resuelve C20 de `08` (salida B, decidida en `01` v2.0): los dos históricos del Reglamento de Estudios Superiores de la UAM colisionaban. La fecha no sirve de identidad porque 3 de 4 índices no la declaran (C2). **Límite conocido:** una re-exportación con bytes distintos no la atrapa el hash; la segunda defensa es `doc_id`. |
 
 ---
