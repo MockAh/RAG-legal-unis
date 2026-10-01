@@ -1,7 +1,7 @@
 # 08 · Evidencia de campo
 
 > Hallazgos **medidos**, no supuestos, obtenidos antes de escribir una línea de código.
-> Estado: vivo · **v15** · se amplía con cada universidad nueva que se explore.
+> Estado: vivo · **v16** · se amplía con cada universidad nueva que se explore.
 > Mediciones: UAM, UNAM-70I, UNAM-OAG, UJAT, **UACAM**.
 > **Medido en vivo el 2026-09-06: la UAM (E1) y la UACAM (E10).** Los conteos de UNAM-OAG (E3)
 > y UJAT (E4) son de la captura original y **no se han vuelto a comprobar**; trátalos como
@@ -531,6 +531,10 @@ La buena noticia: para la UAM ya existen las dos, porque la primera medición pi
 consolidación anterior y la segunda la de julio de 2026. **Esa pareja es el activo de prueba
 más valioso del proyecto y hay que salvarla explícitamente**, porque es irrepetible: no se
 puede volver atrás en el tiempo a capturar un índice que ya cambió.
+
+> **Nota (2026-10-01) — E20.6.** Esas dos capturas no existen: `fixtures/` tiene una sola captura
+> de la UAM, sin fecha en el nombre. El criterio que esta sección llama 6 es hoy el 9 de `03`, y
+> queda bloqueado. Ver E20.6.
 
 ### E9.4 · Las fixtures caducan, y hay que decir cuándo
 
@@ -1941,6 +1945,132 @@ pasara por él. Ahora hay además un artículo abierto que pasa por el IdP y se 
 
 ---
 
+## E20 · Tres fixtures nuevas y lo que midieron (2026-10-01)
+
+**Es la primera captura de índices como fixture que pide E9.2**, para tres de las cinco fuentes:
+UNAM-OAG (E3), UACAM (E10) y el 70-I de la UNAM (E2). Todo lo que sigue sale de los comandos que
+se muestran, sobre los archivos de `fixtures/`; no hay otra medición.
+
+### E20.1 · Qué se capturó y cómo
+
+```
+curl -sS -A "$UA" -D fixtures/<inst>__2026-10-01.headers -o fixtures/<inst>__2026-10-01.html <url>
+  unam-oag  https://www.abogadogeneral.unam.mx/legislacion                        80296 bytes
+  uacam     https://transparencia.uacam.mx/view/paginas/11                        50705 bytes
+  unam-70i  https://transparencia.unam.mx/obligaciones/consulta/marco-normativo   43914 bytes
+
+wc -l fixtures/*__2026-10-01.html
+   790 fixtures/uacam__2026-10-01.html
+   763 fixtures/unam-70i__2026-10-01.html
+  1103 fixtures/unam-oag__2026-10-01.html
+```
+
+`curl` con el User-Agent del proyecto, sin JavaScript. Se guardan **los bytes crudos** (regla de
+E9.2: la reducción es código bajo prueba, no material de prueba) **y las cabeceras**, que son
+las que permiten responder E20.2.
+
+**Los nombres siguen la convención de E9.2,** `<inst>__<AAAA-MM-DD>`. **Inconsistencia conocida:**
+las fixtures viejas de la UAM y la UJAT (`uam-index.html`, `ujat-<n>.html`) no llevan fecha, y
+no se renombran porque `tests/test_extraccion_indices.py` las nombra. Tampoco se sigue el
+directorio que propuso E9.2 (`tests/fixtures/indices/`) ni hay `.esperado.json`: las tres viven
+en `fixtures/`, junto a las viejas.
+
+### E20.2 · Las tres sirven UTF-8 — E6.14 cerrada
+
+```
+grep -i "^content-type" fixtures/*__2026-10-01.headers
+fixtures/uacam__2026-10-01.headers:content-type: text/html; charset=UTF-8
+fixtures/unam-70i__2026-10-01.headers:Content-Type: text/html; charset=UTF-8
+fixtures/unam-oag__2026-10-01.headers:Content-Type: text/html; charset=UTF-8
+```
+
+UNAM-OAG, UACAM y el 70-I declaran **UTF-8**. Con la UAM en `iso-8859-1` (E11.3) y la UJAT en
+`utf-8` (criterio 6 de `03`), **el marcador es 4 de 5 en UTF-8, con la UAM como única
+excepción.** **E6.14 queda cerrada.**
+
+**El requisito de detectar la codificación sigue en pie.** Lo que cambia es que ahora se sabe
+cuál es la institución que rompe un default optimista: un Lector que asumiera UTF-8 acertaría
+cuatro de cinco y corrompería los títulos de la UAM.
+
+### E20.3 · La rejilla del 70-I sigue vacía
+
+```
+grep -o "<tr" fixtures/unam-70i__2026-10-01.html | wc -l
+1
+grep -o "<td" fixtures/unam-70i__2026-10-01.html | wc -l
+1
+grep -o 'href="[^"]*\.pdf[^"]*"' fixtures/unam-70i__2026-10-01.html | sort -u | wc -l
+0
+```
+
+Un `<tr>`, un `<td>`, **cero PDF**, sobre un archivo de 763 líneas sin minificar: no es que el
+conteo falle por tenerlo todo en una línea. Es la misma cáscara que describió E2 (sin fecha en
+este documento). **El criterio 5 de `03` conserva su material de prueba**, ahora congelado.
+
+### E20.4 · La fecha de corte de la UACAM no ha cambiado, y trae una entidad HTML
+
+```
+grep -io "fecha de corte[^<]*" fixtures/uacam__2026-10-01.html
+Fecha de corte:&nbsp;Diciembre del 2016
+```
+
+**Diciembre del 2016**, como en E10.1. Pero entre los dos puntos y la fecha no hay un espacio:
+hay `&nbsp;`, seis caracteres literales en el HTML crudo.
+
+**Requisito nuevo:** la búsqueda de fecha de corte debe correr sobre el **texto decodificado**,
+no sobre el HTML crudo. Un patrón como `Fecha de corte:\s*` no coincide con `&nbsp;`, y el
+criterio 4 de `03` fallaría sin que el índice haya cambiado. Es el fallo de C13 una capa más
+abajo: allí el riesgo era no leer la línea; aquí es leerla y no reconocerla.
+
+### E20.5 · Un conteo a ojo se cae y otro aguanta
+
+```
+grep -o 'href="[^"]*\.pdf[^"]*"' <archivo> | sort -u | wc -l
+unam-oag   84
+uacam      81
+unam-70i    0
+```
+
+- **UNAM-OAG: 84 enlaces únicos a PDF contra el «~60 instrumentos» de E3, un 40 % más.** Otra
+  confirmación de C23. **Salvedad:** el grep cuenta `href` únicos, no instrumentos. El índice
+  incluye legislación federal (E3.1), contratos colectivos (E3.2) y normativa de otras
+  universidades (E3.6), así que no todo enlace es un instrumento de la UNAM. La cifra comparable
+  con E3 sigue sin medirse.
+- **UACAM: 81 contra «~82» de E10.** Ese sí era bueno.
+- **El «27 propios» de la UACAM sigue sin medir, y no se puede medir con grep.** Separar su
+  normativa de la ajena exige leer los títulos, que es justo lo que pone a prueba el criterio 4
+  de `03`.
+
+### E20.6 · El criterio 9 de `03` está bloqueado sin remedio
+
+```
+ls fixtures/
+uacam__2026-10-01.headers
+uacam__2026-10-01.html
+uam-index.html
+ujat-15763.html
+ujat-16443.html
+ujat-17669.html
+ujat-33794.html
+ujat-4232.html
+unam-70i__2026-10-01.headers
+unam-70i__2026-10-01.html
+unam-oag__2026-10-01.headers
+unam-oag__2026-10-01.html
+```
+
+**Hay una sola captura de la UAM**, `uam-index.html`, sin fecha en el nombre. E9.3 daba por
+existentes dos capturas en fechas distintas —la de la consolidación anterior y la de julio de
+2026— y las llamaba «el activo de prueba más valioso del proyecto». **No existen**, y la
+consolidación anterior de la UAM ya no se puede capturar: es lo que la propia E9.3 advertía.
+
+El criterio 9 de `03` (estabilidad de `doc_slug` entre dos capturas del mismo índice; E9.3 lo
+numeraba 6) **no se puede verificar con la UAM**. La próxima consolidación permitirá una pareja
+nueva, pero no la que E9.3 describía. Se añade una nota fechada en E9.3 que remite aquí; su
+texto no cambia.
+
+---
+
 | Versión | Fecha | Cambio |
 |---|---|---|
 | v1 | — | Solo UAM y el fallo del 70-I de la UNAM. |
@@ -1958,3 +2088,4 @@ pasara por él. Ahora hay además un artículo abierto que pasa por el IdP y se 
 | **v13** | **2026-09-26** | **Una omisión pisó 47 filas (E17).** Una corrida de verificación del 26, sin red y sobre los mismos fixtures, dejó las 47 filas de la UAM en `descargas` con `bytes`, `content_type`, `http_status`, `url_final` y `puerta_usada` en NULL y `capturado_en` = 2026-09-26; el valor anterior no se conserva en la base. Causa: los scripts persistían el resultado de la omisión y el upsert sobrescribía la fila. **El daño empezó el 23** (el código de E16 ya pisaba) y el 26 lo repitió. Solo modo jurídico; la UJAT y las 7 académicas, intactas; cero alias, así que `duplicado_de` no se perdió. `documentos`, mismo daño, no se repara. **`content_type` es pérdida definitiva**; lo demás es recuperable (M35b, pendiente), y `capturado_en` solo como estimación. Arreglado en M35. **Nota fechada sobre E16:** «las tablas quedaron intactas» solo lo respaldan los recuentos, que siguen siendo correctos; E16 se conserva tal como se escribió. Ningún número de E14 ni de E16 cambia. |
 | **v14** | **2026-09-26** | **Reparación de las 47 filas (E18).** `scripts/reparar_omisiones.py` (M35b), en una transacción: 47 afectadas, 47 reparables, 0 intactas. `url_final` y `http_status` de `intentos`; `bytes` del tamaño del archivo con SHA-256 verificado; `puerta_usada = 0` comprobado contra el `orden` del intento. `capturado_en` es estimación (fecha de modificación): las 47 caen el 2026-09-18, de 13:57:31 a 13:58:14. `content_type` sigue en NULL: pérdida definitiva. Después: 0 filas con `bytes` en NULL; `descargas` 163 e `intentos` 168, sin cambios. Copia previa fuera del repo. **Anomalía abierta (E18.1):** 43 s entre el primer archivo y el último es menos que los 46 s mínimos de un rate limit de 1 s sobre 47 peticiones a un host; hay tres explicaciones y ninguna está medida, porque `rate_limit_s` no se registró en E14 y la fecha de un archivo no es la de su petición. Pendiente: registrar `rate_limit_s` y el host en el informe de las corridas futuras. |
 | **v15** | **2026-09-27** | **Corrida del Bloque B (E19): 8/30, más 1 omitido.** 30 encargos, 85 puertas, 27 hosts pedidos, `rate_limit_s` 1.0; 2 `sin_puertas`; 9 archivos nuevos. Primera idempotencia académica en campo (B.12). Control de Nature: la señal de E15.3 distingue muro de acceso abierto, pero sigue sin implementarse (E19.2). PMC sirve HTML en la ruta del PDF en 4 fichas (E19.3). Primer `robots_prohibido` en campo (E19.4). Un enlace muerto en un día (E19.5). M33 actuó 11 veces (E19.6). El reloj retrocede tres veces en el log (WSL, interpretación): cuarta hipótesis, no medida, para E18.1 (E19.7). Portales CRIS: 7 pedidos, 0 éxitos (E19.8). Primeros 3 vestíbulos cruzados con éxito (E19.9). 63 puertas pedidas, 0 `muro_de_pago`, 37 `http_error` (todos `403`); 75 puertas sin muro con el Bloque A (E19.10). 41 filas académicas para 37 encargos: los fallos con `sha256` NULL no se deduplican (M34); son las filas que inflaron una consulta con JOIN (E19.11). Un `robots.txt` que redirige a un login SAML con `200` se leyó como legible: toca D8 (E19.12). B.16 pasó por `idp.nature.com` y descargó: confirma la lectura de M32 (E19.13). **Fuente: logs en `~/respaldo-acervo/m37-*.log`, fuera del repo; fragmentos citados en E19.** Incluye además la nota de M36.2 en E18.1: el pendiente de registrar `rate_limit_s` y los hosts queda cubierto desde M36.1, con la salvedad de que el conteo no incluye los hosts de las redirecciones ni el del salto de vestíbulo. |
+| **v16** | **2026-10-01** | **Tres fixtures nuevas y lo que midieron (E20).** Capturas con `curl` y el UA del proyecto, bytes crudos y cabeceras, de UNAM-OAG, UACAM y el 70-I, con la convención `<inst>__<fecha>` de E9.2; las fixtures viejas de la UAM y la UJAT no llevan fecha y no se renombran porque los tests las nombran (E20.1). **Las tres sirven UTF-8: E6.14 cerrada**, 4 de 5 en UTF-8 y la UAM como única excepción; detectar la codificación sigue siendo requisito (E20.2). La rejilla del 70-I sigue vacía: un `<tr>`, un `<td>`, cero PDF en 763 líneas (E20.3). La fecha de corte de la UACAM sigue en diciembre de 2016 y trae `&nbsp;`: **requisito nuevo, buscarla sobre texto decodificado** (E20.4). UNAM-OAG: 84 enlaces únicos a PDF contra ~60 instrumentos, otra confirmación de C23 con la salvedad de que `href` no es instrumento; UACAM: 81 contra ~82; el «27 propios» sigue sin medir (E20.5). **El criterio 9 de `03` queda bloqueado:** solo hay una captura de la UAM, y la pareja que E9.3 daba por existente no existe; nota fechada en E9.3 (E20.6). |
