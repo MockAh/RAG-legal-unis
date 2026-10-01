@@ -1,0 +1,12 @@
+HTTP/2 200 
+expires: Thu, 19 Nov 1981 08:52:00 GMT
+cache-control: no-store, no-cache, must-revalidate
+pragma: no-cache
+set-cookie: tt=ew9ecw; path=/; domain=.uacam.mx; secure; HttpOnly
+set-cookie: mc_23=107290c93d3c332fa949c13c1caee0a9; path=/; domain=.uacam.mx; secure; HttpOnly; SameSite=Lax
+vary: Accept-Encoding
+cache-control: private, must-revalidate
+content-type: text/html; charset=UTF-8
+date: Thu, 01 Oct 2026 06:07:00 GMT
+server: Apache
+

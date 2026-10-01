@@ -1,0 +1,790 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+
+        <meta http-equiv = "Content-Type" content = "text/html; charset=UTF-8">
+
+        <link rel = "shortcut icon" href = "/assets/img/favicon.ico" />
+
+        <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Montserrat:400,700' type='text/css'>
+        <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.css" type="text/css">
+        <link rel="stylesheet" href="/assets/lightbox/css/lightbox.css" type="text/css">
+        <link rel="stylesheet" href="/assets/font-awesome/css/font-awesome.css" type = "text/css">
+        <link rel="stylesheet" href="/assets/DataTables/media/css/dataTables.bootstrap.css" type = "text/css">
+        <link rel="stylesheet" href="/assets/fullcalendar/fullcalendar.css" type = "text/css">
+        <link rel="stylesheet" href="/assets/css/selectize.css" type="text/css">
+        <link rel="stylesheet" href="/assets/css/owl.carousel.css" type="text/css">
+        <link rel="stylesheet" href="/assets/css/vanillabox/vanillabox.css" type="text/css">
+        <link rel="stylesheet" href="/assets/css/bootstrap-toggle.min.css" type="text/css">
+        <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+        <!-- Google Translate -->
+        <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+        <title> Universidad Aut&oacute;noma de Campeche | Unidad de Transparencia </title>
+
+        <style>
+            @font-face {
+                font-family: "SoberanaSans";
+                src: url('/assets/fonts/SoberanaSans-Regular.otf') format("opentype");
+            }
+
+            html, body {
+                font-family: "SoberanaSans";
+            }
+
+            .top-info li:hover,
+            .top-info li a:hover {
+                color: #000053;
+                cursor: pointer;
+            }
+
+            #brand {
+                height: auto;
+                float: none;
+            }
+
+            #brand a {
+                height: 100%;
+            }
+
+            .name-microsite {
+                padding-left: 2%;
+            }
+
+            .language {
+                display: inline-block;
+                line-height: 40px;
+                margin-right: 8px;
+            }
+
+            .language img {
+                width: 20px;
+            }
+            #goog-gt-tt, .goog-te-balloon-frame, div#goog-gt- {
+                display: none !important;
+            }
+
+            .goog-text-highlight {
+                background: none !important;
+                box-shadow: none !important;
+            }
+
+            .mb-0 { margin: 0 !important }
+            .alert-danger { background-color: #d9534f; border-color: #d9534f; color: white; }
+            .alert-warning { background-color: #FFCD00; border-color: #FFCD00; color: white; }
+        </style>
+
+        
+<meta name="csrf-token" content="ec860a1bcd685b5b59f4b422db7631716bcf8a2274d0893ca3becb272c7a776e">
+
+<script type="text/javascript" src="/assets/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="/assets/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/assets/DataTables/media/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="/assets/DataTables/media/js/dataTables.bootstrap.js"></script>
+<script type="text/javascript" src="/assets/js/selectize.min.js"></script>
+<script type="text/javascript" src="/assets/js/owl.carousel.min.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.placeholder.js"></script>
+<script type="text/javascript" src="/assets/js/icheck.min.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.vanillabox-0.1.5.min.js"></script>
+<script type="text/javascript" src="/assets/js/retina-1.1.0.min.js"></script>
+<script type="text/javascript" src="/assets/js/bootbox.min.js"></script>
+<script type="text/javascript" src="/assets/js/bootstrap-toggle.min.js"></script>
+<script type="text/javascript" src="/assets/fullcalendar/lib/moment.min.js"></script>
+<script type="text/javascript" src="/assets/fullcalendar/fullcalendar.js"></script>
+
+<script type="text/javascript">
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            var token = $('meta[name="csrf-token"]').attr('content');
+            var method = settings.type || settings.method || 'GET';
+
+            if (token && method.toUpperCase() !== 'GET') {
+                xhr.setRequestHeader('X-CSRF-Token', token);
+            }
+        }
+    });
+</script>
+
+		<script type="text/javascript" src="/assets/fullcalendar/locale/es.js"></script>
+		<script>
+    var _days = "Dias";
+    var _hours = "Horas";
+    var _minutes = "Minutos";
+    var _seconds = "Segundos";
+    var _messageAfterCount = 'The course has Started!';
+
+    var $ = jQuery.noConflict();
+
+    $(document).ready(function($) {
+        "use strict";
+
+        if ( location.hash ) {
+            window.scrollTo(0, 0);
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 1);
+        }
+
+        //  Homepage Slider (Flex Slider)
+        if ( $('.flexslider').length > 0 ) {
+            $('.flexslider').flexslider({
+                controlNav: false,
+                prevText: "",
+                nextText: ""
+            });
+        }
+
+        //  Center Slide Vertically
+        $('.flexslider').each(function () {
+            var slideHeight = $(this).height();
+            var contentHeight = $('.flexslider .slides li .slide-wrapper').height();
+            var padTop = (slideHeight / 2) - (contentHeight / 2);
+            $('.flexslider .slides li .slide-wrapper').css('padding-top', padTop);
+        });
+
+        //  Slider height on small screens
+        if (document.documentElement.clientWidth < 991) {
+            $('#landing-page-head-image').css('height', $(window).height());
+            $('.flexslider').css('height', $(window).height());
+        }
+
+        //  Homepage Carousel
+        $(".image-carousel").owlCarousel({
+            items: 1,
+            autoPlay: true,
+            stopOnHover: true,
+            navigation: true,
+            navigationText : false,
+            responsiveBaseWidth: ".owl-demo"
+        });
+
+        //  efecto carousel en vista principal, galerias
+        $(".author-carousel").owlCarousel({
+            items: 1,
+            autoPlay: true,
+            stopOnHover: true,
+            responsiveBaseWidth: ".owl-demo"
+        });
+
+        //  Equal Rows
+        $( document.body ).on( 'click', '.dropdown-menu li', function( event ) {
+            var $target = $( event.currentTarget );
+            $target.closest( '.btn-group' )
+              .find( '[data-bind="label"]' ).text( $target.text() )
+              .end()
+              .children( '.dropdown-toggle' ).dropdown( 'toggle' );
+
+            return false;
+        });
+
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    var CustomDataTable = {
+        language : {
+            "sProcessing" : "Espere...",
+            "sLengthMenu" : "_MENU_ Registros por página",
+            "sZeroRecords" : "No se encontraron resultados",
+            "sEmptyTable" : "Ningún dato disponible en esta tabla",
+            "sInfo" : "Mostrando registros _START_ - _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty" : "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered" : "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix" : "",
+            "sSearch" : "Buscar:",
+            "sUrl" : "",
+            "sInfoThousands" : ",",
+            "sLoadingRecords" : "Cargando...",
+            "oPaginate" : {
+                "sFirst" : "Primero",
+                "sLast" : "Último",
+                "sNext" : "Siguiente",
+                "sPrevious" : "Anterior"
+            },
+            "oAria" : {
+                "sSortAscending" : ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending" : ": Activar para ordenar la columna de manera descendente"
+            }
+        },
+        applyCustomStyleTo : function( selector, customOptions ) {
+            var options = {
+                "bFilter" : true,
+                "bSearchable" : true,
+                "destroy": true,
+                "responsive": true,
+                "language" : CustomDataTable.language,
+                "dom" : 'f<"custom-table"t><"custom-table-bottom filtrosPag pagiNation"rlp><"clear">'
+            };
+
+            var mergedOptions = options;
+
+            if ( customOptions ) {
+                mergedOptions = $.extend(options, customOptions);
+            }
+
+            return $(selector).DataTable(mergedOptions);
+        }
+    };
+
+    // Remove button function for "join to course" button after count down is over
+
+    function disableJoin() {
+        // Find "join to course" button
+        var buttonToBeRemoved = document.getElementById("btn-course-join");
+        // Find "join to course" button on bottom of course detail
+        var buttonToBeRemovedBottom = document.getElementById("btn-course-join-bottom");
+        // Remove button
+        buttonToBeRemoved.remove();
+        // Remove button on the bottom
+        buttonToBeRemovedBottom.remove();
+        // Give the ".course-count-down" element new class to hide date
+        document.getElementById("course-count-down").className += " disable-join";
+        document.getElementById("course-start").className += " disable-join";
+    }
+
+    function showAlert( alertClass, selector, message, style ) {
+        div = '<div class="text-center alert alert-' + alertClass + '" role="alert" style = "' + style + '">' + message + '</div>';
+
+        $(selector).empty();
+
+        $(selector).append(div);
+
+        $(selector).find(".alert").fadeOut(8000, function() {
+            $(this).remove();
+        });
+    }
+
+    function vacio( selector, selectorMessage, name ) {
+        valor = $.trim($(selector).val());
+
+        if ( valor == "" ) {
+            showAlert("danger", selectorMessage, name, "");
+            $(selector).parent().removeClass('has-success').addClass("has-error");
+            $(selector).focus();
+            return true;
+        }
+
+        $(selector).parent().removeClass("has-error").addClass("has-success");
+
+        return false;
+    }
+
+    function correoValido( selector, selectorMessage ) {
+        var expresion = new RegExp(/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/);
+
+        valido = expresion.test($(selector).val());
+
+        if (valido) {
+            $(selector).parent().removeClass("has-error").addClass("has-success");
+        } else {
+            $(selector).parent().removeClass("has-success").addClass("has-error");
+            showAlert("danger", selectorMessage, "Debe ingresar un correo válido.", "");
+            $(selector).focus();
+        }
+
+        return valido;
+    }
+
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'es',
+            includedLanguages: 'en,fr',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            gaTrack: true
+        }, 'google_translate_element');
+    }
+</script>
+    </head>
+
+    <body class="page-sub-page page-microsite">
+        <!-- Wrapper -->
+        <div class="wrapper">
+            <!-- Header -->
+            <div class="navigation-wrapper">
+                
+                <div class="branding">
+                    <div class="container">
+                        <div class="navbar-brand nav" id="brand"  >
+                            <div style = "display: inline-block; vertical-align: middle; width: 45%;">
+                                <a href="https://uacam.mx/" class="return-landing">
+                                    <img class="img-logo" src="/assets/img/evoluciona_1.png" width = "120px" style = "min-width: 120px" />
+                                </a>
+                            </div>
+
+                            <div style = "display: inline-block; text-align: right; vertical-align: middle; width: 45%;">
+                                <a href = '/' style = "">
+                                                                            <img class="img-logo" src = "/view/view_image?imagen=logo_micrositio.png&tipo=logo" alt="brand" width = "70px" style = "min-width: 50px" />
+                                        
+                                    <span class="name-microsite"  >
+                                        <label class="title-microsite" style = "cursor: pointer">
+                                            Unidad de Transparencia                                        </label>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="primary-navigation-wrapper">
+                    <header class="navbar" id="top" role="banner">
+                        <div class="col-lg-10 col-lg-offset-1 col-md-12">
+                            <div class="navbar-header">
+                                <button class="navbar-toggle" type="button" data-toggle="collapse"
+                                    data-target=".bs-navbar-collapse">
+                                    <span class="sr-only">Toggle navigation</span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </button>
+                            </div>
+
+                            <nav class="collapse navbar-collapse bs-navbar-collapse navbar-left" role="navigation">
+                                            <ul class="nav navbar-nav level-0">
+                <li>
+                    <a href="http://transparencia.uacam.mx/"  class = "has-child no-link" >
+                        Conocenos                    </a>
+                        <ul class="list-unstyled child-navigation level-1">
+                    <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/42"  >
+                    Misión                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/43"  >
+                    Visión                </a>
+                            </li>
+                </ul>
+                    </li>
+            </ul>
+                        <ul class="nav navbar-nav level-0">
+                <li>
+                    <a href="#"  class = "has-child no-link" >
+                        Solicitud de Información                    </a>
+                        <ul class="list-unstyled child-navigation level-1">
+                    <li>
+                <a href="https://www.plataformadetransparencia.org.mx/"  >
+                    Persona Física y Moral                </a>
+                            </li>
+                        <li>
+                <a href="http://etzna.uacam.mx/aiuac.nsf/Respuestasview/"  >
+                    Solicitudes Resueltas                </a>
+                            </li>
+                </ul>
+                    </li>
+            </ul>
+                        <ul class="nav navbar-nav level-0">
+                <li>
+                    <a href="#"  class = "has-child no-link" >
+                        Histórico                    </a>
+                        <ul class="list-unstyled child-navigation level-1">
+                    <li>
+                <a href="#"  class = "has-child no-link" >
+                    Ley de Transparencia antes de la Reforma 2016                </a>
+                    <ul class="list-unstyled child-navigation level-2">
+                    <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/2"  >
+                    I Estructura Orgánica                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/3"  >
+                    II. Los Tabuladores de Puestos                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/4"  >
+                    III. Los motivos y fundamentos de Permisos                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/5"  >
+                    IV. Los Calendarios y Programas de Adquisiciones y Convocatorias a Concurso                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/6"  >
+                    V. Las Obras por Administración Directa                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/7"  >
+                    VI. Los Resultados de las Auditorias Concluidas                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/8"  >
+                    VII. Los Presupuestos de Egresos aprobados y Programas a su cargo                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/9"  >
+                    VIII. Los Servicios y Programas de Apoyo que ofrecen                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/10"  >
+                    IX. Los Dictámenes sobre iniciativas que se presenten en el Congreso del Estado                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/11"  >
+                    X. Las Disposiciones Legales                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/12"  >
+                    XI. La Relación de los Procedimientos Contenciosos                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/13"  >
+                    XII. El Costo de los Servicios que proporcione                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/13"  >
+                    XII. El Costo de los Servicios que proporcione                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/14"  >
+                    XIII. Los Informes de los Partidos y Agrupaciones políticas                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/15"  >
+                    XIV. Los encargados de tramitar y resolver las Solicitudes de Información                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/16"  >
+                    XVI. Las Recomendaciones que emita la CDHEC                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/17"  >
+                    XVI. Las Recomendaciones que emita la CDHEC                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/18"  >
+                    XVII. Los Contratos                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/19"  >
+                    XVIII. Los estados Financieros del Estado y de los Municipios y la situación de sus respectivas deudas públicas                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/20"  >
+                    XIX.La información completa y actualizada de los indicadores de gestión establecidos                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/21"  >
+                    XX.Los montos y las personas u organismos a quines entreguen por cualquier concepto recursos públicos                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/22"  >
+                    XXI. El presupuesto ejercido por cada año y los programas y acciones alcanzados                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/23"  >
+                    XXII. Las solicitudes de información recibidas y las respuestas dadas a la misma                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/24"  >
+                    XXIII.Cualquier otra información que sea de utilidad                </a>
+                            </li>
+                </ul>
+                </li>
+                </ul>
+                    </li>
+            </ul>
+                        <ul class="nav navbar-nav level-0">
+                <li>
+                    <a href="#"  class = "has-child no-link" >
+                        Ley de Transparencia Reforma 2016                    </a>
+                        <ul class="list-unstyled child-navigation level-1">
+                    <li>
+                <a href="https://transparencia.uacam.mx/view/paginas/49#"  >
+                    Obligaciones de Transparencia Comunes                </a>
+                            </li>
+                        <li>
+                <a href="#"  class = "has-child no-link" >
+                    Obligaciones Especificas                </a>
+                    <ul class="list-unstyled child-navigation level-2">
+                    <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/99"  >
+                    I. Los planes y programas de estudio según el sistema que ofrecen                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/100"  >
+                    II. Toda la información relacionada con sus procedimientos administrativos                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/101"  >
+                    III. La remuneración de los profesores                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/102"  >
+                    IV. La lista con los profesores con licencia o en año sabático                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/103"  >
+                    V. El listado de las becas y apoyos que otorgan                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/104"  >
+                    VI. Las convocatorias de los concursos de oposición                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/105"  >
+                    VII. La información relativa a los procesos de selección de los consejos                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/106"  >
+                    VIII. Resultado de las evaluaciones del cuerpo docente                </a>
+                            </li>
+                        <li>
+                <a href="http://transparencia.uacam.mx/view/paginas/107"  >
+                    IX. El listado de instituciones incorporadas y requisitos de incorporación                </a>
+                            </li>
+                </ul>
+                </li>
+                </ul>
+                    </li>
+            </ul>
+                        <ul class="nav navbar-nav level-0">
+                <li>
+                    <a href="https://drive.google.com/file/d/1tPqmiMK9NdaWDUBdXA9MQ75pybSf_s1U/view?usp=sharing"  >
+                        Formato ARCO                    </a>
+                                    </li>
+            </ul>
+                        <ul class="nav navbar-nav level-0">
+                <li>
+                    <a href="#"  class = "has-child no-link" >
+                        Normativa                    </a>
+                        <ul class="list-unstyled child-navigation level-1">
+                    <li>
+                <a href="https://drive.google.com/file/d/1e8WoNMjWX7qwIxpZIVYkHQGcXBarfzVK/view?usp=sharing"  >
+                    Ley de Transparencia                </a>
+                            </li>
+                        <li>
+                <a href="http://etzna.uacam.mx/transparencia/X/Lineamientos%20de%20Transparencia%20UAC.pdf"  >
+                    Lineamientos de Transparencia UAC                </a>
+                            </li>
+                        <li>
+                <a href="https://drive.google.com/file/d/1MP4dy38-hr1K5iVhsgBTovp2_RKsjbAl/view?usp=sharing"  >
+                    Ley de Protección de Datos Personales                </a>
+                            </li>
+                        <li>
+                <a href="https://drive.google.com/file/d/1Co0Xhrw-Q4ebJ_MYV-xYubHAocXdF629/view?usp=sharing"  >
+                    Lineamientos de Protección de Datos Personales UAC                </a>
+                            </li>
+                </ul>
+                    </li>
+            </ul>
+            
+                                <ul class="nav navbar-nav">
+                                    <ul style = "text-decoration: none; list-style: none; padding: 0">
+                                                                                    <li class = "language">
+                                                <a href = "/login">
+                                                    <i class = "fa fa-lg fa-lock" data-toggle = "tooltip"
+                                                        data-placement = "top" data-title = "Iniciar Sesión"></i>
+                                                </a>
+                                            </li>
+                                                                                </ul>
+                                </ul>
+
+                                <div class="search">
+                                    <form method = "GET" action = "/view/search">
+                                        <div class="input-group">
+                                            <input type="search" class="form-control" name="search" placeholder="Búsqueda" style = "margin-top: 4px" />
+                                            <span class="input-group-btn">
+                                                <button type="submit" id="search-submit" class="btn" style = "color: white">
+                                                    <i class="fa fa-search"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </nav>
+                            <div><ul style = "text-decoration: none; list-style: none; padding: 0"><li><div id="google_translate_element" class="google" style="float: right; padding-top: 5px"></li></ul></div>
+                                                            <div class="social">
+                                    <div class="icons">
+                                        <a href="http://www.facebook.com/"
+                                            target = "_blank"><i class="fa fa-facebook social-facebook"></i>
+                                        </a>
+                                        <a href="X8fieWinZLA"
+                                            target = "_blank"><i class="fa fa-youtube-play social-youtube"></i>
+                                        </a>
+                                        <a href="#"
+                                            target = "_blank"><i class="fa fa-instagram social-instagram"></i>
+                                        </a>
+                                        <a href="http://www.twitter.com/"
+                                            target = "_blank"><svg class="fa-x-twitter" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>
+                                        </a>
+                                    </div><!-- /.icons -->
+                                </div>
+                                                        </div><!-- /.container -->
+                    </header><!-- /.navbar -->
+                </div><!-- /.primary-navigation -->
+
+            </div>
+            <!-- end Header -->
+
+            <!-- Content -->
+            <div id="page-content">
+
+<style>
+	
+	.social-button-container {
+		display: inline-block;
+		vertical-align: middle;
+		width: 55px;
+	}
+
+	.fa-twitter-square {
+		color: #337ab7 !important;
+	}
+
+	.fa-google-plus-square {
+		color: #B20000 !important;
+	}
+
+	.fa-linkedin-square {
+		color: #0177B5 !important;
+	}
+
+	.fa-facebook-square {
+		color: #000053 !important;
+	}
+
+</style>
+
+<div class = "container" style = "margin-top: 3%">
+	<div class = "panel panel-default">
+		<div class = "panel-heading text-center">
+			<h3 class = "text-uppercase"> 
+				X. Disposiciones legales 
+			</h3>
+		</div>
+
+		<div class = "panel-body" style = "padding: 10px 24px;">
+							<div class = "content_redactor">
+					<p><strong>a. Disposiciones constitucionales, tanto federal como locales.</strong></p><blockquote><a href="http://etzna.uacam.mx/transparencia/X/a/constitucion%2029012016.pdf">a.1&nbsp;Constitución Política de los Estados Unidos Mexicanos</a> <br><a href="http://etzna.uacam.mx/transparencia/X/a/constitucion_politica_campeche%20oct-15.pdf">a.2&nbsp;Constitución Política del Estado de Campeche</a> <br><a href="http://etzna.uacam.mx/transparencia/X/a/constitucion_politica_campeche_especial.pdf">a.3 Constitución Política del Estado de Campeche Edición Especial</a><br></blockquote><p><strong><br></strong></p><p><strong>b. La Ley o Leyes que rigen su actuación.</strong></p><blockquote><a href="http://etzna.uacam.mx/transparencia/X/b/ley%20general%20de%20Educacion.pdf">b.1&nbsp;Ley General de Educación</a> <br><a href="http://etzna.uacam.mx/transparencia/X/b/ley_de_educacion_del_estado_de_campeche%20vigente.pdf">b.2 Ley Estatal de Educación</a> <br><a href="http://etzna.uacam.mx/transparencia/X/3%20Ley%20Constitutiva%20b.pdf">b.3 Ley Constitutiva<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/4%20Ley%20Organica%20b.pdf">b.4 Ley Orgánica<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/b/Ley-de-Transparencia-y-Acceso-a-la-Informacion-Publica-del-Estado-de-Campeche%20vigente%20agosto%2015.pdf">b.5 Ley de Transparencia&nbsp;y Acceso a la información Pública del Estado de Campeche</a> &nbsp;<br><a href="http://etzna.uacam.mx/transparencia/X/b/Ley-de-Proteccion-de-Datos-Personales-del-Estado-de-Campeche-y-sus-Municipios%20vigente%202015.pdf">b.6 Ley de Protección de datos Personales</a> &nbsp;<br><a href="http://etzna.uacam.mx/transparencia/X/b/Ley%20General%20de%20Transparencia%20y%20Acceso%20a%20la%20Informacion%20Publica.pdf">b.7 Ley General de Transparencia y Acceso a la Información Pública.</a> <br><a href="http://etzna.uacam.mx/transparencia/X/b/ley_de_archivos_del_estado_de_campeche.pdf">b.8 Ley de Archivos del Estado de Campeche.</a><br><a href="http://etzna.uacam.mx/transparencia/X/b/LineamientosGenerales.pdf">b.9 Lineamientos Generales de Archivos</a></blockquote><p><strong><br></strong></p><p><strong>c. Los reglamentos, manuales, instructivos, etc.</strong></p><blockquote><a href="http://etzna.uacam.mx/transparencia/X/01%20Reglamento%20del%20Consejo%20Universitario%20c.pdf">c.1 Reglamento del Consejo Universitario<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/02%20Reglamento%20de%20Consejos%20Tecnicos%20c.pdf">c.2 Reglamento de Consejos Técnicos<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/03%20Reglamento%20del%20Tribunal%20de%20Honor%20c.pdf">c.3 Reglamento del Tribunal de Honor<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/04%20Reglamento%20de%20Planeacion%20c.pdf">c.4 Reglamento de Planeación<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/05%20Reglamento%20de%20Extension%20y%20Vinculacion%20Social%20Universitaria%20c.pdf">c.5 Reglamento de Vinculación y Extensión Social Universitaria<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/06%20Reglamento%20de%20Viaticos%20c.pdf">c.6 Reglamento de Víaticos<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/07%20Reglamento%20de%20Baja%20y%20Destino%20Final%20de%20Bienes%20Muebles%20c.pdf">c.7 Reglamento de Baja y Destino Final de Bienes Muebles<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/08%20Reglamento%20de%20Entrega%20Recepcion%20c.pdf">c.8 Reglamento de Entrega Recepción<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/09%20Reglamento%20de%20Incorporacion%20c.pdf">c.9 Reglamento de Incorporación<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/10%20Reglamento%20de%20la%20Politica%20Editorial%20y%20de%20Publicaciones%20c.pdf">c.10 Reglamento de la Política Editorial y de Publicaciones<br></a><a href="http://etzna.uacam.mx/transparencia/X/Reglamento%20General%20de%20los%20Alumnos%20de%20la%20UAC.pdf">c.11 Reglamento General de los Alumnos de la Universidad Autónoma de Campeche</a> <br><a href="http://etzna.uacam.mx/transparencia/X/c/MANUAL%20INTEGRACION%20Y%20FUNCIONAMIENTO%20MISMAS%20DE%20LA%20UAC.pdf">c.12&nbsp;Manual Para La Integración y&nbsp;Funcionamiento del&nbsp;Comité De Adquisiciones, Arrendamientos y&nbsp;Servicios Relacionados con las Mismas de la Uac.</a> <br><a href="http://etzna.uacam.mx/transparencia/X/c/MANUAL%20PARA%20LA%20INTEGRACION%20Y%20FUNCIONAMIENTO%20MISMAS%20DE%20LA%20UAC.pdf">c.13&nbsp;Manual para la Integración y&nbsp;Funcionamiento del Comité de Obras y Servicios&nbsp;Relacionados con las Mismas de la Uac.</a> <br><a href="http://etzna.uacam.mx/transparencia/X/c/Reglasde%20Operacion%20de%20la%20Comision%20de%20Vigilancia.pdf">c.14&nbsp;Reglas de Operación de la Comisión de Vigilancia del Fondo de Prestaciones Sociales</a></blockquote><p><strong><br></strong></p><p><strong>d. Circulares administrativas</strong></p><blockquote><a href="http://etzna.uacam.mx/transparencia/X/d/circulares%202012.pdf">d.1&nbsp;Circulares administrativas del 2012</a><p><a href="http://etzna.uacam.mx/transparencia/X/d/circulares%20administrativas%202013.PDF">d.2 Circulares administrativas 2013</a> <br><a href="http://etzna.uacam.mx/transparencia/X/d/circulares%20administrativas%202014.pdf" style="background-color: initial;">d.3 Circulares administrativas 2014</a> <br><a href="http://etzna.uacam.mx/transparencia/X/d/circulares%20administrativas%202015.pdf">d.4 Circulares administrativas 2015</a></p></blockquote><p><strong><br></strong></p><p><strong>e. Formatos que emplee en todos los trámites o servicios que preste.</strong></p><blockquote><a href="http://etzna.uacam.mx/transparencia/X/Correccion%20de%20Datos%20Personales%20e.pdf">e.1&nbsp;Corrección de Datos Personales<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/Formatos%20Facultad%20de%20Humanidades%20e.pdf">e.2&nbsp;Formatos Facultad de Humanidades<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/Recurso%20de%20Revision%20e.pdf">e.3&nbsp;Recurso de Revisión<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Acceso%20a%20la%20Informacion%20e.pdf">e.4&nbsp;Solicitud de Acceso a la Información<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Analisis%20Clinicos%20e.pdf">e.5&nbsp;Solicitud de Análisis Clínicos<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Servicio%20de%20la%20Sala%20Guillermo%20Gonzalez%20Galera%20e.pdf">e.6&nbsp;Solicitud de Servicio de la Sala Guillermo González Galera<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Servicio%20de%20la%20Sala%20Justo%20Sierra%20Mendez%20e.pdf">e.7&nbsp;Solicitud de Servicio de la Sala Justo Sierra Méndez<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Servicio%20de%20Sonorizacion%20e.pdf">e.8&nbsp;Solicitud de Servicio de Sonorización<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Servicio%20de%20Textos%20y%20Logotipos%20e.pdf">e.9&nbsp;Solicitud de Servicio de Textos y Logotipos<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Servicio%20del%20Aula%20Magna%20e.pdf">e.10&nbsp;Solicitud de Servicio del Aula Magna</a></blockquote><p><strong><br></strong></p><p><strong>f. Convenios, contratos, acuerdos de coordinación o apoyo, etc.</strong></p><blockquote>f 1 Contrato de Prestación de servicios Laboratorio de ensaye</blockquote><blockquote><blockquote><blockquote><p><a href="http://etzna.uacam.mx/transparencia/IV-c/Contrato%20de%20prestacion%20de%20servicios%20laboratorio%20de%20ensaye%20c.3.pdf">Ejercicio 2010</a></p></blockquote></blockquote><blockquote><blockquote><p><a href="http://etzna.uacam.mx/transparencia/IV-c/Contrato%20de%20prestacion%20de%20servicios%20LEM%20(2011).pdf">Ejercicio 2011</a> </p><p>A la presente fecha no se han realizado contratos con el laboratorio de ensayes.</p></blockquote></blockquote></blockquote><blockquote>f.2 Contratos de Prestación de servicios<br>
+</blockquote><blockquote><blockquote style="margin-left: 1px;"><blockquote style="margin-left: 1px;"><p><a href="http://etzna.uacam.mx/transparencia/IV-c/Contratos%20de%20prestacion%20de%20servicios%20c.3.pdf">Ejercicio 2010</a></p></blockquote></blockquote><blockquote style="margin-left: 1px;"><blockquote style="margin-left: 1px;"><p><a href="http://etzna.uacam.mx/transparencia/IV-c/Contrato%20de%20prestacion%20de%20servicios%20(2011).pdf">Ejercicio 2011</a></p></blockquote></blockquote><blockquote style="margin-left: 1px;"><blockquote style="margin-left: 1px;"><p><a href="http://etzna.uacam.mx/transparencia/IV-c/Contrato%20de%20prestacion%20de%20servicios%20(2012).pdf">Ejercicio 2012</a></p></blockquote></blockquote><blockquote style="margin-left: 1px;"><blockquote style="margin-left: 1px;"><p><a href="http://etzna.uacam.mx/transparencia/IV-c/contratos%20de%20prestacion%20de%20servicios%202013.pdf">Ejercicio 2013</a> </p><p><a href="http://etzna.uacam.mx/transparencia/IV-c/contratos%20de%20prestacion%20de%20servicios%202014.pdf">Ejercicio 2014</a> </p><p><a href="http://etzna.uacam.mx/transparencia/IV-c/CONTRATOS%202015%20(1).pdf">Ejercicio 2015</a></p></blockquote></blockquote></blockquote><blockquote>f.3 Contratos Interinstitucionales<br>
+</blockquote><blockquote><blockquote style="margin-left: 1px;"><p style="margin-left: 20px;"><a href="http://etzna.uacam.mx/transparencia/IV-c/Contratos%20Interinstitucionales%20c.2.pdf">Ejercicio 2010</a></p></blockquote><blockquote style="margin-left: 1px;"><p style="margin-left: 20px;"><a href="http://etzna.uacam.mx/transparencia/IV-c/Contratos%20Interinstitucionales%20(2011)%20ANEXO%202.pdf">Ejercicio 2011</a></p></blockquote><blockquote style="margin-left: 1px;"><p style="margin-left: 20px;"><a href="http://etzna.uacam.mx/transparencia/IV-c/ContratosInterinstitucionales(2012).pdf">Ejercicio 2012</a></p></blockquote><blockquote style="margin-left: 1px;"><p style="margin-left: 20px;"><a href="http://etzna.uacam.mx/transparencia/IV-c/Contratos%20Interinstitucionales%20(2013).pdf">Ejercicio 2013<span rel="pastemarkerend" id="pastemarkerend41994"></span></a> &nbsp;</p><p style="margin-left: 20px;"><a href="http://etzna.uacam.mx/transparencia/X/f/Contratos%20Interinstitucionales%20(2014).pdf">Ejercicio 2014</a> </p><p style="margin-left: 20px;"><a href="http://etzna.uacam.mx/transparencia/X/f/CONTRATOS-INTERINSTITUCIONAL-2015%20(2).pdf">Ejercicios 2015</a></p></blockquote></blockquote><blockquote style="margin-left: 41px;">f.4. Convenios Beca PROMEP<br>
+&nbsp;<a href="http://etzna.uacam.mx/transparencia/X/f/Convenios Becas PROMEP (2010).pdf">Ejercicio 2010</a> <br><a href="http://etzna.uacam.mx/transparencia/X/f/Convenios Beca PROMEP (2011).pdf">Ejercicio 2011</a> <br><a href="http://etzna.uacam.mx/transparencia/X/f/Convenios Beca PROMEP (2012).pdf">Ejercicio 2012</a> <br><a href="http://etzna.uacam.mx/transparencia/X/f/Convenios Beca PROMEP (2013).pdf">Ejercicio 2013</a> &nbsp;<br><a href="http://etzna.uacam.mx/transparencia/X/f/Convenios%20Beca%20PROMEP%20(2014).pdf">Ejercicio 2014</a> <br><a href="http://etzna.uacam.mx/transparencia/X/f/CONVENIO-BECA-PROMEP-2015.pdf">Ejercicio 2015</a><br><a href="http://etzna.uacam.mx/transparencia/X/f/Contratos%20Interinstitucionales%20(2014).pdf"></a><br></blockquote><blockquote style="margin-left: 41px;">f.5 Convenios Becas<br>
+<a href="http://etzna.uacam.mx/transparencia/X/f/Convenios Becas (2010).pdf">ejercicio 2010</a> <br>
+<a href="http://etzna.uacam.mx/transparencia/X/f/Convenios Beca (2011).pdf">ejercicio 2011</a> <br>
+<a href="http://etzna.uacam.mx/transparencia/X/f/Convenios Beca (2012).pdf">ejercicio 2012</a> <br>
+<a href="http://etzna.uacam.mx/transparencia/X/f/Convenios Beca (2013).pdf">ejercicio 2013&nbsp;</a> <br><a href="http://etzna.uacam.mx/transparencia/X/f/Convenios%20Beca%20(2014).pdf">Ejercicio 2014</a> <br><a href="http://etzna.uacam.mx/transparencia/X/f/CONVENIO-BECA-2015%20(1).pdf">Ejercicio 2015</a><br>
+</blockquote><blockquote style="margin-left: 41px;">f.6. Convenios Institucionales<br><a href="http://etzna.uacam.mx/transparencia/X/f/Convenios Institucionales (2011).pdf">Ejercicio 2011</a> <br><a href="http://etzna.uacam.mx/transparencia/X/f/Convenios%20Institucionales%20(2012).pdf">Ejercicio 2012</a><br><a href="http://etzna.uacam.mx/transparencia/X/f/Convenios Institucionales (2013).pdf">Ejercicio 2013</a> <br><a href="http://etzna.uacam.mx/transparencia/X/f/CONVENIOS%20INSTITUCIONALE%202014.pdf">Ejercicio 2014</a> <br><a href="http://etzna.uacam.mx/transparencia/X/f/CONVENIOS-INTERINSTITUCIONALES-2015%20(2).pdf">Ejercicio 2015</a><br>
+</blockquote><p><strong>g. Lineamientos o recomendaciones de carácter general emitidos.</strong></p><blockquote><a href="http://etzna.uacam.mx/transparencia/X/Lineamiento%20para%20la%20revision%20de%20supervivencia%20g.pdf">g.1&nbsp;Lineamiento para la revisión de&nbsp;supervivencia<br>
+</a><a href="http://etzna.uacam.mx/transparencia/X/Lineamientos%20de%20Transparencia%20UAC.pdf">g.2&nbsp;Lineamientos generales en materia&nbsp;de Transparencia y Acceso a la Información Pública de la UACAM</a> <br><a href="http://etzna.uacam.mx/transparencia/X/g/Lineamientos%20de%20datos%20personales%20UAC.pdf">g.3&nbsp;Lineamientos para la protección de datos personales de la UACAM</a> <br><a href="http://etzna.uacam.mx/transparencia/X/g/LINEAMIENTOS-APOYO-ENTES-PUBLICOS-PUBLICAR-LA-INFORMACION-A-QUE-SE-REFIERE-EL-ARTICULO-5-DE-LA-LEY.pdf">g.4 Lineamientos de apoyo para que los Entes Públicos den cumplimiento a la Obligación de Publicar la Información a que se refiere el Articulo 5 de la Ley.</a> <br><a href="http://etzna.uacam.mx/transparencia/X/g/LINEAMIENTOSDEOBRAUAC.pdf">g.5&nbsp;Lineamientos en Materia de Obra Pública y &nbsp;Servicios Relacionados con las mismas de la Universidad Autónoma de Campeche</a> <br><a href="http://etzna.uacam.mx/transparencia/X/g/LINEAMIENTOS%20DE%20ADQUISICIONESUAC.pdf">g.6&nbsp;Lineamientos en Materia de Adquisiciones,&nbsp;Arrendamientos y Servicios Relacionados con Bienes Muebles de la Universidad&nbsp;Autónoma de Campeche.</a><br></blockquote><p><strong><br></strong></p><p><strong>h. Cualquier otra disposición normativa de carácter general y obligatorio.</strong></p><blockquote><a href="http://etzna.uacam.mx/transparencia/X/h/acuerdo%20001.PDF">h.1&nbsp;Acuerdo de Reserva 01-2010<br></a><a href="http://etzna.uacam.mx/transparencia/X/h/ACUERDO%20002.pdf">h.2&nbsp;Acuerdo de Reserva 02-2010</a> &nbsp;<br><a href="http://etzna.uacam.mx/transparencia/X/h/acuerdo%20de%20reserva%2001-2013.pdf">h.3 Acerdo de Reserva 01-2013</a> <br><a href="http://etzna.uacam.mx/transparencia/X/h/Acuerdo%20Lineamientos%20proceso%20electoral.pdf">h.4&nbsp;Acuerdo Lineamientos proceso electoral&nbsp;</a><br><p><a href="http://etzna.uacam.mx/transparencia/X/h/Lineamientos%20proceso%20electoral%20consejo%20universitario.pdf">h.5&nbsp;Lineamientos proceso electoral consejo universitario</a> <br><a href="http://etzna.uacam.mx/transparencia/X/h/Acuerdo%20Consejo%20Universitario%20con%20respecto%20a%20la%20Veda%20Electoral.pdf">h.6&nbsp;Acuerdo que establece la prohibición de realizar actos&nbsp;distintos a los académicos durante el proceso electoral Ordinario 2014-2015 en la Universidad Autónoma de Campeche</a></p><p>Fecha de corte:&nbsp;Diciembre del 2016</p></blockquote>				</div>
+						</div>
+
+	</div>
+	
+	</div>
+
+<script>
+	
+	$(document).ready(function() {
+		
+		function windowPopup( url, width, height ) {
+		  	var left = (screen.width / 2) - (width / 2),
+		      top = (screen.height / 2) - (height / 2);
+
+		  	window.open(
+		    	url,
+		    	"",
+		    	"menubar=no, toolbar=no, resizable=yes, scrollbars=yes, width=" + 
+		    	width + ", height=" + height + ", top=" + top + ", left=" + left
+		  	);
+		}
+
+		$(".social-button-container a").on("click", function( event ) {
+			event.preventDefault();
+			windowPopup($(this).attr("href"), 600, 400);
+		});
+
+	});
+
+</script>
+            </div>
+            <!-- end Content -->
+
+            <!-- Footer -->
+            <footer id="page-footer">
+                <section id="footer-top">
+                    <div class="container">
+                        <div class="footer-inner">
+                            <div class="footer-social">
+                                                                    <figure>Síguenos:</figure>
+
+                                    <div class="icons">
+                                        <a href="http://www.facebook.com/">
+                                            <i class="fa fa-facebook social-facebook"></i>
+                                        </a>
+                                        <a href="X8fieWinZLA">
+                                            <i class="fa fa-youtube-play social-youtube"></i>
+                                        </a>
+                                        <a href="#"
+                                           target = "_blank"><i class="fa fa-instagram social-instagram"></i>
+                                        </a>
+                                        <a href="http://www.twitter.com/"
+                                           target = "_blank"><svg class="fa-x-twitter" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>
+                                        </a>
+                                    </div>
+                                                                </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="footer-content">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                                            </div><!-- /.col-md-3 -->
+
+                            <div class="col-md-4 col-sm-4">
+                                                            </div><!-- /.col-md-3 -->
+
+                            <div class="col-md-4 col-sm-4">
+                                                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="footer-bottom">
+                    <div class="container">
+                        <div class="footer-inner">
+                            <div class="copyright">
+                                © Universidad Autónoma de Campeche © 2026 Desarrollado por
+                                <a href="http://www.grupoicarus.com.mx" target="_blank">
+                                    <img src="/assets/img/icarus_footer.png" /> Grupo Icarus S.A. de C.V.
+                                </a>
+                            </div><!-- /.copyright -->
+
+                                                            <div class="copyright">
+                                    Visitas desde Julio 2014                                    <label>&nbsp;</label>
+                                    <span style = "background-color: #FFCD00; color: white; font-weight: 300; padding: 3px 8px;">613746</span>
+                                </div>
+                                                        </div><!-- /.footer-inner -->
+                    </div><!-- /.container -->
+                </section><!-- /#footer-bottom -->
+            </footer>
+            <!-- end Footer -->
+        </div>
+        <!-- end Wrapper -->
+
+        <script type="text/javascript" src="/assets/lightbox/js/lightbox.js"></script>
+
+            </body>
+</html>
