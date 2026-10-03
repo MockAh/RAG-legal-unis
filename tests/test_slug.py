@@ -67,3 +67,19 @@ def test_prefijo_numerico_unam():
 def test_respaldo_por_titulo():
     assert doc_slug("/docs/reglamentogeneral.pdf", "Reglamento de Pagos (julio 2026)", "ujat") == "reglamento-de-pagos"
     assert doc_slug("/ver?id=5", "Código de Ética 24 de julio de 2026", "uacam") == "codigo-de-etica"
+
+
+def test_ujat_fixtures_reales_sin_residuos_de_percent_encoding():
+    from legisuni.lector.classify import candidatos
+    from legisuni.lector.reduce import reducir
+
+    cands = [
+        e
+        for f in sorted((RAIZ / "fixtures").glob("ujat-*.html"))
+        for e in candidatos(reducir(f.read_bytes(), None).enlaces)
+    ]
+    assert len(cands) == 109
+    for e in cands:
+        s = doc_slug(e.href.strip(), e.texto.strip(), "ujat")
+        assert s and not s.startswith("-")
+        assert "20de" not in s and "c3-93" not in s
