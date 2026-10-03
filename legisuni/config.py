@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     rate_limit_s: float = 1.0
     max_reintentos: int = 5
     paralelismo_dominios: int = 4
+    umbral_caducidad_meses: int = 18
 
     def __repr__(self) -> str:
         # SecretStr ya se enmascara en su propio repr, evitando fugas en tracebacks

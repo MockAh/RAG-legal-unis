@@ -86,3 +86,15 @@ def test_candidatos_no_deduplica_ni_cambia_orden():
 )
 def test_es_candidato_unitarios(href, esperado):
     assert es_candidato(Enlace("t", href)) is esperado
+
+
+def test_uacam_conteo_exacto_de_candidatos():
+    # E20.5 decía 81 porque su grep no era -i (M42): con -i son 83 PDF únicos.
+    from legisuni.descargador.guard import es_visor_de_terceros
+
+    cands = candidatos(_enlaces("uacam__2026-10-01.html"))
+    unicos = {e.href.strip() for e in cands}
+    assert len(cands) == 89
+    assert len(unicos) == 87
+    assert sum(".pdf" in h.lower() for h in unicos) == 83
+    assert sum(es_visor_de_terceros(h) is not None for h in unicos) == 4
