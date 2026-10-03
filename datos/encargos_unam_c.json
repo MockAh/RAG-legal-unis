@@ -1,0 +1,193 @@
+{
+  "lote_id": "catalogo-fuentes-c-e2175405",
+  "archivo_origen": "catalogo-fuentes.md",
+  "sha256_archivo": "e21754059e9134e24b7522fe6a306006fa9981a395dc16e9f94dc7cc0dc9a149",
+  "encargos": [
+    {
+      "encargo_id": "unam:presupuesto-dependencias-2025-3t:26adefdaca24",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.patronato.unam.mx/pdf/presupuesto/2025/25-3er-dependencias.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#C1-2025",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "presupuesto-dependencias-2025-3t__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:presupuesto-dependencias-2025-3t",
+      "creado_en": "2026-10-02T01:40:00"
+    },
+    {
+      "encargo_id": "unam:presupuesto-dependencias-2023:ef61acb1e109",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.patronato.unam.mx/pdf/presupuesto/2023/23-dependencias.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#C1-2023",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "presupuesto-dependencias-2023__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:presupuesto-dependencias-2023",
+      "creado_en": "2026-10-02T01:40:00"
+    },
+    {
+      "encargo_id": "unam:presupuesto-dependencias-2019:bd9cc2d477bc",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.patronato.unam.mx/pdf/presupuesto/2019/19-dependencias.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#C1-2019",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "presupuesto-dependencias-2019__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:presupuesto-dependencias-2019",
+      "creado_en": "2026-10-02T01:40:00"
+    },
+    {
+      "encargo_id": "unam:cuenta-anual-2023:a30382fd658f",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.patronato.unam.mx/pdf/cuenta_anual_gaceta/GacetaCuentaAnual2023.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#C4-2023",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "cuenta-anual-2023__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:cuenta-anual-2023",
+      "creado_en": "2026-10-02T01:40:00"
+    },
+    {
+      "encargo_id": "unam:cuenta-anual-2022:51829ef6fa4d",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.gaceta.unam.mx/wp-content/uploads/2023/04/230410-suplemento-Cuenta-Anual-2022.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#C4-2022",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "cuenta-anual-2022__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:cuenta-anual-2022",
+      "creado_en": "2026-10-02T01:40:00"
+    },
+    {
+      "encargo_id": "unam:cuenta-anual-2011:5f3352f245a9",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://stunam.org.mx/41consejouni/consejo%20universitario15/2012/2pleno2012/2sesionplenocu30mar15/10.%20Cuentaanual/10.1Cuenta+anual2011.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#C4-2011",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "cuenta-anual-2011__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:cuenta-anual-2011",
+      "creado_en": "2026-10-02T01:40:00"
+    },
+    {
+      "encargo_id": "unam:cuenta-publica-federal-2023:1951f3249869",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.cuentapublica.hacienda.gob.mx/work/models/CP/2023/tomo/VII/MAT_Print.11A3Q.03.AEPE_A.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#C6-2023",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "cuenta-publica-federal-2023__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:cuenta-publica-federal-2023",
+      "creado_en": "2026-10-02T01:40:00"
+    }
+  ],
+  "no_obtenidos": [],
+  "_notas": [
+    {
+      "ref_catalogo": "C4-2011",
+      "aviso": "alojado en stunam.org.mx, dominio NO institucional (sindicato). D9 degrada su autenticidad: requiere verificacion de contenido. Es la unica copia localizada."
+    },
+    {
+      "ref_catalogo": "C6-2023",
+      "aviso": "alojado en cuentapublica.hacienda.gob.mx: oficial federal, no UNAM. Correcto por D9 para un documento de la Cuenta Publica federal."
+    }
+  ],
+  "_no_declarados": [
+    {
+      "ref": "C2",
+      "url": "https://www.fciencias.unam.mx/nosotros/acerca-de/presupuesto/general-fc-2025",
+      "por_que": "pagina de la FC, no documento"
+    },
+    {
+      "ref": "C3",
+      "url": "https://www.fciencias.unam.mx/nosotros/acerca-de/presupuesto/flujograma-recursos-paso1",
+      "por_que": "pagina de la FC, no documento"
+    },
+    {
+      "ref": "C3b",
+      "url": "https://www.fciencias.unam.mx/nosotros/acerca-de/presupuesto",
+      "por_que": "indice de la FC; requiere Lector de Indice"
+    },
+    {
+      "ref": "C5",
+      "url": "https://transparencia.unam.mx/obligaciones/consulta/dictaminacion-estados-financieros/2021",
+      "por_que": "rejilla JavaScript vacia (E2, E20.3)"
+    },
+    {
+      "ref": "C8",
+      "url": "https://www.asf.gob.mx/Section/58_Informes_de_auditoria",
+      "por_que": "portal de la ASF; requiere Lector de Indice"
+    },
+    {
+      "ref": "C9a",
+      "url": "https://transparencia.unam.mx/obligaciones/",
+      "por_que": "rejilla JavaScript vacia (E2, E20.3)"
+    },
+    {
+      "ref": "C9b",
+      "url": "https://www.sa.unam.mx/obligaciones-transparencia",
+      "por_que": "portal; requiere Lector de Indice"
+    },
+    {
+      "ref": "C7",
+      "url": null,
+      "por_que": "sin URL en el catalogo (PEF, Ramo 11, DOF)"
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "lote_id": "catalogo-fuentes-b-e2175405",
+  "archivo_origen": "catalogo-fuentes.md",
+  "sha256_archivo": "e21754059e9134e24b7522fe6a306006fa9981a395dc16e9f94dc7cc0dc9a149",
+  "encargos": [
+    {
+      "encargo_id": "unam:politicas-normas-presupuestal-2026:64b68952497b",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://dgapa.unam.mx/images/papime/normatividad/2026_politicas_normas_operacion_presupuestal.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#B1",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "politicas-normas-presupuestal-2026__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:politicas-normas-presupuestal-2026",
+      "creado_en": "2026-10-02T01:15:00"
+    },
+    {
+      "encargo_id": "unam:programa-racionalidad-presupuestaria-2026:597ac45088be",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.gaceta.unam.mx/wp-content/uploads/2026/03/260302-Suplemento-Programa-de-Racionalidad-Presupuestaria-2026.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#B2",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "programa-racionalidad-presupuestaria-2026__2026-03-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:programa-racionalidad-presupuestaria-2026",
+      "creado_en": "2026-10-02T01:15:00"
+    },
+    {
+      "encargo_id": "unam:manual-organizacion-dgf:ff4d094de255",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.abogadogeneral.unam.mx/sites/default/files/archivos/RepositorioCont/6_Dependencias/110_DireccionGeneraldeFinanzas/1_ManualdeOrganizacionDGF.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#B5",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "manual-organizacion-dgf__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:manual-organizacion-dgf",
+      "creado_en": "2026-10-02T01:15:00"
+    },
+    {
+      "encargo_id": "unam:patronato-tesoreria:1f941b7958f4",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.patronato.unam.mx/tesoreria.html",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#B6",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "patronato-tesoreria__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:patronato-tesoreria",
+      "creado_en": "2026-10-02T01:15:00"
+    }
+  ],
+  "no_obtenidos": [],
+  "_sin_puertas": [
+    {
+      "ref_catalogo": "B1h",
+      "documento": "PNOP de años anteriores (2011–2025)",
+      "motivo": "sin_puertas",
+      "intentos": 0,
+      "por_que": "el catalogo da un PATRON de URL, no direcciones. D3 prohibe construirlas: hay que confirmar cada ano"
+    },
+    {
+      "ref_catalogo": "B3",
+      "documento": "Normatividad en materia de Adquisiciones, Arrendamientos y Servicios",
+      "motivo": "sin_puertas",
+      "intentos": 0,
+      "por_que": "sin URL; el catalogo la marca ⬜"
+    },
+    {
+      "ref_catalogo": "B4",
+      "documento": "Disposiciones sobre fondo fijo y fondos revolventes",
+      "motivo": "sin_puertas",
+      "intentos": 0,
+      "por_que": "sin URL; el catalogo la marca ⬜. Bloquea K2b (tamano del monedero de la FC)"
+    },
+    {
+      "ref_catalogo": "B7",
+      "documento": "Manual de organizacion de la FC / Secretaria Administrativa",
+      "motivo": "sin_puertas",
+      "intentos": 0,
+      "por_que": "sin URL; el catalogo la marca ⬜ → 📨 (requiere solicitud de informacion)"
+    }
+  ]
+}

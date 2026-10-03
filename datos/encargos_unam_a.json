@@ -1,0 +1,205 @@
+{
+  "lote_id": "catalogo-fuentes-a-e2175405",
+  "archivo_origen": "catalogo-fuentes.md",
+  "sha256_archivo": "e21754059e9134e24b7522fe6a306006fa9981a395dc16e9f94dc7cc0dc9a149",
+  "encargos": [
+    {
+      "encargo_id": "unam:ley-organica:4327d7b09046",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/158.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#A2",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "ley-organica__1945-01-06",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:ley-organica",
+      "creado_en": "2026-10-02T00:50:00",
+      "_ref_catalogo": "A2"
+    },
+    {
+      "encargo_id": "unam:compendio-legislacion-acad-lab:6e1d2bfb4f6b",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.personal.unam.mx/Docs/Contratos/LegislacionAcadLabUni.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#A3",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "compendio-legislacion-acad-lab__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:compendio-legislacion-acad-lab",
+      "creado_en": "2026-10-02T00:50:00",
+      "_ref_catalogo": "A3"
+    },
+    {
+      "encargo_id": "unam:reglamento-interior-patronato:6a7653e31828",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.abogadogeneral.unam.mx/sites/default/files/archivos/LegUniv/13-ReglamentoInteriorPatronatoUniversitario_rem38_021220.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#A4",
+          "construida": false
+        },
+        {
+          "url": "http://www.contraloria.unam.mx/sites/default/files/archivos/Reg-Int-Patronato.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#A4",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "reglamento-interior-patronato__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:reglamento-interior-patronato",
+      "creado_en": "2026-10-02T00:50:00",
+      "_ref_catalogo": "A4"
+    },
+    {
+      "encargo_id": "unam:reglamento-ingresos-extraordinarios:1d2f596d337c",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://vinculacion.unam.mx/wp-content/uploads/2021/11/Reglamento-sobre-Ingresos-Extaordinarios-UNAM.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#A5",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "reglamento-ingresos-extraordinarios__2012-01-19",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:reglamento-ingresos-extraordinarios",
+      "creado_en": "2026-10-02T00:50:00",
+      "_ref_catalogo": "A5"
+    },
+    {
+      "encargo_id": "unam:reglamento-ingresos-extraordinarios-1985:68adcdb64796",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://abogadogeneral.unam.mx/PDFS/COMPENDIO/222.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#A5h",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "reglamento-ingresos-extraordinarios-1985__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:reglamento-ingresos-extraordinarios-1985",
+      "creado_en": "2026-10-02T00:50:00",
+      "_ref_catalogo": "A5h"
+    },
+    {
+      "encargo_id": "unam:reglamento-general-becas:c7011118c3ce",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.becarios.unam.mx/Portal2018/wp-content/uploads/2025/02/Reglamento-General-de-Becas.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#A7",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "reglamento-general-becas__2024-10-24",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:reglamento-general-becas",
+      "creado_en": "2026-10-02T00:50:00",
+      "_ref_catalogo": "A7"
+    },
+    {
+      "encargo_id": "unam:bases-comision-presupuestos:d4acd9414980",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://consejo.unam.mx/comisiones/CP/cp.php",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#A9",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "bases-comision-presupuestos__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:bases-comision-presupuestos",
+      "creado_en": "2026-10-02T00:50:00",
+      "_ref_catalogo": "A9"
+    },
+    {
+      "encargo_id": "unam:presupuesto-anual-consejo:83417c06ea56",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://consejo.unam.mx/archivo/presupuesto.php",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#A11",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "presupuesto-anual-consejo__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:presupuesto-anual-consejo",
+      "creado_en": "2026-10-02T00:50:00",
+      "_ref_catalogo": "A11"
+    }
+  ],
+  "no_obtenidos": [],
+  "_sin_puertas": [
+    {
+      "ref_catalogo": "A1",
+      "documento": "Constitución, art. 3º fr. VII (autonomía)",
+      "motivo": "sin_puertas",
+      "intentos": 0,
+      "por_que": "el catálogo no da URL (solo «DOF»)"
+    },
+    {
+      "ref_catalogo": "A6",
+      "documento": "Normas complementarias del RIE (art. 8)",
+      "motivo": "sin_puertas",
+      "intentos": 0,
+      "por_que": "sin URL; el catálogo la marca ⬜ / 📨"
+    },
+    {
+      "ref_catalogo": "A8",
+      "documento": "Lineamientos Generales para la Operación de Becas Presupuestales (12-sep-2022)",
+      "motivo": "sin_puertas",
+      "intentos": 0,
+      "por_que": "el catálogo solo da la página que lo refiere (orienta.unam.mx/senda/8/art2/), no el documento"
+    },
+    {
+      "ref_catalogo": "A10",
+      "documento": "Reglamento General de Pagos",
+      "motivo": "sin_puertas",
+      "intentos": 0,
+      "por_que": "sin URL; el catálogo la marca ⬜"
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "lote_id": "catalogo-fuentes-b2-e2175405",
+  "archivo_origen": "catalogo-fuentes.md",
+  "sha256_archivo": "e21754059e9134e24b7522fe6a306006fa9981a395dc16e9f94dc7cc0dc9a149",
+  "encargos": [
+    {
+      "encargo_id": "unam:politicas-normas-presupuestal-2025:59d6ae4e2be8",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://dgapa.unam.mx/images/papime/normatividad/2025_politicas_normas_operacion_presupuestal.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "resultado de busqueda, 2026-10-02 [B1h-2025]",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "politicas-normas-presupuestal-2025__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:politicas-normas-presupuestal-2025",
+      "creado_en": "2026-10-02T01:28:00"
+    },
+    {
+      "encargo_id": "unam:politicas-normas-presupuestal-2024:a7a75c94a294",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://dgapa.unam.mx/images/papime/normatividad/2024_politicas_normas_operacion_presupuestal.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "resultado de busqueda, 2026-10-02 [B1h-2024]",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "politicas-normas-presupuestal-2024__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:politicas-normas-presupuestal-2024",
+      "creado_en": "2026-10-02T01:28:00"
+    },
+    {
+      "encargo_id": "unam:politicas-normas-presupuestal-2023:95d74e87a958",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://dgapa.unam.mx/images/infocab/normatividad/2023_politicas_normas_operacion_presupuestal.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "resultado de busqueda, 2026-10-02 [B1h-2023]",
+          "construida": false
+        },
+        {
+          "url": "https://www.red-tic.unam.mx/recursos/2023/2023_PNOP.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "resultado de busqueda, 2026-10-02 [B1h-2023]",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "politicas-normas-presupuestal-2023__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:politicas-normas-presupuestal-2023",
+      "creado_en": "2026-10-02T01:28:00"
+    },
+    {
+      "encargo_id": "unam:politicas-normas-presupuestal-2022:c251dc1cd847",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "http://www.secadminfi.unam.mx/assets/politicas2022_v2.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "resultado de busqueda, 2026-10-02 [B1h-2022]",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "politicas-normas-presupuestal-2022__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:politicas-normas-presupuestal-2022",
+      "creado_en": "2026-10-02T01:28:00"
+    },
+    {
+      "encargo_id": "unam:politicas-normas-presupuestal-sin-anio:25a845c71ecf",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://dgapa.unam.mx/images/papiit/normatividad/politicas_normas_operacion_presupuestal.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "resultado de busqueda, 2026-10-02 [B1h-sin-anio]",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "politicas-normas-presupuestal-sin-anio__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:politicas-normas-presupuestal-sin-anio",
+      "creado_en": "2026-10-02T01:28:00"
+    }
+  ],
+  "no_obtenidos": [],
+  "_pendientes": [
+    {
+      "ref_catalogo": "B1h-2011",
+      "motivo": "sin_puertas",
+      "por_que": "no aparecio en las dos busquedas del 2026-10-02"
+    },
+    {
+      "ref_catalogo": "B1h-2012",
+      "motivo": "sin_puertas",
+      "por_que": "no aparecio en las dos busquedas del 2026-10-02"
+    },
+    {
+      "ref_catalogo": "B1h-2013",
+      "motivo": "sin_puertas",
+      "por_que": "no aparecio en las dos busquedas del 2026-10-02"
+    },
+    {
+      "ref_catalogo": "B1h-2014",
+      "motivo": "sin_puertas",
+      "por_que": "no aparecio en las dos busquedas del 2026-10-02"
+    },
+    {
+      "ref_catalogo": "B1h-2015",
+      "motivo": "sin_puertas",
+      "por_que": "no aparecio en las dos busquedas del 2026-10-02"
+    },
+    {
+      "ref_catalogo": "B1h-2016",
+      "motivo": "sin_puertas",
+      "por_que": "no aparecio en las dos busquedas del 2026-10-02"
+    },
+    {
+      "ref_catalogo": "B1h-2017",
+      "motivo": "sin_puertas",
+      "por_que": "no aparecio en las dos busquedas del 2026-10-02"
+    },
+    {
+      "ref_catalogo": "B1h-2018",
+      "motivo": "sin_puertas",
+      "por_que": "no aparecio en las dos busquedas del 2026-10-02"
+    },
+    {
+      "ref_catalogo": "B1h-2019",
+      "motivo": "sin_puertas",
+      "por_que": "no aparecio en las dos busquedas del 2026-10-02"
+    },
+    {
+      "ref_catalogo": "B1h-2020",
+      "motivo": "sin_puertas",
+      "por_que": "no aparecio en las dos busquedas del 2026-10-02"
+    },
+    {
+      "ref_catalogo": "B1h-2021",
+      "motivo": "sin_puertas",
+      "por_que": "no aparecio en las dos busquedas del 2026-10-02"
+    }
+  ]
+}

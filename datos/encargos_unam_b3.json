@@ -1,0 +1,56 @@
+{
+  "lote_id": "catalogo-fuentes-b3-e2175405",
+  "archivo_origen": "catalogo-fuentes.md",
+  "sha256_archivo": "e21754059e9134e24b7522fe6a306006fa9981a395dc16e9f94dc7cc0dc9a149",
+  "encargos": [
+    {
+      "encargo_id": "unam:normatividad-adquisiciones:f9b1478cb710",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://abogadogeneral.unam.mx/PDFS/NORMATIVIDAD_MAD/NMAAyS.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "busqueda-2026-10-02#B3",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "normatividad-adquisiciones__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:normatividad-adquisiciones",
+      "creado_en": "2026-10-02T01:32:00"
+    },
+    {
+      "encargo_id": "unam:procedimiento-fondo-fijo:bb0043a6c769",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.abogadogeneral.unam.mx/sites/default/files/archivos/RepositorioCont/6_Dependencias/147_DireccionGeneraldeServiciosAdministrativos/32_ProcedimientoOperativo_AdmondelFondoFijo.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "busqueda-2026-10-02#B4",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "procedimiento-fondo-fijo__2026-10-02",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:procedimiento-fondo-fijo",
+      "creado_en": "2026-10-02T01:32:00"
+    }
+  ],
+  "no_obtenidos": [],
+  "_notas": [
+    {
+      "ref_catalogo": "B4",
+      "aviso": "el documento hallado es el PROCEDIMIENTO de administracion del fondo fijo (DGSA). El catalogo pide los MONTOS del fondo fijo y revolvente; puede no traerlos. Si no los trae, B4 sigue abierto y va por solicitud de informacion."
+    },
+    {
+      "ref_catalogo": "B7",
+      "aviso": "Manual de organizacion de la FC: sin URL localizada. No genera encargo."
+    }
+  ]
+}
