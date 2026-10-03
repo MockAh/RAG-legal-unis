@@ -77,5 +77,5 @@ def reducir(crudo: bytes, content_type: str | None = None) -> PaginaReducida:
         if "href" in a.attributes
     ]
     raiz = arbol.root
-    texto = raiz.text(deep=True, separator="", strip=False) if raiz is not None else ""
+    texto = raiz.text(deep=True, separator="\n", strip=False) if raiz is not None else ""
     return PaginaReducida(texto, enlaces, codificacion, origen)

@@ -114,3 +114,11 @@ def test_medicion_hrefs_unicos_pdf(nombre, esperado):
     p = _reducir_nueva(nombre)
     medido = {e.href for e in p.enlaces if ".pdf" in e.href}
     assert len(medido) == esperado
+
+
+def test_texto_separa_elementos_sin_saltos_en_el_html():
+    t = _reducir_nueva("uacam__2026-10-01").texto
+    assert "CampecheFecha" not in t
+    i = t.index("Fecha de corte")
+    j = t.index("Diciembre del 2016")
+    assert "\u00a0" in t[i:j]
