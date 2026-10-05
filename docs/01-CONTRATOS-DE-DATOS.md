@@ -3,8 +3,8 @@
 > **El documento más importante del Proyecto.** Las conversaciones no se ven entre sí;
 > estos esquemas son su única frontera común. Cualquier cambio aquí debe propagarse
 > a todas las conversaciones activas y anotarse en el changelog de abajo.
-> Estado: **v2.6** · esquemas en pseudocódigo Pydantic v2. **Primera versión que rompe
-> compatibilidad** (ver §"Qué rompe la v2.0 y cómo se migra"). Desde aquí vuelve a regir la
+> Estado: **v2.7** · esquemas en pseudocódigo Pydantic v2. **La v2.0 fue la primera versión que
+> rompió compatibilidad** (ver §"Qué rompe la v2.0 y cómo se migra"). Desde ahí vuelve a regir la
 > regla de siempre: las specs refinan sin romper; los cambios aditivos son libres; renombrar o
 > quitar campos exige actualizar aquí primero.
 
@@ -56,7 +56,7 @@ La conversación de diseño usó una metáfora. Se deja aquí para que el vocabu
 MODO JURÍDICO (LegisUni)
   InstitutionRef N0 ─► Localizador ─► SourceCandidate N1 ─► Lector de Índice ─► CatalogEntry N2 / Catalog N3
                                                                               └► Corroborador ─► CoverageReport N4
-  CatalogEntry N2 ──traducción──► Encargo N10 ─► Descargador ─► DownloadResult N5
+  CatalogEntry N2 ──(selección temática N15, opcional)──► Encargo N10 ─► Descargador ─► DownloadResult N5
                                    ─► Verificador Documental ─► DocumentVerdict N6 ─► NormativeRecord N7
                                    (ManualQueueItem N8 · HarvestStats N9)
 
@@ -163,7 +163,7 @@ puerta. Así el modo jurídico, que siempre lleva una, conserva exactamente sus 
 
 ## N0 · InstitutionRef — entrada del modo jurídico
 
-*Sin cambios en v2.0.*
+*Sin cambios en v2.0. **Sin cambios en v2.7**: ver la nota al final.*
 
 Lo único que el usuario debe proporcionar. **Regla de diseño: tres datos obligatorios, el
 resto opcional y auto-completable por el Localizador.**
@@ -187,6 +187,11 @@ rutas en disco (`data/norm/<inst_id>/`). Se fija una vez y no cambia nunca.
 **Nota sobre `dominio_raiz`:** es el ancla de D9. Si el Localizador no logra fijarlo con
 certeza, ese solo hecho manda la institución a la cola manual: sin dominio verificado no hay
 autenticidad posible.
+
+**Nota sobre el filtro temático (v2.7).** Se consideró añadir aquí un campo `temas` y **se
+descartó**. El tema pertenece a la **corrida**, no a la institución: la UNAM no «es de
+deportes»; una petición concreta pide deportes. Un campo aquí lo volvería propiedad permanente
+de un `InstitutionRef`, que es identidad estable. El filtro vive en `SeleccionTematica` (N15).
 
 ---
 
@@ -217,7 +222,8 @@ visitó, la candidata se descarta. No existe la URL "deducida por convención".
 
 ## N2 · CatalogEntry — una entrada del catálogo (spec 03)
 
-*Cambia en v2.0: formato de `entry_id`. En v2.3: campo `titulo_derivado` (aditivo).*
+*Cambia en v2.0: formato de `entry_id`. En v2.3: campo `titulo_derivado` (aditivo).
+**Sin cambios en v2.7:** el filtro temático NO toca este contrato (ver N15).*
 
 Lo que el Lector de Índice extrae de la página. **Es una promesa, no un documento**: describe
 algo que debería existir en esa URL. Todavía no se ha descargado ni verificado nada.
@@ -274,6 +280,15 @@ la fecha interna del PDF) y el hash ya no coincide. El alias no lo atrapa. La se
 defensa es `doc_id` (N7): mismo instrumento y misma fecha de versión leída por el Verificador.
 Cómo se concilian dos archivos con el mismo `doc_id` se decide en `06`/`07`. **Nunca se borra
 ninguno.**
+
+**Segundo límite, medido (v2.7).** El alias **no cruza `grupo_alias`**, y `grupo_alias` lleva
+`doc_slug` dentro. Si el `doc_slug` de un instrumento cambia —porque se corrige una heurística
+defectuosa, o porque dos corridas lo nombraron distinto—, los mismos bytes se escriben otra vez
+bajo un grupo nuevo. Está medido dos veces: los 9 `encargo_id` de la UAM con una fecha por slug
+(E14.5) y los documentos de la UNAM cosechados con slugs escritos a mano (E21.15). **No es un
+defecto del alias: es la consecuencia de que el slug sea parte de la identidad.** El remedio es
+de procedimiento y vive en `03`: la primera corrida tras corregir slugs se hace sobre `data/`
+vacío y base limpia.
 
 **Lo que no cambia.** `doc_slug` sigue sin derivarse de la URL (spec `03`). Re-leer el mismo
 índice produce los mismos `entry_id`, porque las direcciones son las mismas: el criterio de
@@ -366,10 +381,10 @@ Corroborador atribuiría a la universidad huecos que son del Lector.
 | JSON inválido | `False`: no se salta de eslabón en D1 | `"salida_invalida"` | `True`: todo queda sin cuenta |
 | 40 de 47 | `False` | `None` | `True`, y la lista dice cuáles faltan |
 
-- **Vistos contra emitidos no basta.** En la UACAM, 81 enlaces a PDF (E20.5) contra los ~27
-  instrumentos propios que estima E10, aún sin medir: casi toda la diferencia es descarte
-  legítimo. Por eso el agente **declara** lo
-  que descarta (`enlaces_descartados`), y la resta la hace código (regla de reparto de `00` §2).
+- **Vistos contra emitidos no basta.** En la UACAM, 83 enlaces a PDF (E20.5, corregido) contra los
+  ~27 instrumentos propios que estima E10, aún sin medir: casi toda la diferencia es descarte
+  legítimo. Por eso el agente **declara** lo que descarta (`enlaces_descartados`), y la resta la
+  hace código (regla de reparto de `00` §2).
 - **`lector_agotado` y `fallo_lector` son excluyentes.** Regla dura en `03`.
 - **Listas, no conteos** (D5): el Corroborador necesita saber qué hueco es del Lector.
 - **Qué hace la orquestación ante `salida_invalida`** (¿reintentar?) no se decide aquí: queda
@@ -379,7 +394,7 @@ Corroborador atribuiría a la universidad huecos que son del Lector.
 
 ## N4 · CoverageReport — salida del Corroborador (spec 04)
 
-*Sin cambios en v2.0. Solo modo jurídico.*
+*Sin cambios de esquema en v2.0 ni en v2.7. Solo modo jurídico.*
 
 ```python
 class CoverageReport(BaseModel):
@@ -402,7 +417,14 @@ class Hueco(BaseModel):
 **`severidad="critico"`** se reserva para lo que hace inservible al corpus: falta la Ley
 Orgánica o falta el estatuto. Un corpus sin su norma fundante no puede sustentar nada.
 
+**Nota sobre el filtro temático (v2.7).** `CoverageReport` se calcula **siempre sobre el catálogo
+completo**, nunca sobre `SeleccionTematica.incluidas` (N15). Si se calculara sobre la selección,
+`completo=True` no significaría nada: un catálogo de deportes «completo» sin su estatuto
+habilitante sigue estando incompleto por construcción, que es justo lo que la comprobación de
+jerarquía existe para cazar (C15).
+
 ---
+
 ## N5 · DownloadResult — salida del Descargador (spec 05)
 
 *Cambia en v2.0: `entry_id` → `encargo_id`; campos nuevos; motivos nuevos. Común a ambos modos.*
@@ -607,6 +629,10 @@ llevar la URL del visor y `por_que` debe decir que el documento existe pero est�
 visor. Es el ítem de cola manual más barato de resolver que produce el sistema, y por eso
 merece estar bien formado.
 
+**Lo que NUNCA entra aquí (v2.7):** una entrada excluida por `SeleccionTematica` (N15). No es un
+fallo del sistema, es una decisión del usuario. Mezclarlas vaciaría de sentido a esta cola, que
+es producto.
+
 **Modo académico (v2.0):** no usa esta cola. Ahí no hay institución ni severidad jurídica, y la
 ruta de solución es otra (biblioteca, autor). Lo que falta vive en `BatchReport.no_obtenidos`
 (N14).
@@ -633,6 +659,9 @@ class HarvestStats(BaseModel):
     llamadas_llm: int
     costo_estimado_usd: float | None
 ```
+
+**Nota (v2.7):** `entradas_catalogo` cuenta el catálogo **completo**, no la selección temática.
+Una entrada excluida por tema no cuenta como descarga fallida en `descargas_fallidas`.
 
 ---
 
@@ -683,6 +712,9 @@ Encargo(
 los mismos motivos de fallo, la misma ruta en disco. Esa es la prueba de que la migración no
 rompió nada (§Migración).
 
+**v2.7 · qué entradas se traducen.** Sin `SeleccionTematica`, **todas** las del catálogo, como
+hasta la v2.6. Con una selección, solo las de `incluidas` (N15). La traducción en sí no cambia.
+
 ### Traducción académica
 
 ```python
@@ -707,6 +739,7 @@ carpeta (`raup-1982__3f9a…pdf`). El hash corto es lo que lo hace único. En un
 autor ni año propios, la etiqueta usa los del artículo corregido con el prefijo `corr-`.
 
 ---
+
 ## Modo académico
 
 ### Evidencia de partida
@@ -959,6 +992,58 @@ debería existir: la lista es el esqueleto. Se confirma en su spec.
 
 ---
 
+## N15 · SeleccionTematica — qué se descarga de un catálogo (v2.7) · solo modo jurídico
+
+**El filtro temático NO es una entrada del sistema: es una decisión posterior al catálogo.**
+El Lector de Índice levanta siempre el catálogo **completo**, haya tema o no, y el Corroborador
+juzga siempre sobre el catálogo **completo**. Lo único que el tema decide es **qué
+`CatalogEntry` se traduce a `Encargo`** (N10).
+
+```python
+class Excluida(BaseModel):
+    entry_id: str
+    razon: str                # por qué queda fuera del tema pedido; frase corta, auditable
+
+class SeleccionTematica(BaseModel):
+    seleccion_id: str         # f"{inst_id}:{sha256('|'.join(sorted(temas)))[:8]}"
+    inst_id: str
+    temas: list[str]          # literal, como los escribió el usuario: ["deportes"]
+    catalogo_generado_en: datetime   # qué lectura del catálogo se filtró (D5)
+    incluidas: list[str]      # entry_id
+    excluidas: list[Excluida]
+    confianza: Literal["alta", "media", "baja"]
+    generado_en: datetime
+```
+
+**Regla dura de cobertura.** `incluidas` + `excluidas` debe cubrir **exactamente** las entradas
+del catálogo filtrado, sin solaparse y sin faltar ninguna. **Lo comprueba código, no el agente**,
+igual que `enlaces_sin_cuenta` (N3). Si no cuadra, la selección es inválida y **no se traduce
+ningún `Encargo`**: una entrada que desaparece en silencio es el fallo de C13 otra vez.
+
+**Por qué tabla aparte y no un campo en `CatalogEntry`.** El tema pertenece a quien pide, no al
+documento. Un mismo catálogo puede filtrarse hoy por deportes y mañana por personal académico, y
+el catálogo no debe reescribirse por eso. `entry_id` no cambia entre selecciones: las dos
+conviven apuntando a las mismas entradas. Por la misma razón tampoco va en `InstitutionRef`
+(N0): el tema es de la corrida, no de la institución.
+
+**`excluido` no es `fallido`.** Una entrada excluida por tema **no** va a la cola manual (N8),
+no cuenta como descarga fallida en `HarvestStats` (N9) y no reduce `entradas_catalogo`. Es una
+decisión del usuario, no un problema del sistema. Confundirlas vaciaría de sentido a la cola
+manual, que es producto (D7).
+
+**Sin `temas` no hay `SeleccionTematica`:** toda entrada del catálogo se traduce a `Encargo`,
+exactamente como hasta la v2.6. **El comportamiento por defecto no cambia.**
+
+**El filtro es juicio de agente y hoy no tiene oráculo.** Decidir si un reglamento «es de
+deportes» no se resuelve con una lista de palabras: un Reglamento de Alumnado puede regular la
+participación deportiva sin llamarse así. Mientras no exista ese oráculo (pregunta abierta 6),
+la `confianza` baja y las excluidas se muestran al usuario **antes** de descargar.
+
+**Qué no resuelve.** Una selección temática no hace más barata la lectura: el Lector gasta la
+misma llamada al LLM, porque extrae todo igual. Lo que ahorra son descargas, no razonamiento.
+
+---
+
 ## Parámetros globales congelados
 
 | Parámetro | Valor v2.0 |
@@ -982,9 +1067,10 @@ debería existir: la lista es el esqueleto. Se confirma en su spec.
 | **Cruce de vestíbulo** | Si `cruzar_vestibulos=True` y la puerta devuelve HTML: se busca en esa página un enlace a archivo y se sigue **un solo salto**. El enlace debe **aparecer literal** en la página (D3), y la página es entrada no confiable (D4): se extrae un enlace, no se obedece nada. Sin enlace → `vestibulo_sin_pdf`. **Orden:** visor → petición → guardián → vestíbulo → guardián. Jurídico en `False` por defecto: conserva el comportamiento medido de v1.4 (150/150). La heurística de búsqueda del enlace vive en `05` (v2.0) |
 | **Excepción a D3: resolutor DOI** | Única URL que se construye: `https://doi.org/<doi normalizado>`, y solo desde un DOI escrito en la lista. Marcada con `Puerta.construida=True`. Cualquier otra construcción sigue prohibida (v2.0) |
 | **Muros** | El Descargador **nunca** intenta pasar un muro de pago, suscripción o sesión, ni usa servicios que los eludan. Un muro es un resultado (`muro_de_pago`), no un obstáculo a vencer (v2.0) |
-| **Alias por hash** | Antes de registrar una descarga como nueva, se compara su SHA-256 con los ya registrados del mismo `Encargo.grupo_alias` (jurídico: `inst_id` + `doc_slug`; académico: `articulo_id`). El Descargador no deduce el grupo del `encargo_id`: lo recibe (v2.1). Si coincide → no se escribe archivo, `duplicado_de` apunta al original. **Nunca se sobrescribe ni se borra un archivo** (v2.0) |
+| **Alias por hash** | Antes de registrar una descarga como nueva, se compara su SHA-256 con los ya registrados del mismo `Encargo.grupo_alias` (jurídico: `inst_id` + `doc_slug`; académico: `articulo_id`). El Descargador no deduce el grupo del `encargo_id`: lo recibe (v2.1). Si coincide → no se escribe archivo, `duplicado_de` apunta al original. **Nunca se sobrescribe ni se borra un archivo** (v2.0). **El alias no cruza grupos:** si cambia el `doc_slug`, cambia el grupo y los mismos bytes se escriben otra vez (v2.7, ver N2 §Segundo límite) |
 | **Revisión académica** | Candidatos DOI solo de metadatos y primera página, cortando en referencias. Normalización de DOI: minúsculas; quitar prefijos `doi:`, `https://doi.org/`, `http://dx.doi.org/`; quitar puntuación final `.,;)]`. Patrón de referencia: `10\.\d{4,9}/\S+`. Decisión según la tabla de N13 (v2.0) |
 | **Confiabilidad académica** | En modo académico **no hay ancla de dominio**: una copia legítima puede vivir en GitHub, en un repositorio o en la página de un autor. La confianza la da el Verificador Académico. Un artículo cuenta como obtenido solo con veredicto `correcto` u `otra_edicion`. **D9 sigue rigiendo el modo jurídico sin cambios** (v2.0) |
+| **Filtro temático** | Opcional y **posterior al catálogo** (v2.7). El Lector extrae siempre todo; el Corroborador juzga siempre sobre todo; solo la traducción a `Encargo` se limita a `SeleccionTematica.incluidas` (N15). Sin temas, se traducen todas las entradas, como en v2.6. Una entrada excluida **no** es un fallo, no va a cola manual y no cuenta en `descargas_fallidas` |
 
 ---
 
@@ -1059,8 +1145,17 @@ Lector de Índice produzca slugs correctos. Son minutos.
 | Documento | Qué cambia |
 |---|---|
 | `03` | El agente declara sus descartes; código calcula `enlaces_sin_cuenta` y `lectura_incompleta`; **regla dura: `lector_agotado` y `fallo_lector` son excluyentes**, y un JSON inválido marca `fallo_lector="salida_invalida"`, nunca `lector_agotado`; criterio de aceptación nuevo con salida truncada |
-| `04` | No tratar `lectura_incompleta` como hueco de la institución |
-| `07` | Pregunta abierta: qué hace la orquestación ante `salida_invalida` (¿reintento?). **Pendiente de su propia conversación; no se decide en `01`** |
+| `04` | No tratar `lectura_incompleta` como hueco de la institución. **Pendiente: `04` sigue en v2 y no lo recoge** |
+| `07` | Pregunta abierta: qué hace la orquestación ante `salida_invalida` (¿reintento?). **Pendiente: `07` sigue en v2 y no lo recoge** |
+
+**v2.7 · filtro temático (N15):**
+
+| Documento | Qué cambia |
+|---|---|
+| `03` | **Nada funcional:** el Lector extrae siempre el catálogo completo. Se anota explícitamente que el filtro **no es suyo**, para que nadie lo implemente ahí |
+| `04` | `CoverageReport` se calcula sobre el catálogo completo, nunca sobre la selección (nota ya en N4) |
+| `07` | Tabla `selecciones` (espejo de N15); `acervo juridico --inst X --tema deportes`; la última selección por institución se recuerda; una entrada excluida **no** entra a `cola_manual` ni a `descargas_fallidas` |
+| `05` | **Sin cambios:** recibe `Encargo` y no sabe de temas (D14) |
 
 ---
 
@@ -1075,6 +1170,11 @@ Lector de Índice produzca slugs correctos. Son minutos.
    en `06`/`07`.
 5. **Orden de puertas académicas.** Copia libre primero trae a veces un manuscrito cuando la
    versión publicada también estaba abierta. Medir con la primera corrida antes de cambiarlo.
+6. **¿Cómo se evalúa el filtro temático (N15)?** Decidir si un instrumento «es de deportes» es
+   juicio de agente y hoy **no tiene oráculo**. Hace falta escribir uno —como el de la UACAM para
+   el criterio 4 de `03`— antes de poder medir si sirve. Mientras tanto, la `confianza` baja y las
+   excluidas se muestran al usuario antes de descargar. **No bloquea la implementación de N15,
+   pero sí bloquea cualquier afirmación sobre su calidad.**
 
 ---
 
@@ -1094,3 +1194,4 @@ Lector de Índice produzca slugs correctos. Son minutos.
 | **v2.4** | **2026-09-11** | **Criterios de migración, corregidos contra medición.** El criterio 2 deja de pedir «150/150» y pasa a «todo enlace publicado produce descarga», con **N medido = 156** (UAM 47, UJAT 109): el 150 venía de una heurística de slug que perdía 2 documentos en la UAM y de un filtro por extensión que ignoraba 4 enlaces de la UJAT con salto de línea. El criterio 3 admite `muro_de_pago` en modo jurídico, porque el reconocimiento de muros de `05` v3 no distingue modo (D8) y ninguna aserción de v1.4 lo contradice. **Sin cambios de esquema: ningún contrato N0–N14 se toca. Compatible con v2.3.** |
 | **v2.5** | **2026-09-25** | **Aclaración sobre la lista de origen, sin cambios de esquema.** `Geologia_dois_.docx`, la lista contra la que se diseñó §Modo académico, **nunca llegó al repositorio**: sus tres hallazgos (§Evidencia de partida) y las «17 fichas» (N11) se conservan como historia de diseño, con nota de que no son verificables. La primera corrida académica usó `datos/lotes/bloque-a.txt` (E15 de `08`). La razón del orden de puertas (§Nota sobre `puertas` y su orden) cita E15, con datos a favor y en contra. El registro de v2.0 no se toca. **Ningún contrato N0–N14 se toca. Compatible con v2.4.** |
 | **v2.6** | **2026-10-01** | **Contabilidad de la lectura, aditivo.** `Catalog` (N3) gana `enlaces_vistos`, `enlaces_descartados`, `enlaces_sin_cuenta`, `lectura_incompleta` y `fallo_lector`: distingue rejilla vacía, salida inválida del agente y lectura truncada, que antes caían todas en `lector_agotado` + `notas`. `lector_agotado` y `fallo_lector` son excluyentes. Propaga a `03`, `04` y `07`. **Ningún campo existente cambia. Compatible con v2.5.** |
+| **v2.7** | **2026-10-04** | **Filtro temático, aditivo.** Contrato nuevo **N15 `SeleccionTematica`**: el tema vive en una selección aparte, no en `CatalogEntry` (N2), porque pertenece a quien pide y no al documento; **y tampoco en `InstitutionRef` (N0)**, que es identidad estable: el tema es de la corrida, no de la institución. Se consideraron las dos alternativas y se descartaron, con su razón escrita. Reglas: el Lector extrae siempre el catálogo completo; el Corroborador juzga siempre sobre el completo (nota en N4); `incluidas` + `excluidas` cubren el catálogo exactamente, comprobado por **código**; una entrada excluida no es un fallo, no va a cola manual (N8) ni a `descargas_fallidas` (N9). Sin `temas`, el comportamiento es idéntico al de v2.6. **Además, sin cambio de esquema:** N2 gana el «segundo límite» del alias por hash —el alias no cruza `grupo_alias`, y cambiar un `doc_slug` reescribe los mismos bytes bajo otro grupo—, medido dos veces (E14.5, E21.15), con el remedio de procedimiento en `03`. Pregunta abierta 6: el filtro no tiene oráculo. **Ningún contrato N0–N14 se toca. Compatible con v2.6.** |
