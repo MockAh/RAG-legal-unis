@@ -1,7 +1,7 @@
 # 08 · Evidencia de campo
 
 > Hallazgos **medidos**, no supuestos, obtenidos antes de escribir una línea de código.
-> Estado: vivo · **v16** · se amplía con cada universidad nueva que se explore.
+> Estado: vivo · **v19** · se amplía con cada universidad nueva que se explore.
 > Mediciones: UAM, UNAM-70I, UNAM-OAG, UJAT, **UACAM**.
 > **Medido en vivo el 2026-09-06: la UAM (E1) y la UACAM (E10).** Recontados con herramienta:
 > la **UJAT** en M23b (109 enlaces, sobre sus fixtures) y la **UNAM-OAG** en E20.5 (84 enlaces
@@ -11,7 +11,11 @@
 > **Descargas reales ejecutadas:** 45/45 documentos de la UAM el **2026-09-06** (E11) y
 > **105/105 de la UJAT el 2026-09-08** (E12). **150 de 150.** Tras la migración a `Encargo`,
 > **156 de 156 (E14)**, medido el 2026-09-18. **Primera corrida académica: 3 de 7 (E15)**, el
-> 2026-09-25. **Segunda: 8 de 30 (E19)**, el 2026-09-27. Es la evidencia que no viene de
+> 2026-09-25. **Segunda: 8 de 30 (E19)**, el 2026-09-27. **Primera cosecha jurídica de la UNAM:
+> 22 de 26 (E21)**, el 2026-10-02, en cinco lotes escritos a mano desde un catálogo de fuentes y
+> no desde un índice; es la **tercera universidad descargada**. **Segunda cosecha, el 2026-10-04:
+> 13 de 15 (E22)**, con lo que el catálogo completo queda recorrido: **41 encargos, 35 archivos, 34
+> documentos distintos** en nueve lotes. Es la evidencia que no viene de
 > mirar una página, sino de ejercitar código contra servidores reales. Con ella la spec `05`
 > queda cerrada.
 > **v8 (2026-09-10):** al auditar el disco antes de la migración apareció que la UAM se descargó
@@ -339,6 +343,9 @@ marco jurídico — señal aprovechable por el Localizador.
 | **C23** | La UJAT publica **105 documentos**, no ~60 (E12.1) | E4 subestimaba casi al doble. Los conteos hechos a ojo sobre un índice paginado **no son fiables**; hay que contar enlaces únicos con herramienta |
 | **C24** | **La idempotencia se cumple dentro de una corrida, no entre corridas de días distintos** (E13). Los 45 documentos de la UAM están **dos veces en disco**, con los mismos bytes y distinto nombre | La fecha de captura entra en el nombre cuando el índice no declara fecha de versión, así que **otro día es otro nombre**. No se sobrescribió nada: la regla funcionó y el diseño falló. **Primera evidencia medida a favor del alias por hash** (D15 de `00`, `01` v2.1): comparar el SHA-256 dentro del `grupo_alias` habría reconocido los 45 pares |
 | **C20** | Dos versiones históricas del mismo instrumento colisionan en `entry_id` (E11.6) | **Hueco de `01`**, no del sitio: `CatalogEntry.entry_id` no lleva versión, `doc_id` (N7) sí. **Cerrada.** En M23b se midió que dos pares de la UAM con slug idéntico (`2026`, `rjd`) se separan solo por `url_id`; eran los 2 documentos que v1 perdía. E14 confirma 156 identificadores únicos en base limpia (2026-09-18) |
+| **C25** | **Un certificado válido con cadena incompleta hace perder documentos en un dominio institucional vivo** (E21.4). `consejo.unam.mx` sirve un comodín legítimo de Sectigo sin su intermedio: `--insecure` da `200`, la verificación estricta da cero documentos. Un segundo host (Hacienda) falla con la misma firma, sin diagnosticar | **Reabre la pregunta 4 de `05`**, que E12.3 cerró midiendo otro mecanismo (los `http` de la UJAT que redirigen solos). Por el criterio de E8.2 es **sólida como requisito** —un caso basta para obligar a manejarlo— y **muda sobre su frecuencia** (E6.22). Hay una salida que no relaja nada: aportar el intermedio leído de la extensión AIA del propio certificado |
+| **C26** | **La cortesía por host tiene dos huecos: el `robots.txt` no pasa por el limitador, y un alias de `www` duplica la cuota del mismo servidor** (E21.8) | El criterio 7 de `05` se cumple tal como está redactado, así que **no es un defecto de implementación**: lo que falla es que «host» no sea la unidad correcta para lo que D8 pretende. Medido en cinco corridas: 130–160 ms entre el `robots.txt` y el primer documento de cada host, y 275 ms entre las dos formas del Abogado General, que sirvió cinco documentos repartidos entre ambas |
+| **C27** | **Un documento puede tener texto extraíble en una parte y no en otra** (E22.7). El PNOP 2026 tiene texto en **153 de sus 215 páginas**: no es un escaneo ni un PDF limpio | **Refina C21 y mide por primera vez lo que E6.19 anticipaba.** El criterio de E12.5 —`pdfplumber` sobre las tres primeras páginas, umbral de 100 caracteres— clasificaría este PDF como «tiene texto» y la fase de OCR lo saltaría entero, perdiendo 62 páginas sin señalarlo. **La spec de extracción necesita un criterio por página, no por documento** |
 
 ---
 
@@ -353,7 +360,7 @@ marco jurídico — señal aprovechable por el Localizador.
 | E6.5 | El 70-I accedido programáticamente | Sigue siendo el respaldo de D1 y sigue sin ruta conocida |
 | E6.6 | Tasa de PDFs escaneados sin capa de texto | Decide si el OCR entra en v1 (spec `06`). Sospecha: alta en leyes orgánicas viejas |
 | E6.7 | Si los PDF de la UJAT de 2012 abren realmente | Rutas viejas con espacios: candidatas a enlace muerto |
-| E6.8 | **Recontar UNAM-OAG y UJAT en vivo** | Sus cifras son de la captura original. La re-medición de la UAM corrigió dos conteos; es razonable esperar lo mismo allí. **Nota (2026-10-01) — parcialmente satisfecha.** Ambas se recontaron con herramienta, pero sobre fixtures: la UJAT en M23b (109 enlaces) y la UNAM-OAG en E20.5 (84 enlaces a PDF, que no son 84 instrumentos). **Sigue abierta en lo que pedía: recontar en vivo.** La cabecera dejó de remitir aquí al reescribirse; esta nota lo compensa |
+| E6.8 | **Recontar UNAM-OAG y UJAT en vivo** | Sus cifras son de la captura original. La re-medición de la UAM corrigió dos conteos; es razonable esperar lo mismo allí. **Nota (2026-10-01) — parcialmente satisfecha.** Ambas se recontaron con herramienta, pero sobre fixtures: la UJAT en M23b (109 enlaces) y la UNAM-OAG en E20.5 (84 enlaces a PDF, que no son 84 instrumentos). **Sigue abierta en lo que pedía: recontar en vivo.** La cabecera dejó de remitir aquí al reescribirse; esta nota lo compensa. **Nota (2026-10-04): las cosechas de la UNAM de E21 y E22 no la tocan.** Sus 41 encargos salieron de un catálogo de fuentes escrito a mano sobre la economía de una facultad, no del índice de la Oficina del Abogado General, que **sigue sin cosecharse** y es el único que daría el denominador de la UNAM (E21.16). **E6.8 sigue abierta en lo que pedía: recontar en vivo** |
 | ~~E6.9~~ | ~~¿Hay más enlaces sin texto de ancla?~~ | **CERRADA, en contra (E10.3): sí los hay.** 2 de 4 instituciones. Es requisito firme del Lector, no caso raro |
 | E6.10 | **Las obligaciones de transparencia VIGENTES de la UACAM** (`/view/paginas/49`) | E10 midió la rama histórica. La rama actual no se ha abierto: puede que el catálogo bueno esté ahí y el hallazgo de E10.1 sea menos grave de lo que parece — o que no exista, y sea peor |
 | E6.11 | ¿Cuántos índices más declaran fecha de corte? | Si C13 se repite, el Lector necesita esa comprobación **antes** que ninguna otra |
@@ -367,6 +374,14 @@ marco jurídico — señal aprovechable por el Localizador.
 | E6.20 | **Estado real de `legisuni.db`** | E13 midió el disco, no la base. Falta saber si las 45 filas duplicadas también se registraron (¿195 filas o 150?). Determina si la duplicación es solo de archivos o también de persistencia |
 | E6.21 | **¿La UJAT se duplicaría igual?** | Solo se corrió una vez (2026-09-08). Por C24 debería pasarle lo mismo, pero **no está medido**: son 285 MB, y confirmarlo a propósito cuesta más que asumirlo |
 | E6.19 | **¿Cuántos documentos tienen texto pero mal extraído?** | El umbral usado fue "< 100 caracteres en 3 páginas". Un PDF con texto en columnas o con capa OCR mala pasa el filtro y da basura después |
+| E6.22 | **¿Cuántos hosts institucionales sirven cadena incompleta?** | 1 diagnosticado de 13 en las corridas de E21, más 1 sin diagnosticar (E21.4). Si es frecuente, un bundle de intermedios es infraestructura; si es raro, un parche. Es la misma pregunta que E6.13 hace del `robots.txt` |
+| E6.23 | **¿Los cinco `robots.txt` que respondieron `200` eran `robots.txt` de verdad?** | M38 no se disparó (E21.3), así que no eran HTML. Pero el log no guarda cuerpo ni `Content-Type`: es el riesgo residual que M38 dejó anotado, ahora con cinco casos más |
+| E6.24 | **¿Arreglar la cadena entrega los dos documentos del Consejo?** | Predicción de E21.4: pasarían de `http_error` a `no_es_pdf`, porque son páginas. Si se cumple, el gatillo que se activa es la pregunta **9** de `05` (cruzar vestíbulos en jurídico), no la 4 |
+| E6.25 | **El solapamiento entre un catálogo a mano y el índice del OAG** | E21.15: los mismos bytes bajarán dos veces con `grupo_alias` distintos, y E21.10 ya midió el caso dentro de un lote. El alias no cruza grupos, por diseño. Unificar `doc_slug` entre las dos fuentes es trabajo del Lector y del Corroborador |
+| E6.26 | **Por qué falla `www.cuentapublica.hacienda.gob.mx`** | Misma firma que `consejo.unam.mx` (fetcher fallido, 161 ms, sin status) pero **el documento responde desde otra red** (E21.4). Cadena, versión de TLS, DNS o bloqueo: no se sabe, y `http_error` sin status no lo distingue (E21.6). Se cierra con dos comandos |
+| E6.27 | **¿Qué se hace con una fuente que es una página y no un documento?** | Tres casos medidos (E21.12). El guardián solo acepta `%PDF-` y `PK\x03\x04`, así que una página que *es* la fuente no puede entrar al corpus, aunque respalde una afirmación citable. Decidir qué se archiva y cómo se fecha toca `05` |
+| E6.28 | **¿Cuántos documentos del corpus tienen texto parcial?** | 1 medido de 1 probado (E22.7, C27). El criterio por documento de E12.5 no los detecta, así que los 156 jurídicos y los académicos **no están clasificados por este criterio**. Decide si la fase de extracción necesita una pasada por página sobre todo el corpus |
+| E6.29 | **¿Se puede recuperar un documento que el sitio ya borró?** | G3 desapareció entre su registro en el catálogo y la corrida (E22.4). Un archivo web conservaría la URL original y la fecha de captura —que es lo que D5 pide— pero **no es un dominio institucional**, así que entraría con autenticidad degradada, como la Cuenta Anual que vive en el sitio del sindicato (E21.2). No está decidido si eso es aceptable |
 
 **Próxima medición recomendada: E6.10.** Es la más barata (una URL ya conocida) y la que más
 cambia: decide si el hallazgo de E10.1 es una rama histórica correctamente rotulada —molesta
@@ -442,6 +457,9 @@ ese criterio nuevo, el marcador honesto no es 4 de 4 sino **3 de 4**.
 | C9 · enlaces sin texto de ancla | **Sólida como requisito** | Un caso obliga a manejarlo; **no** dice nada sobre su frecuencia |
 | C10 · un enlace vivo no prueba vigencia | **Sólida** | Es una propiedad de cómo funcionan los servidores de archivos, no de la UAM |
 | C12 · varias versiones históricas a la vez | **Sólida** | Ídem C3: la existencia se prueba con un ejemplo |
+| C25 · una cadena incompleta hace perder documentos | **Sólida como requisito** | Un caso diagnosticado (E21.4) obliga a manejarlo; **no** dice nada sobre su frecuencia, que es E6.22 |
+| C26 · la cortesía por host tiene huecos | **Sólida** | Es una propiedad de cómo está definida la unidad «host», no de los sitios medidos: se reproduce en las cinco corridas de E21 y en dos más de E22, con un mecanismo nuevo |
+| C27 · un documento puede tener texto parcial | **Sólida como requisito** | Un caso basta para obligar a manejarlo, y el criterio vigente no lo detecta. **No** dice nada sobre su frecuencia, que es E6.28 |
 | C4 · cada sitio tiene su mecanismo de identidad | **Razonable** | Tres sitios, tres mecanismos distintos. La conclusión operativa (fallback por título) es conservadora, así que el riesgo de equivocarse es bajo |
 | C6 · la Ley Orgánica a veces está pero vieja | **Razonable** | Un caso, pero el mecanismo que lo explica (la universidad no actualiza lo que no promulga) es general |
 | C7 · los contratos colectivos se publican | **Débil** | Dos de tres, y ambos son sindicatos grandes y consolidados |
@@ -463,6 +481,7 @@ Vale más tener escrito qué nos haría cambiar de opinión que acumular evidenc
 | Una universidad sin ninguna página de legislación hallable | **D1 entera.** La PNT volvería a ser fuente primaria, y con ella el problema sin resolver de E6.5 |
 | Un sitio que sirve su índice pero con enlaces mayoritariamente muertos | El Descargador dejaría de ser la pieza fácil, y la cola manual pasaría de excepción a norma |
 | Que el 70-I resulte accesible y completo por una ruta simple | **D1 se volvería a invertir**, esta vez con datos de los dos lados |
+| Que la cadena TLS incompleta aparezca en varios hosts institucionales | **La pregunta 4 de `05` dejaría de ser una cuestión de caso raro.** El bundle de intermedios pasaría de parche a infraestructura (C25, E6.22) |
 
 **Ninguna de las cuatro está descartada.** Las cuatro se resuelven con las mediciones de E6.
 
@@ -869,6 +888,13 @@ fallos de certificado en 105 peticiones.
 **Cierra la pregunta abierta 4 de la spec `05`:** la verificación TLS estricta se queda.
 Relajarla no habría ganado nada, y promover `http` a `https` por cuenta propia habría sido
 adivinar cuando el servidor ya lo hace bien.
+
+> **Nota (2026-10-02) — E21.4: la pregunta 4 se reabre.** Lo que esta sección midió es un
+> mecanismo —servidores que redirigen `http` a `https` por su cuenta— y su conclusión sigue
+> siendo correcta para ese caso. Pero la pregunta 4 estaba redactada sobre otro supuesto, los
+> certificados mal configurados, y **ese supuesto se midió por primera vez el 2026-10-02**:
+> `consejo.unam.mx` sirve un certificado legítimo sin su intermedio y se perdieron dos
+> documentos (C25, E21.4). El texto de esta sección no cambia.
 
 ### E12.4 · Las rutas de 2012 siguen vivas — E6.7 cerrada
 
@@ -1576,6 +1602,10 @@ que esto sea medible. No está implementado.
 > anomalía sigue abierta: E14 no se puede re-medir, y hará falta una corrida nueva para
 > distinguir entre las tres explicaciones.
 
+> **Nota (2026-10-02) — E21.13.** El retroceso del reloj se midió también en modo **jurídico**,
+> así que la cuarta hipótesis no es un artefacto de un solo tipo de corrida. Sigue sin medirse su
+> magnitud acumulada, y la anomalía sigue abierta.
+
 ## E19 · Corrida del Bloque B (2026-09-27)
 
 **Segunda medición del criterio 18 de `05`.** Entrada: `datos/encargos_bloque_b.json` (M36).
@@ -1887,6 +1917,9 @@ una `intentos` con `descargas` por `encargo_id` hereda esta duplicación.**
 > puede separar por fecha (E19.1). Y unir ambas tablas por `encargo_id` sigue duplicando cuando
 > un encargo tiene fila de fallo y de éxito, o dos versiones.
 
+> **Nota (2026-10-02) — E21.7.** M39 se midió en campo por primera vez en la cosecha de la UNAM:
+> dos fallos repetidos en una re-corrida y `descargas` sin filas nuevas.
+
 ### E19.12 · Un `robots.txt` que acaba en un login SAML
 
 ```
@@ -1920,6 +1953,10 @@ Toca **D8**: una política de `robots.txt` que se obedece si es legible supone q
 > rama: UAM y UJAT sirvieron `403` y `404`, nunca `200` (E14). Riesgo residual: los logs no
 > guardan `Content-Type` ni cuerpo; si alguno de los 24 hosts que respondieron `200` en E15 y E19
 > sirvió HTML, su clasificación cambia, y sería el mismo fallo, no un `robots.txt` legítimo.
+
+> **Nota (2026-10-02) — E21.3.** El modo jurídico sí entró en esa rama en la cosecha de la UNAM:
+> cinco hosts respondieron `200` y **ninguno disparó el warning de M38**. Es el primer dato a
+> favor de su criterio negativo, con el mismo riesgo residual (E6.23).
 
 ### E19.13 · B.16 pasó por el IdP de Nature y descargó
 
@@ -2073,6 +2110,733 @@ texto no cambia.
 
 ---
 
+## E21 · Primera cosecha jurídica de la UNAM (2026-10-02)
+
+**Primera descarga de una tercera universidad, y primera cuyos encargos no salen de un índice.**
+Entrada: cinco lotes escritos a mano (`datos/encargos_unam_{a,b,b2,b3,c}.json`) a partir de
+`catalogo-fuentes.md` —un catálogo de fuentes sobre la economía y el régimen jurídico de la
+Facultad de Ciencias— y no de ninguna página de legislación de la UNAM.
+
+**Fuente de todo lo que sigue:** los logs de las cinco corridas de `scripts/lote.py` más dos
+re-corridas de idempotencia, un `ls` y un `for` sobre `data/norm/unam/`, y siete consultas a
+`legisuni_v2.db`. Los fragmentos se citan en cada subsección. Donde el texto interpreta, lo dice.
+
+### E21.1 · Qué se corrió: 22 de 26
+
+| Lote | Capa del catálogo | Encargos | Exitosas | Fallos | Hosts |
+|---|---|---|---|---|---|
+| `a` | A · marco jurídico superior | 8 | 6 | 2 `http_error` | 7 |
+| `b` | B · normatividad presupuestal | 4 | 3 | 1 `no_es_pdf` | 4 |
+| `b2` | B1h · serie del PNOP | 5 | 5 | — | 2 |
+| `b3` | B3 y B4 | 2 | 2 | — | 2 |
+| `c` | C · series presupuestales y contables | 7 | 6 | 1 `http_error` | 4 |
+| | **total** | **26** | **22** | **4** | **13 distintos** |
+
+**28 puertas declaradas, 26 pedidas.** Las dos que no se pidieron quedaban detrás de una puerta
+que entregó (E21.5). Cero omitidos en las primeras corridas; cero `sin_puertas` declarados —las
+fichas del catálogo sin URL no se declararon como encargo y por tanto **no cuentan en estos
+totales**. `rate_limit_s = 1.0` en las cinco.
+
+```
+ls data/norm/unam/ | wc -l
+22
+sqlite3 legisuni_v2.db "SELECT COUNT(*) FROM descargas WHERE encargo_id LIKE 'unam:%';"
+26
+```
+
+**22 archivos para 21 documentos distintos:** dos tienen los mismos bytes (E21.10).
+
+**Lo que esto no mide:** el total de `descargas` tras las corridas. Solo se contaron las filas
+`unam:%`. Que las 156 jurídicas de E14 y las académicas de E19 sigan intactas **no se comprobó**.
+
+### E21.2 · Tres dominios que no son de la institución emisora
+
+De los 13 hosts pedidos, tres están fuera de `unam.mx`, y los tres son correctos por razones
+distintas:
+
+| Documento | Host | Por qué es correcto |
+|---|---|---|
+| Ley Orgánica de la UNAM | `diputados.gob.mx` | Es una ley federal: su dominio institucional es el del Congreso (D9), y E3.1 ya medía que la UNAM lista legislación federal en su propio marco normativo |
+| Cuenta Pública federal · UNAM | `www.cuentapublica.hacienda.gob.mx` | Documento de Hacienda, no de la UNAM. **Falló, E21.4** |
+| **Cuenta Anual 2011 de la UNAM** | **`stunam.org.mx`** | **Ninguna.** Es un documento de la UNAM en el sitio de su sindicato |
+
+**El tercero es el caso nuevo:** un documento institucional cuya única copia localizada vive en un
+dominio que **no es institucional ni oficial de ningún emisor**. Respondió `200` y se descargó.
+**Por D9 su autenticidad está degradada y exige verificación de contenido**, que es trabajo del
+Verificador Documental. Es el primer documento del corpus en esa situación: la UACAM tenía copias
+en el Congreso de Campeche y en la CNDH (E10.4), ambos oficiales; un sindicato no lo es.
+
+### E21.3 · Primer `robots.txt` legible del modo jurídico — y M38 no se disparó
+
+```
+200 OK   www.abogadogeneral.unam.mx   vinculacion.unam.mx   abogadogeneral.unam.mx
+         dgapa.unam.mx                www.gaceta.unam.mx
+404      www.diputados.gob.mx   www.personal.unam.mx   www.becarios.unam.mx
+         www.patronato.unam.mx  www.secadminfi.unam.mx  stunam.org.mx
+falló    consejo.unam.mx   www.cuentapublica.hacienda.gob.mx   → fail-open (permitido)
+```
+
+**Cinco hosts respondieron `200` y los cinco permitieron la descarga.** Es la primera vez en el
+**modo jurídico**: la nota de M38 en E19.12 dice que UAM y UJAT sirvieron `403` y `404`, nunca
+`200` (E14), de modo que esa rama del código no se había ejercitado con datos jurídicos.
+`robots_prohibido` en campo ya lo midió E19.4, pero en modo académico.
+
+**Ninguno de los cinco disparó el warning de M38** («no parece robots.txt»): su `Content-Type` no
+era de marcado y su cuerpo no empezaba por `<`. **Primer dato a favor del criterio negativo de
+M38** después del caso que lo motivó. **Lo que no se midió:** el contenido de esos archivos; el
+log no guarda cuerpo ni `Content-Type`, que es el riesgo residual que M38 dejó anotado (E6.23).
+
+**Seis de trece hosts no tienen `robots.txt`.** Con los `403` de la UAM, Hull y ScienceDirect y
+los `404` de la UJAT, el marcador de hosts institucionales sin política legible sigue creciendo:
+refuerza C17 y el fail-open.
+
+### E21.4 · Dos hosts caídos sin código de estado — **reabre la pregunta 4 de `05`**
+
+Cuatro fallos en total. Dos son `http_error` **sin `http_status`**, es decir sin respuesta HTTP:
+los dos encargos de `consejo.unam.mx` (bloque A) y la Cuenta Pública de Hacienda (bloque C). En
+los tres casos el `robots.txt` del mismo host falló igual, con el warning de fail-open.
+
+**`consejo.unam.mx`, diagnosticado:**
+
+```
+openssl s_client -connect consejo.unam.mx:443 -servername consejo.unam.mx
+verify error:num=20:unable to get local issuer certificate
+verify error:num=21:unable to verify the first certificate
+subject=CN = *.consejo.unam.mx
+issuer=C = GB, O = Sectigo Limited, CN = Sectigo Public Server Authentication CA DV R36
+
+curl -sS -o /dev/null -w '%{http_code}\n' --insecure https://consejo.unam.mx/archivo/presupuesto.php
+200
+```
+
+**Medido:** certificado comodín legítimo de una CA pública, servidor que **no manda el
+intermedio**, cadena inconstruible. Con la verificación desactivada responde `200`: **el documento
+está ahí y el único obstáculo es la cadena.** Reproducido desde otra red con otro cliente, que
+falló con `CERTIFICATE_VERIFY_FAILED: unable to get local issuer certificate`. **No es la máquina
+del operador.**
+
+**Por qué no se había visto nunca.** Los navegadores completan solos el eslabón que falta —lo
+buscan en la extensión AIA del certificado—, así que una persona abre el sitio sin notar nada.
+`httpx` no. **El sitio «funciona» para un humano y falla para el script.**
+
+**`www.cuentapublica.hacienda.gob.mx`: sin diagnosticar.** Misma firma (fetcher fallido, 161 ms,
+sin status), pero **el documento sí responde desde otra red**: se abrió y es la Cuenta Pública 2023
+de la UNAM. **No se sabe si es cadena, versión de TLS, DNS o un bloqueo**, y el log no lo dice
+(E21.6). Queda en E6.26.
+
+**Qué le pasa a la pregunta abierta 4 de `05`.** E12.3 la cerró a favor del TLS estricto, y su
+razonamiento sigue siendo correcto **para el caso que midió**: los cinco `http` de la UJAT
+redirigían solos a `https`. **Pero la pregunta estaba redactada sobre otro supuesto** —«algunos
+sitios institucionales mexicanos tienen certificados mal configurados… no relajarlo pierde
+documentos»— y **ese supuesto es el que E21.4 mide por primera vez**: cadena incompleta, en un
+dominio de la UNAM, con dos documentos perdidos.
+
+**La pregunta 4 se reabre. No queda decidida aquí.**
+
+**Hay una tercera salida que ninguna de sus dos opciones contemplaba**, y conviene anotarla antes
+de que el debate se plantee como relajar o perder: **aportar el intermedio**. Su dirección viene
+escrita en la extensión AIA del certificado —no se construye, se lee—, y añadirlo a un bundle que
+se pase como `verify=<bundle>` al cliente único de M25 **conserva la verificación estricta**: la
+cadena se valida completa, con el eslabón que el servidor omite. No es `verify=False`. **No está
+implementado, no tiene criterio en `05` y no se propone aquí como decisión.**
+
+**Lo que sigue sin medirse:** si arreglar la cadena entrega los documentos del Consejo. Los dos
+son páginas (`cp.php`, `presupuesto.php`), así que lo esperable es que pasen de `http_error` a
+`no_es_pdf` — **predicción, no medición** (E6.24).
+
+### E21.5 · Puertas múltiples en modo jurídico, primera vez en campo
+
+Dos encargos se declararon con dos puertas, y los dos tienen **un solo intento**:
+
+| Encargo | Puerta 0 (entregó) | Puerta 1 (nunca se pidió) |
+|---|---|---|
+| Reglamento Interior del Patronato (A4) | `www.abogadogeneral.unam.mx` | `www.contraloria.unam.mx` |
+| PNOP 2023 (B1h-2023) | `dgapa.unam.mx/images/infocab/…` | `www.red-tic.unam.mx` |
+
+```
+sqlite3 legisuni_v2.db "SELECT COUNT(*) FROM intentos WHERE encargo_id LIKE 'unam:%';"
+26
+```
+
+**26 intentos para 26 encargos:** ninguna puerta de respaldo se pidió. Es el **criterio 13 de
+`05` observado en campo en modo jurídico**, donde hasta ahora solo existía en tests y en el modo
+académico: la traducción jurídica de `01` N10 produce **una** puerta por `CatalogEntry`, de modo
+que ningún `Encargo` jurídico de E14 tenía más de una.
+
+**El segundo caso añade algo:** en el PNOP 2023 el orden no expresa un respaldo sino una
+**preferencia de D9** —el repositorio del emisor antes que la republicación en otro host de la
+UNAM—. Es la primera vez que el orden de puertas codifica esa jerarquía en lugar de una simple
+alternativa.
+
+> **Aviso metodológico, del mismo tipo que el de E11.6.** Estos encargos **no los produjo
+> `juridico/traduccion.py`**: se escribieron a mano, y con ellos sus `doc_slug`, `etiqueta` y
+> `grupo_alias`. Los `url_id` sí se comprobaron contra `urlnorm.url_id` del repositorio
+> (`4327d7b09046` para la Ley Orgánica, verificado antes de la primera corrida), y el generador
+> del lote `c` comprobó además que **las siete URLs aparecen literales en el catálogo** y aborta
+> si no. **Lo que estas corridas miden es el Descargador contra hosts institucionales de la UNAM,
+> no la identidad de estos documentos.** Trece de las 22 etiquetas llevan **fecha de captura**
+> porque el catálogo no declara la de versión, que es el mismo mecanismo de E13.3; aquí no
+> duplicó nada porque todo se corrió el mismo día.
+
+### E21.6 · `http_error` sin `http_status` no dice qué pasó
+
+En las tres filas de fallo sin respuesta (`consejo` ×2, Hacienda ×1), `http_status` está **vacío**.
+Aun así el motivo es `http_error`, el mismo valor que llevan los 37 `403` de E19.10 y los seis de
+E15.4.
+
+**Un fallo de verificación TLS, un DNS que no resuelve, una conexión rechazada y un `500` del
+servidor son indistinguibles en la base.** `MotivoFallo` tiene `url_muerta` y `timeout`, pero
+ninguno describe «no se pudo establecer la conexión». La causa de `consejo.unam.mx` solo se
+conoció por un sondeo manual posterior; la de Hacienda **sigue sin conocerse** por este mismo
+motivo. Nada en la corrida la registró.
+
+**Se anota como motivo de una micro-tarea futura; E21 no propone el arreglo**, y con tres casos de
+dos hosts no se propone tocar `MotivoFallo`, que es vocabulario de N5 y por tanto contrato. Se
+relaciona con la pregunta 8 de `05` —motivos que no distinguen la causa— aunque esa pregunta está
+redactada para las protecciones anti-bot.
+
+### E21.7 · Idempotencia, y primera medición en campo de M39
+
+Dos re-corridas, 19 segundos y 3 minutos después de las originales, sin vaciar nada:
+
+```
+# lote a, segunda vez
+total: 8   exitosas: 0   omitidos: 6     http_error: 2    hosts distintos pedidos: 1
+# lote b, segunda vez
+total: 4   exitosas: 0   omitidos: 3     no_es_pdf: 1     hosts distintos pedidos: 1
+```
+
+```
+sqlite3 legisuni_v2.db "SELECT encargo_id, sha256, exito FROM descargas WHERE encargo_id LIKE 'unam:%' AND sha256 IS NULL;"
+unam:bases-comision-presupuestos:d4acd9414980||0
+unam:presupuesto-anual-consejo:83417c06ea56||0
+```
+
+- **Cero peticiones para lo ya descargado** y un solo host tocado en cada re-corrida, el del fallo
+  que persiste. Es la regla 5 de `05` con M40 (comprobación del archivo en disco) funcionando
+  sobre encargos de varias puertas, y las categorías son disjuntas (M33).
+- **`descargas` no creció: 26 filas para 26 encargos.** Los fallos se repitieron y **cada uno
+  reemplazó su propia fila** en vez de añadir otra. **Es la primera medición en campo de M39.** Lo
+  que E19.11 midió fue el comportamiento anterior: 41 filas académicas para 37 encargos, porque
+  dos `sha256` NULL de una PK son distintos en SQLite.
+- **Un fallo sí se vuelve a pedir, y debe hacerlo:** no hay descarga registrada que omitir.
+
+### E21.8 · El limitador de cortesía tiene dos huecos — **conclusión nueva C26**
+
+**Hueco 1 · el `robots.txt` no pasa por el limitador.** En las cinco corridas, la primera petición
+de documento a un host sigue a su `robots.txt` por **130–160 ms**, sin línea de `ratelimit`:
+
+```
+01:42:24.082  GET https://www.patronato.unam.mx/robots.txt                     "404"
+01:42:24.215  GET https://www.patronato.unam.mx/pdf/presupuesto/2025/…pdf      "200"
+01:42:24.434  cortesia: www.patronato.unam.mx espera 0.649s (ultima hace 0.351s)
+```
+
+**Medido:** la línea de cortesía del tercer renglón dice «última hace 0.351 s» a las 24.434, es
+decir que el limitador registró su última petición a las **24.083** — el envío del PDF, no el del
+`robots.txt`, que fue anterior. El `robots.txt` **no quedó registrado y no impuso espera**.
+
+**Interpretación, a verificar en el código:** `RobotsCache` recibe el `httpx.Client` (M25), no el
+`Fetcher`, así que sus peticiones no pasan por el `RateLimiter`, que vive en `Fetcher`. Se
+comprueba con un `grep` sobre `robots.py` y `fetch.py`.
+
+**Hueco 2 · un alias de `www` duplica la cuota del mismo servidor.**
+
+```
+01:35:16.462  resultado normatividad-adquisiciones   (abogadogeneral.unam.mx)
+01:35:16.737  GET https://www.abogadogeneral.unam.mx/robots.txt      "200"
+```
+
+**275 ms entre dos peticiones al mismo servidor físico, sin espera.** Para el limitador
+`abogadogeneral.unam.mx` y `www.abogadogeneral.unam.mx` son hosts distintos. En estas corridas el
+repositorio del Abogado General sirvió **cinco documentos repartidos entre las dos formas**
+(A4, A5h, B4, B5, B3), de modo que recibió aproximadamente el doble de la cuota prevista.
+
+**Ninguno de los dos huecos es un defecto de implementación:** el limitador hace lo que su
+especificación dice, «≥ 1 s entre peticiones al mismo host». Lo que el caso muestra es que
+**«host» no es la unidad correcta** para la cortesía que D8 pretende. **E21 no propone el
+arreglo** y el criterio 7 de `05` no cambia: sigue cumpliéndose tal como está redactado.
+
+### E21.9 · `urlnorm` con `%20` y `+` literales, en campo
+
+```
+01:42:28.996  GET https://stunam.org.mx/41consejouni/consejo%20universitario15/2012/2pleno2012/
+              2sesionplenocu30mar15/10.%20Cuentaanual/10.1Cuenta+anual2011.pdf   "200 OK"
+```
+
+La URL de la Cuenta Anual 2011 trae **dos `%20` ya codificados y un `+` literal** en el nombre del
+archivo. Se pidió **idéntica** y respondió `200`: ni el `%20` se volvió `%2520` ni el `+` se
+alteró. Es la idempotencia que E12.2 midió en la UJAT, ahora con un `+` de propina y en un host
+nuevo.
+
+**También se midió el otro extremo:** el PNOP 2022 se sirve por **`http` y no redirige a
+`https`**.
+
+```
+01:28:42.359  GET http://www.secadminfi.unam.mx/robots.txt                "404"
+01:28:42.432  GET http://www.secadminfi.unam.mx/assets/politicas2022_v2.pdf  "200 OK"
+```
+
+Es el **primer documento del corpus que solo existe en claro**: los cinco `http` de la UJAT
+devolvían `301` a `https` (E12.3). La advertencia de `05` de **no promover el esquema** —que hasta
+ahora se justificaba con un riesgo hipotético— tiene su primer caso: promoverlo habría pedido un
+`https` que nadie ha comprobado que exista.
+
+### E21.10 · Identidad por hash: un archivo sin año, identificado sin abrirlo
+
+El catálogo cita, para la serie del PNOP, un PDF en una carpeta de DGAPA **cuyo nombre no lleva
+año**. Se descargó como encargo propio y la consulta de hashes lo resolvió:
+
+```
+sqlite3 legisuni_v2.db "SELECT sha256, COUNT(*), GROUP_CONCAT(encargo_id,' | ') FROM descargas WHERE encargo_id LIKE 'unam:politicas-normas-presupuestal-%' AND exito=1 GROUP BY sha256 ORDER BY 2 DESC;"
+53bfcfee…b38f|2|unam:politicas-normas-presupuestal-2026 | unam:politicas-normas-presupuestal-sin-anio
+cb14e9f2…43e0|1|unam:politicas-normas-presupuestal-2022
+4784343c…dbe29|1|unam:politicas-normas-presupuestal-2024
+368cc410…c4bc|1|unam:politicas-normas-presupuestal-2023
+32180987…e069|1|unam:politicas-normas-presupuestal-2025
+```
+
+**Es el PNOP 2026, publicado en una segunda carpeta.** La identidad salió de los bytes, no de la
+ubicación ni del nombre. **Es la primera vez que el corpus identifica un documento por su hash**,
+y el mecanismo es el mismo que `01` previó para el alias (D15), usado aquí como diagnóstico.
+
+**Interpretación:** esa URL no lleva año **porque es una dirección rodante** —DGAPA la sobrescribe
+con el documento del año en curso—. No está comprobado; se apoya en que sus bytes son los del año
+vigente y en que el nombre omite el año.
+
+**Y deja dos archivos idénticos en disco.** El alias por hash (M29) **no actuó**, porque solo
+opera dentro de un `grupo_alias` y cada encargo tenía el suyo. Es el criterio 16 de `05`
+funcionando como está especificado —el alias no cruza grupos— y es **el primer caso medido de ese
+límite de ámbito**, ahora dentro de un mismo lote y no entre corridas lejanas. Los archivos no se
+borran nunca, así que la copia se queda. La forma correcta a futuro es declarar esa URL como
+**puerta 1 del encargo de 2026**, no como encargo propio.
+
+### E21.11 · Un patrón de URL del catálogo estaba mal — D3 pagado con un caso
+
+El catálogo propone reconstruir la serie del PNOP con un patrón:
+`dgapa.unam.mx/images/papime/normatividad/AAAA_politicas_normas_operacion_presupuestal.pdf`.
+Buscando los años reales el 2026-10-02 aparecieron **cuatro formas distintas** para el mismo
+documento anual:
+
+| Año | Dónde está | ¿Encaja en el patrón? |
+|---|---|---|
+| 2026, 2025, 2024 | `dgapa…/images/papime/normatividad/AAAA_…pdf` | Sí |
+| 2023 | `dgapa…/images/infocab/normatividad/2023_…pdf` | **No** |
+| 2023 (2ª copia) | `www.red-tic.unam.mx/recursos/2023/2023_PNOP.pdf` | **No** |
+| 2022 | `www.secadminfi.unam.mx/assets/politicas2022_v2.pdf`, por `http` | **No** |
+
+Las tres carpetas de DGAPA (`papime`, `infocab`, `papiit`) corresponden a **tres programas
+distintos**, y el documento se republica cada año en la del programa que toque. **No hay carpeta
+canónica.**
+
+**Construir las URLs no habría fallado con un error ruidoso:** habría dado `404` para 2022 y 2023,
+y la conclusión honesta de una corrida habría sido *«el PNOP de 2023 no está en línea»*, que es
+falso. **Es la primera evidencia medida a favor de D3** en los términos exactos en que D3 está
+redactado: hasta ahora la decisión se sostenía en el argumento del riesgo (una URL alucinada que
+casualmente resuelve), no en un caso.
+
+**El mismo riesgo está abierto en el bloque C y es peor.** El catálogo propone «probar el patrón
+de URL año por año» para el presupuesto por dependencia, cuyas tres direcciones medidas son
+`/2025/25-3er-dependencias.pdf`, `/2023/23-dependencias.pdf` y `/2019/19-dependencias.pdf`: **el
+de 2025 declara trimestre y los otros dos no.** Como la serie es trimestral, una URL construida
+que resuelva podría traer el 1T de un año mientras se da por el cierre, y el denominador del
+modelo quedaría mal sin que nada lo advirtiera.
+
+### E21.12 · Tres fuentes del catálogo son páginas, no documentos — y el corpus no puede guardarlas
+
+| Ref | Página | Qué respalda en el catálogo |
+|---|---|---|
+| A9 | Bases de funcionamiento de la Comisión de Presupuestos | quién dictamina presupuestos y transferencias |
+| A11 | Presupuesto UNAM anual aprobado (índice por años) | el macro 2026 |
+| B6 | Tesorería del Patronato | registro contable y Cuenta Anual |
+
+**B6 está medido entero:** responde `200` con HTML, el guardián lo rechazó con `no_es_pdf` y **no
+dejó archivo** (criterio 3 de `05`, primera verificación en campo de su mitad negativa: las dos
+del Consejo murieron antes de tener cuerpo). **No contiene ningún enlace a PDF**, ni
+`citation_pdf_url` ni `link rel=alternate type=application/pdf`: su contenido **es el texto de la
+página**.
+
+**Consecuencia que no tiene salida hoy.** El guardián acepta `%PDF-` y `PK\x03\x04`, así que una
+página institucional que *es* la fuente **no puede entrar al corpus**. B6 respalda una afirmación
+citable del catálogo y queda como cita a una página viva, que es justo lo que el proyecto evita
+para los documentos (C10: un enlace vivo no prueba vigencia; aquí ni eso).
+
+**No se propone tocar el guardián.** Toca `05` y haría falta decidir qué se archiva —¿el HTML?,
+¿una captura?— y cómo se fecha. Se anota (E6.27).
+
+**Además, A11 y A9 revelan el otro lado:** A11 no es un documento sino **un índice de
+presupuestos por año**, de modo que incluso con la cadena TLS resuelta haría falta la pieza ②
+(Lector de Índice) para sacar sus PDF. El Descargador no cosecha índices, por diseño.
+
+### E21.13 · El reloj del sistema retrocede, ahora en modo jurídico
+
+```
+01:42:28.786  GET https://www.gaceta.unam.mx/wp-content/uploads/…Cuenta-Anual-2022.pdf  "200 OK"
+01:42:28.510  resultado unam:cuenta-anual-2022:51829ef6fa4d: exito=True
+```
+
+El resultado se registra **276 ms antes** de la petición que lo produjo. Es el mismo fenómeno que
+E19.7 midió tres veces en el modo académico, y la **interpretación es la misma**: WSL ajustando la
+hora del sistema. El log muestra el retroceso, no su causa.
+
+**Importa porque E18.1 sigue abierta** con esa hipótesis como cuarta explicación de los 43 s que
+no cuadran con el rate limit. Ahora está visto en jurídico además de en académico, así que **no
+es un artefacto de un solo tipo de corrida**. Sigue sin medirse su magnitud acumulada.
+
+### E21.14 · Un hueco de 2.62 s sin explicar, que no se repitió
+
+```
+00:52:13.197  resultado unam:reglamento-interior-patronato:6a7653e31828: exito=True
+00:52:15.817  GET https://vinculacion.unam.mx/robots.txt "200 OK"
+```
+
+Entre el fin de un encargo y la primera petición del siguiente pasan **2.62 s**, con **hosts
+distintos** (`www.abogadogeneral.unam.mx` → `vinculacion.unam.mx`) y sin línea de `ratelimit`. Los
+demás saltos entre encargos de las cinco corridas van de 0 a 0.6 s, y todos se explican por la
+petición de `robots.txt`.
+
+**No está explicado**, y **no se repitió** en las cuatro corridas siguientes, lo que debilita la
+hipótesis del reloj (E21.13: ahí el tiempo retrocede, aquí avanza) y deja la de una resolución de
+DNS lenta. **Tampoco se puede cerrar con el log**, por la razón de E11.7: `httpx` registra al
+recibir, así que 2.62 s entre líneas no son 2.62 s de espera antes de enviar.
+
+### E21.15 · Este corpus se solapará con el índice del OAG, y el alias no lo atrapará
+
+Cinco de los 22 documentos vienen del repositorio del Abogado General, que es el dominio del
+índice de E3 — un índice con **84 enlaces únicos a PDF** (E20.5) que todavía no se ha cosechado.
+
+**Cuando se coseche, los mismos bytes volverán a bajarse.** El alias por hash solo actúa **dentro
+de un `grupo_alias`**, y aquí los grupos son `unam:<doc_slug escrito a mano>`, mientras los del
+Lector saldrán de su propia heurística para ese sitio (E3.4: prefijo numérico). **Dos grupos
+distintos → no hay alias → archivo propio**, que es el comportamiento especificado.
+
+**No es un defecto del alias: es el límite de su ámbito**, el mismo que E21.10 ya midió dentro de
+un lote. Se anota como deuda (E6.25) porque el remedio no es evidente: unificar `doc_slug` entre
+un catálogo escrito a mano y un índice institucional es trabajo del Lector y del Corroborador, no
+del Descargador.
+
+### E21.16 · El denominador de estas corridas no es el corpus de la UNAM
+
+A diferencia de la UAM y la UJAT, donde el denominador era el índice publicado (47 y 109
+enlaces), **aquí el denominador es un catálogo escrito a mano con un propósito concreto**:
+documentar la economía y el régimen jurídico de una facultad. Sus renglones se eligieron por su
+utilidad para esa pregunta, no por ser la legislación de la UNAM.
+
+**Por tanto «22 de 26» no dice nada sobre qué fracción de la normativa de la UNAM está en el
+corpus.** El índice del OAG (E3, 84 enlaces) es el que daría ese denominador, y no se ha
+cosechado. El catálogo completo tiene **59 URLs** en nueve bloques, 54 en hosts `*.unam.mx`; de
+ellas **31 parecen PDF directo y 28 son páginas o portales** —conteo sobre el propio archivo, no
+sobre respuestas del servidor—. Las corridas de esta noche cubrieron los bloques A, B y C;
+**quedan seis bloques sin tocar** (D a I: población, macro, salarios, becas, concesiones,
+gobernanza).
+
+Es el mismo cuidado que E20.5 pide con el «~60» de E3: **un conteo sobre la fuente no es un
+conteo de instrumentos.**
+
+> **Nota de procedencia (2026-10-04).** Los logs de las nueve corridas de la UNAM **no se guardaron
+> en archivo**: los comandos no llevaban `tee`. E21 y E22 se redactaron sobre la salida de terminal
+> pegada en la conversación —con sus fragmentos transcritos literales— y sobre consultas a
+> `legisuni_v2.db`. **No son reconstruibles desde un log**, a diferencia de E15 y E19, cuyos logs sí
+> viven en `~/respaldo-acervo/`. Lo que sí es verificable hoy son las filas de `descargas` e
+> `intentos` con `encargo_id LIKE 'unam:%'`, que conservan `url_final`, `http_status`, `bytes` y
+> motivo. **Si el scrollback de la terminal todavía existe, conviene volcarlo a
+> `~/respaldo-acervo/` y anotarlo aquí: comprobarlo es más barato hoy que mañana.**
+
+---
+
+---
+
+## E22 · Segunda cosecha de la UNAM y primeras lecturas del corpus (2026-10-04)
+
+**Continuación de E21, dos días después y sobre los seis bloques restantes del mismo catálogo.**
+Entrada: cuatro lotes escritos a mano (`datos/encargos_unam_{d,f,g,h}.json`). Los bloques **E** e
+**I** no generaron lote: no tienen documentos descargables (E22.9).
+
+**Y trae algo que el proyecto no había hecho nunca: leer su propio corpus.** Cuatro afirmaciones del
+catálogo se verificaron abriendo PDF que ya estaban en disco, sin tocar la red (E22.8).
+
+**Fuente:** los logs de las cuatro corridas de `scripts/lote.py`, una re-corrida de idempotencia,
+cuatro consultas a `legisuni_v2.db`, una extracción con `pdfplumber` sobre seis documentos del
+corpus y la lectura de dos páginas de la Cuenta Anual 2023. Los fragmentos se citan en cada
+subsección. Donde el texto interpreta, lo dice.
+
+### E22.1 · Qué se corrió: 13 de 15
+
+| Lote | Capa del catálogo | Encargos | Exitosas | Fallos | Hosts |
+|---|---|---|---|---|---|
+| `d` | D · población y plantilla | 7 | 7 | — | 4 |
+| `f` | F · salarios y nómina | 3 | 2 | 1 `no_es_pdf` (sonda, E22.3) | 2 |
+| `g` | G · becas | 3 | 2 | 1 `url_muerta` (E22.4) | 2 |
+| `h` | H · concesiones | 2 | 2 | — | 2 |
+| | **total** | **15** | **13** | **2** | **8 distintos** |
+
+**Quince puertas declaradas y quince pedidas:** ningún encargo de esta tanda tuvo puerta de
+respaldo. `rate_limit_s = 1.0` en las cuatro corridas.
+
+**Acumulado con E21:** **41 encargos, 35 archivos, 34 documentos distintos** (un par comparte bytes,
+E21.10), repartidos en nueve lotes sobre los nueve bloques del catálogo.
+
+**Lo que esto no mide:** el total de `descargas` tras las corridas. Solo se contaron filas `unam:%`.
+
+### E22.2 · El limitador cuenta el host equivocado cuando hay un `301` entre hosts — **C26 reproducida**
+
+E21.8 describió dos huecos de la cortesía por host. Esta cosecha encontró **un tercero, más fuerte, y
+lo reprodujo en dos corridas independientes**.
+
+```
+# lote d, 2026-10-04
+00:14:12.246  GET https://web.planeacion.unam.mx/Agenda/2020/pdf/Agenda2020.pdf   "200"  ← última a web.
+00:14:12.728  GET https://www.planeacion.unam.mx/robots.txt                       "301"
+00:14:12.767  GET https://web.planeacion.unam.mx/robots.txt                       "200"  ← 0.52 s después
+00:14:12.810  GET https://www.planeacion.unam.mx/Memoria/2024/PDF/4.3-FCres.pdf   "301"
+00:14:12.854  GET https://web.planeacion.unam.mx/Memoria/2024/PDF/4.3-FCres.pdf   "200"  ← 0.60 s después
+00:14:12.922  cortesia: web.planeacion.unam.mx espera 0.272s (ultima hace 0.728s)
+
+# lote h, 2026-10-04
+00:46:38.565  GET https://www.planeacion.unam.mx/robots.txt                       "301"
+00:46:38.709  GET https://web.planeacion.unam.mx/robots.txt                       "200"
+00:46:38.755  GET https://www.planeacion.unam.mx/Memoria/2023/PDF/11.5-DGPU.pdf   "301"
+00:46:38.795  GET https://web.planeacion.unam.mx/Memoria/2023/PDF/11.5-DGPU.pdf   "200"  ← 86 ms después
+```
+
+**Medido:** en el lote `d`, la línea de cortesía de las 12.922 dice «última hace 0.728 s», es decir
+que el limitador sitúa su última petición a `web.planeacion` en las **12.194** — el envío de la
+Agenda 2020. **No registró las de 12.767 ni 12.854**, que fueron a ese mismo host. En el lote `h` el
+patrón se repite y las dos peticiones a `web.planeacion` quedan separadas por **86 ms**.
+
+**Interpretación, a verificar en el código:** el `RateLimiter` se indexa por el host **pedido**, y
+`Fetcher` pide con `follow_redirects=True`, así que un `301` entre hosts entrega la petición a un
+host que el limitador nunca contabiliza. Es el primo de E15.8 —las redirecciones no pasan por
+`robots.txt`— aplicado a la cortesía.
+
+**Efecto medido:** `web.planeacion.unam.mx` recibió **tres peticiones en 0.66 s** en el lote `d`, con
+un límite configurado de 1 s. Y su `robots.txt` se descargó **dos veces en la misma corrida**, porque
+la caché también se indexa por host pedido.
+
+**C26 pasa de un caso a un patrón reproducible**, con tres mecanismos distintos: el `robots.txt` que
+no pasa por el limitador, el alias de `www` que duplica la cuota, y el `301` entre hosts que la
+contabiliza en el host equivocado. **E22 no propone el arreglo** y el criterio 7 de `05` sigue
+cumpliéndose tal como está redactado.
+
+### E22.3 · `urlnorm` con query string, medido con una sonda deliberada
+
+El lote `f` declaró **a propósito** un encargo que no podía entregar documento: la página del
+Departamento de Personal de DGAPA, **la primera URL del corpus con query string**. Las 156 descargas
+jurídicas de E14, las académicas de E15 y E19 y las 22 de E21 son todas rutas sin parámetros.
+
+```
+sqlite3 legisuni_v2.db "SELECT encargo_id, exito, motivo_fallo, http_status, url_final FROM descargas WHERE encargo_id LIKE 'unam:dgapa-depto-personal%';"
+unam:dgapa-depto-personal:be28b10c6615|0|no_es_pdf|200|https://dgapa.unam.mx/index.php/reconocimientos/pun?view=article&id=268&catid=109
+```
+
+**El query llegó intacto:** el `?`, los tres parámetros y los dos `&` sin escapar, y el servidor
+respondió `200`. El resultado `no_es_pdf` es el correcto para una página.
+
+**Cierra un camino que solo existía en tests.** Coste: una petición. **Es también el primer encargo
+del corpus declarado como instrumento de medición y no como documento**, y se anotó como tal en el
+JSON del lote antes de correrlo.
+
+### E22.4 · Primer `url_muerta` del modo jurídico, y su mecanismo
+
+```
+00:40:35.556  GET https://www.becas.unam.mx/robots.txt                           "200 OK"
+00:40:35.911  GET https://www.becas.unam.mx/bodega/2025/09/BDBRA_2026-1-Conv.pdf "404 Not Found"
+→ motivo_fallo = url_muerta
+```
+
+**El host está vivo y el archivo ya no está.** Los dos `url_muerta` anteriores (E19.5) fueron
+académicos; este es el primero jurídico.
+
+**Interpretación, no medición:** la ruta de la convocatoria **2026-1** es `bodega/2025/09/`, una
+carpeta fechada en septiembre de 2025, y la **2026-2**, publicada en marzo de 2026, está viva **en
+otro host** (`becarios.unam.mx` en vez de `becas.unam.mx`). La lectura es que **cada convocatoria se
+retira cuando sale la siguiente**.
+
+**Si es así, tiene una consecuencia que excede a este documento:** la serie de convocatorias de becas
+2011–2026 que el catálogo pide **puede no existir en línea**. No es que no se haya encontrado: se
+borra cada semestre. La vía alternativa medida es la Gaceta, que sí conserva su archivo (sirvió un
+suplemento de 2023 con `200`, E21.1).
+
+### E22.5 · El estado 🔎 del catálogo no significa «existe»
+
+El catálogo de fuentes declara el estado de cada renglón con cinco símbolos, y su propia leyenda
+define 🔎 como *«URL confirmada en resultados de búsqueda; contenido visto solo en extracto»* — es
+decir, **nadie abrió el documento**.
+
+```
+ocurrencias de estado en las capas A–I del catálogo:
+  🔎  37   localizado, no abierto
+  ⬜  17   por localizar
+  ✅  12   verificado, abierto y leído
+  ☑️   3   heredado
+  📨   3   solo por solicitud de información
+```
+
+**El estado dominante es el más débil.** De los 35 documentos descargados en E21 y E22, la gran
+mayoría salió de renglones 🔎 y respondió, así que la etiqueta no es engañosa en la práctica. **Pero
+G3 es el primer 🔎 que al pedirse resultó no estar** (E22.4), y un índice de buscador puede llevar
+meses desactualizado.
+
+**Es un dato sobre el catálogo, no sobre el Descargador**, y se anota porque el corpus se está
+construyendo sobre él.
+
+### E22.6 · Idempotencia con cero peticiones
+
+```
+# segunda corrida del lote d, 5 minutos después
+total: 7   exitosas: 0   omitidos: 7   hosts distintos pedidos: 0
+```
+
+**Primera vez que el conteo de hosts llega a cero.** Las re-corridas de E21.7 marcaban 1, porque
+quedaba un fallo que sí se vuelve a pedir; el lote `d` no tuvo ninguno, así que la segunda corrida no
+emitió **ninguna petición, ni siquiera de `robots.txt`**.
+
+Es la demostración más limpia de la regla 5 de `05` con M40: con todo descargado y presente en
+disco, una re-corrida no toca la red.
+
+### E22.7 · Un documento con texto **parcial** — **conclusión nueva C27**
+
+Al buscar los términos «fondo fijo» y «revolvente» en el PNOP 2026 (descargado en E21) la búsqueda
+devolvió **cero coincidencias**. Para distinguir «las palabras no están» de «la búsqueda no las vio»
+se midió el texto página por página:
+
+```
+.venv/bin/python -c "
+import pdfplumber
+with pdfplumber.open('data/norm/unam/politicas-normas-presupuestal-2026__2026-10-02.pdf') as p:
+    c=[len(pg.extract_text() or '') for pg in p.pages]
+    print('páginas con texto:', sum(1 for x in c if x>200), 'de', len(c))
+"
+páginas con texto: 153 de 215
+```
+
+**153 de 215 páginas tienen texto extraíble. Las otras 62, no.** No es un escaneo —el documento tiene
+capa de texto en el 71 % de sus páginas— y tampoco es un PDF limpio.
+
+**Dos consecuencias, y la segunda es la importante:**
+
+1. **La búsqueda no concluye nada.** El 29 % del documento fue invisible para ella, y los montos, de
+   existir, viven en anexos y tablas, que es justo lo que peor se extrae. El renglón del catálogo
+   que preguntaba por el fondo fijo **sigue abierto**.
+2. **El criterio con el que se midió la UJAT no detecta este caso.** E12.5 clasificó documentos con
+   `pdfplumber` sobre **las tres primeras páginas**, umbral de 100 caracteres. Este PDF da 1 590
+   caracteres en esas tres páginas: **se clasificaría como «tiene texto» y la fase de OCR lo saltaría
+   entero**, perdiendo 62 páginas sin que nada lo señalara.
+
+**Es el caso que E6.19 anticipaba** —documentos con texto pero mal extraído— medido por primera vez,
+y refina C21: el problema no es solo que haya documentos sin texto, sino que **un documento puede
+tener texto en una parte y no en otra**, y el criterio por documento no lo ve.
+
+### E22.8 · Primeras lecturas del corpus: cuatro afirmaciones del catálogo, verificadas
+
+Hasta aquí, toda la evidencia de este documento venía de **mirar páginas** o de **ejercitar código
+contra servidores**. Esta subsección viene de **abrir documentos que el propio sistema descargó**. No
+hubo red.
+
+**Método:** extracción con `pdfplumber` sobre seis PDF de `data/norm/unam/`, más la lectura de dos
+páginas de la Cuenta Anual 2023.
+
+**1 · Los montos de las becas.** La convocatoria BDBRA 2026-2 declara **$2,500.00 en una sola
+exhibición**. Y la Beca de Fortalecimiento resultó ser **una sola beca con tres expresiones del mismo
+número**: su nombre completo es *Beca de Fortalecimiento de los Estudios de Licenciatura y Alta
+Exigencia*, y su monto, **$11,400 al año = $5,700 por semestre = $950 al mes**. La contradicción que
+el catálogo registraba —que podían ser dos modalidades distintas— **se disuelve**.
+
+**Pero el ritmo declarado estaba mal.** La tabla de pagos del documento muestra **nueve
+depósitos**: el primero de **$3,800** y ocho de $950, no doce de $950. Son doce meses de derecho y
+nueve pagos, con el primero cuatro veces mayor. **Para un modelo que simula pulsos de dinero, esa
+diferencia no es cosmética.**
+
+**2 · Los ingresos del Sistema de Tiendas UNAM.** Las tres Cuentas Anuales del corpus dan cinco
+ejercicios, porque cada estado trae su columna comparativa (miles de pesos, declarado bajo el título
+del estado):
+
+| Año | Ingresos | Costos y gastos | Diferencia |
+|---|---|---|---|
+| 2010 | 209,684 | 266,409 | −56,725 |
+| 2011 | 222,485 | 277,667 | −55,182 |
+| 2021 | 511,784 | 525,857 | −14,073 |
+| 2022 | 560,706 | 595,852 | −35,146 |
+| 2023 | 677,619 | 719,146 | −41,527 |
+
+**La Tienda opera con déficit en los cinco ejercicios medidos.** Y la tabla de *Egresos por función*
+de la Cuenta Anual 2023 (página 15, columnas *Autorizado por Consejo · Ampliación (Reducción) ·
+Ejercido*) desglosa cómo:
+
+```
+COSTOS Y GASTOS DE LA TIENDA (1)     65,723      653,423      719,146
+(1) Los 653,423 son egresos de la Tienda, ejercidos con sus ingresos generados durante el año 2023.
+```
+
+El Consejo Universitario le autoriza **$65.7 M**; sus propios ingresos financian **$653.4 M** de su
+operación; de los **$677.6 M** que ingresa, **el 96 % vuelve a salir** como costo de operarla.
+
+**Consecuencia para el modelo:** la afirmación de que lo que se gasta en la Tienda «regresa a la caja
+central» es cierta en el sentido de que entra como ingreso, **pero el saldo anual es negativo**. Ni
+hacer desaparecer ese dinero ni devolverlo íntegro describe el flujo real.
+
+**3 · La proporción subsidio / ingresos propios, al peso.** El estado de ingresos de 2023 da
+**49,778,834** de subsidio federal y **6,173,239** de ingresos propios sobre **55,952,073**:
+**88.97 % / 11.03 %**. La afirmación del catálogo, «≈ 89 / 11», queda confirmada con el documento
+abierto en vez de con un extracto.
+
+**4 · Un dato que nadie buscaba.** El mismo estado registra **becas por 1,320,722 en 2023 contra
+1,421,006 en 2022**: una caída de unos **$100 millones** en un año. No estaba en ninguna afirmación
+del catálogo.
+
+**Qué significa esta subsección para el proyecto.** Es la primera vez que el corpus **devuelve**
+algo: cuatro afirmaciones que vivían como extracto o como suposición ahora están respaldadas por un
+documento descargado, con su hash y su proveniencia. **Y es trabajo que no necesitó red, LLM ni
+piezas nuevas** — solo abrir lo que ya estaba en disco.
+
+### E22.9 · Dos bloques del catálogo no producen corpus, y la razón no es técnica
+
+De los nueve bloques, **dos no generaron lote**: el de macro y deflactor y el de gobernanza.
+
+- El primero pide **el INPC**, que es una **serie de datos**, no un documento. El guardián acepta
+  `%PDF-` y la firma de ZIP: un CSV se rechazaría con `no_es_pdf` y un XLSX entraría al corpus
+  guardado con extensión `.docx`. **El Descargador no es la herramienta para ese renglón.**
+- El segundo es, por su propio título, **«procedimiento»**: un portal con rejilla JavaScript, la
+  plataforma de solicitudes de información y una nota de prensa. **Ninguno es un documento.**
+
+**Medido de paso, el 2026-10-04:** la página del INPC en INEGI **llega sin cuerpo** a una herramienta
+de fetch; solo vienen sus metadatos, que sí declaran el periodo base vigente. Es el mismo patrón de
+la rejilla vacía que E2 y E20.3 midieron en `transparencia.unam.mx`, y **es la primera vez que
+aparece fuera del mundo universitario**. Debilita un poco más C1, que ya era la conclusión más frágil
+del documento.
+
+### E22.10 · El denominador del catálogo: 25 de 67 renglones
+
+```
+renglones por capa (contados sobre el archivo):
+  A 12 · B  8 · C 10 · D  5 · E  2 · F 12 · G  8 · H  7 · I  3   →  total 67
+```
+
+**Veinticinco renglones tienen al menos un documento en el corpus tras las nueve corridas.** La cifra
+suena peor de lo que es, y la razón importa para interpretar todo lo anterior: **los renglones del
+catálogo no son todos de la misma naturaleza.** Conviven en una sola columna de URL:
+
+- **documentos**, que se descargan y entran al corpus;
+- **índices**, que hay que recorrer para sacar documentos (y que son trabajo de la pieza ②);
+- **páginas cuyo contenido es la fuente misma**, que el corpus **no puede guardar** porque el
+  guardián solo acepta dos firmas de bytes — **siete renglones** están en esta situación;
+- **cifras dentro de documentos que ya tenemos**, que no se descargan sino que se leen (E22.8);
+- **datos que no existen** y que habría que generar, como una encuesta de gasto estudiantil.
+
+**El catálogo distingue bien el *estado* de cada renglón con sus cinco símbolos, pero no su
+*naturaleza*,** y es la naturaleza la que decide si el Descargador puede hacer algo con él. **No se
+propone cambiar el catálogo**, que es del usuario y no es un contrato del Proyecto; se anota porque
+explica por qué «25 de 67» no mide lo que parece medir.
+
+> **Nota de procedencia (2026-10-04).** Los logs de las nueve corridas de la UNAM **no se guardaron
+> en archivo**: los comandos no llevaban `tee`. E21 y E22 se redactaron sobre la salida de terminal
+> pegada en la conversación —con sus fragmentos transcritos literales— y sobre consultas a
+> `legisuni_v2.db`. **No son reconstruibles desde un log**, a diferencia de E15 y E19, cuyos logs sí
+> viven en `~/respaldo-acervo/`. Lo que sí es verificable hoy son las filas de `descargas` e
+> `intentos` con `encargo_id LIKE 'unam:%'`, que conservan `url_final`, `http_status`, `bytes` y
+> motivo. **Si el scrollback de la terminal todavía existe, conviene volcarlo a
+> `~/respaldo-acervo/` y anotarlo aquí: comprobarlo es más barato hoy que mañana.**
+
 | Versión | Fecha | Cambio |
 |---|---|---|
 | v1 | — | Solo UAM y el fallo del 70-I de la UNAM. |
@@ -2091,3 +2855,6 @@ texto no cambia.
 | **v14** | **2026-09-26** | **Reparación de las 47 filas (E18).** `scripts/reparar_omisiones.py` (M35b), en una transacción: 47 afectadas, 47 reparables, 0 intactas. `url_final` y `http_status` de `intentos`; `bytes` del tamaño del archivo con SHA-256 verificado; `puerta_usada = 0` comprobado contra el `orden` del intento. `capturado_en` es estimación (fecha de modificación): las 47 caen el 2026-09-18, de 13:57:31 a 13:58:14. `content_type` sigue en NULL: pérdida definitiva. Después: 0 filas con `bytes` en NULL; `descargas` 163 e `intentos` 168, sin cambios. Copia previa fuera del repo. **Anomalía abierta (E18.1):** 43 s entre el primer archivo y el último es menos que los 46 s mínimos de un rate limit de 1 s sobre 47 peticiones a un host; hay tres explicaciones y ninguna está medida, porque `rate_limit_s` no se registró en E14 y la fecha de un archivo no es la de su petición. Pendiente: registrar `rate_limit_s` y el host en el informe de las corridas futuras. |
 | **v15** | **2026-09-27** | **Corrida del Bloque B (E19): 8/30, más 1 omitido.** 30 encargos, 85 puertas, 27 hosts pedidos, `rate_limit_s` 1.0; 2 `sin_puertas`; 9 archivos nuevos. Primera idempotencia académica en campo (B.12). Control de Nature: la señal de E15.3 distingue muro de acceso abierto, pero sigue sin implementarse (E19.2). PMC sirve HTML en la ruta del PDF en 4 fichas (E19.3). Primer `robots_prohibido` en campo (E19.4). Un enlace muerto en un día (E19.5). M33 actuó 11 veces (E19.6). El reloj retrocede tres veces en el log (WSL, interpretación): cuarta hipótesis, no medida, para E18.1 (E19.7). Portales CRIS: 7 pedidos, 0 éxitos (E19.8). Primeros 3 vestíbulos cruzados con éxito (E19.9). 63 puertas pedidas, 0 `muro_de_pago`, 37 `http_error` (todos `403`); 75 puertas sin muro con el Bloque A (E19.10). 41 filas académicas para 37 encargos: los fallos con `sha256` NULL no se deduplican (M34); son las filas que inflaron una consulta con JOIN (E19.11). Un `robots.txt` que redirige a un login SAML con `200` se leyó como legible: toca D8 (E19.12). B.16 pasó por `idp.nature.com` y descargó: confirma la lectura de M32 (E19.13). **Fuente: logs en `~/respaldo-acervo/m37-*.log`, fuera del repo; fragmentos citados en E19.** Incluye además la nota de M36.2 en E18.1: el pendiente de registrar `rate_limit_s` y los hosts queda cubierto desde M36.1, con la salvedad de que el conteo no incluye los hosts de las redirecciones ni el del salto de vestíbulo. |
 | **v16** | **2026-10-01** | **Tres fixtures nuevas y lo que midieron (E20).** Capturas con `curl` y el UA del proyecto, bytes crudos y cabeceras, de UNAM-OAG, UACAM y el 70-I, con la convención `<inst>__<fecha>` de E9.2; las fixtures viejas de la UAM y la UJAT no llevan fecha y no se renombran porque los tests las nombran (E20.1). **Las tres sirven UTF-8: E6.14 cerrada**, 4 de 5 en UTF-8 y la UAM como única excepción; detectar la codificación sigue siendo requisito (E20.2). La rejilla del 70-I sigue vacía: un `<tr>`, un `<td>`, cero PDF en 763 líneas (E20.3). La fecha de corte de la UACAM sigue en diciembre de 2016 y trae `&nbsp;`: **requisito nuevo, buscarla sobre texto decodificado** (E20.4). UNAM-OAG: 84 enlaces únicos a PDF contra ~60 instrumentos, otra confirmación de C23 con la salvedad de que `href` no es instrumento; UACAM: 81 contra ~82; el «27 propios» sigue sin medir (E20.5). **El criterio 9 de `03` queda bloqueado:** solo hay una captura de la UAM, y la pareja que E9.3 daba por existente no existe; nota fechada en E9.3 (E20.6). **E6.8 queda parcialmente satisfecha:** UJAT y UNAM-OAG recontadas sobre fixtures (M23b, E20.5); recontar en vivo sigue abierto, con nota fechada en la fila. |
+| **v17** | **2026-10-02** | **Primera cosecha jurídica de la UNAM (E21): 22 de 26**, en cinco lotes (`a`, `b`, `b2`, `b3`, `c`) sobre los bloques A, B y C de `catalogo-fuentes.md`. Tercera universidad descargada y **primera cuyos encargos no salen de un índice**: 28 puertas, 26 pedidas, 13 hosts, `rate_limit_s` 1.0, 22 archivos para 21 documentos distintos (E21.1). **Tres dominios no institucionales**, uno de ellos sin justificación posible: la Cuenta Anual 2011 de la UNAM vive en el sitio de su sindicato, descargada con autenticidad degradada por D9 (E21.2). **Primer `robots.txt` legible del modo jurídico:** cinco hosts con `200` que permitieron, ninguno disparó el warning de M38; seis de trece sin `robots.txt` (E21.3). **Dos hosts caídos sin código de estado y reapertura de la pregunta 4 de `05`:** `consejo.unam.mx` sirve un comodín legítimo de Sectigo **sin el intermedio** —`--insecure` da `200`, reproducido desde otra red—, y Hacienda falla igual pero su documento sí responde fuera; aparece una tercera salida que no relaja nada, aportar el intermedio leído de la AIA, sin implementar ni decidir (E21.4). **Puertas múltiples en jurídico, primera vez en campo:** 26 intentos para 26 encargos, dos puertas de respaldo nunca pedidas, y una de ellas codificando una preferencia de D9 en vez de una alternativa (E21.5). `http_error` sin `http_status` no distingue TLS, DNS, conexión rechazada y `500`; por eso el fallo de Hacienda sigue sin causa conocida (E21.6). **Primera medición en campo de M39:** los fallos se repiten en las re-corridas y `descargas` sigue con 26 filas; idempotencia con un solo host pedido (E21.7). **La cortesía por host tiene dos huecos** —el `robots.txt` no pasa por el limitador y un alias de `www` duplica la cuota—, nueva conclusión **C26** (E21.8). **`urlnorm` con `%20` y `+` literales**, y el **primer documento del corpus que solo existe en `http`**, sin redirección: la regla de no promover el esquema tiene su primer caso (E21.9). **Identidad por hash:** un PDF sin año en el nombre resultó ser el PNOP 2026, identificado sin abrirlo, y dejó dos archivos idénticos en disco porque el alias no cruza `grupo_alias` (E21.10). **Un patrón de URL del catálogo estaba mal: primera evidencia medida a favor de D3**, con el mismo riesgo abierto y peor en la serie trimestral del bloque C (E21.11). **Tres fuentes del catálogo son páginas y el corpus no puede guardarlas**, con la mitad negativa del criterio 3 de `05` verificada en campo (E21.12). El reloj retrocede también en jurídico, lo que mantiene abierta E18.1 (E21.13). Hueco de 2.62 s sin explicar que no se repitió (E21.14). **El corpus se solapará con el índice del OAG y el alias no lo atrapará** (E21.15). **El denominador no es el corpus de la UNAM:** el catálogo tiene 59 URLs en nueve bloques y **quedan seis bloques sin tocar** (E21.16). Dos conclusiones nuevas (**C25, C26**) y seis deudas nuevas (**E6.22–E6.27**). |
+| **v18** | **2026-10-04** | **Segunda cosecha de la UNAM y primeras lecturas del corpus (E22): 13 de 15**, en cuatro lotes (`d`, `f`, `g`, `h`). Con E21 queda recorrido el catálogo completo: 41 encargos, 35 archivos, 34 documentos distintos, nueve lotes (E22.1). **C26 reproducida y ampliada:** un `301` entre hosts hace que el limitador contabilice la petición en el host equivocado; medido dos veces, con `web.planeacion` recibiendo tres peticiones en 0.66 s y su `robots.txt` dos veces en una corrida (E22.2). **`urlnorm` con query string, medido con una sonda deliberada**, el primer encargo del corpus declarado como instrumento y no como documento (E22.3). **Primer `url_muerta` del modo jurídico**, con la lectura de que cada convocatoria de becas se retira cuando sale la siguiente, lo que pondría la serie 2011–2026 fuera de línea (E22.4). **El estado 🔎 del catálogo no significa «existe»:** 37 ocurrencias contra 12 ✅, y G3 es el primer contraejemplo (E22.5). **Idempotencia con `hosts distintos pedidos: 0`**, la primera vez que no se emite ninguna petición (E22.6). **Un documento con texto parcial: 153 de 215 páginas**, que el criterio de E12.5 no detecta — conclusión nueva **C27** y deuda **E6.28** (E22.7). **Primeras lecturas del corpus, sin red:** los montos de las becas (una sola beca, $11,400 al año, en **nueve** pagos y no doce), cinco ejercicios de ingresos y costos del Sistema de Tiendas —**déficit en los cinco**, con el desglose *Autorizado · Ampliación · Ejercido*—, la proporción 88.97 / 11.03 confirmada al peso, y una caída de ~$100 M en becas entre 2022 y 2023 (E22.8). **Dos bloques del catálogo no producen corpus** porque lo que piden no son documentos; de paso, la página del INPC en INEGI llega sin cuerpo, primera rejilla vacía fuera del mundo universitario (E22.9). **25 de los 67 renglones del catálogo tienen al menos un documento**, y la cifra engaña porque conviven cinco naturalezas distintas en una sola columna de URL (E22.10). Dos conclusiones nuevas (**C27**, y **C26** ampliada) y dos deudas nuevas (**E6.28**, **E6.29**). |
+| **v19** | **2026-10-04** | **Nota de procedencia al pie de E21 y E22.** Los logs de las nueve corridas de la UNAM **no se guardaron en archivo**: los comandos no llevaban `tee`. Las dos entradas se redactaron sobre la salida de terminal pegada en la conversación —con sus fragmentos transcritos literales— y sobre consultas a `legisuni_v2.db`, así que **no son reconstruibles desde un log**, a diferencia de E15 y E19, cuyos logs sí viven en `~/respaldo-acervo/`. Lo verificable hoy son las filas de `descargas` e `intentos` con `encargo_id LIKE 'unam:%'`. Queda anotado que, si el scrollback de la terminal sobrevive, conviene volcarlo y corregir la nota. **Nota fechada en E6.8:** las cosechas de E21 y E22 **no** cierran esa deuda, porque salieron de un catálogo escrito a mano y no del índice del Abogado General, que sigue sin cosecharse (E21.16); **E6.8 sigue abierta en lo que pedía, recontar en vivo**. **Ninguna medición cambia, ninguna conclusión ni deuda nueva.** E1, E14.5 y E20.5 no se tocan: la conversación del Lector de Índice tiene correcciones medidas para esas tres y entran en la v20. |
