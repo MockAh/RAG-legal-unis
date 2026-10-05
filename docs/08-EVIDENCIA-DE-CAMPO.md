@@ -1,13 +1,18 @@
 # 08 · Evidencia de campo
 
 > Hallazgos **medidos**, no supuestos, obtenidos antes de escribir una línea de código.
-> Estado: vivo · **v19** · se amplía con cada universidad nueva que se explore.
+> Estado: vivo · **v20** · se amplía con cada universidad nueva que se explore.
 > Mediciones: UAM, UNAM-70I, UNAM-OAG, UJAT, **UACAM**.
 > **Medido en vivo el 2026-09-06: la UAM (E1) y la UACAM (E10).** Recontados con herramienta:
 > la **UJAT** en M23b (109 enlaces, sobre sus fixtures) y la **UNAM-OAG** en E20.5 (84 enlaces
-> a PDF, que **no** son 84 instrumentos). **Sigue sin recontar:** cuántos de esos enlaces son
+> a PDF, que **no** son 84 instrumentos) y la **UACAM** en E23.3 (**83**, no 81: el grep de E20.5
+> no distinguía mayúsculas). **Sigue sin recontar:** cuántos de esos enlaces son
 > instrumentos de la UNAM (el «~60» de E3) y el «27 propios» de la UACAM (E10). Ninguno de los
-> dos sale de un grep; ver E20.5.
+> dos sale de un grep; ver E20.5 y E23.3.
+> **v20 (2026-10-04):** el núcleo determinista del Lector de Índice se construyó y se midió contra
+> las cinco fixtures (**E23**). Con ello **E13.5 queda cerrada** y se corrigen tres cifras de este
+> documento. **Ningún documento nuevo se descargó:** E23 mide código contra fixtures, no contra
+> servidores.
 > **Descargas reales ejecutadas:** 45/45 documentos de la UAM el **2026-09-06** (E11) y
 > **105/105 de la UJAT el 2026-09-08** (E12). **150 de 150.** Tras la migración a `Encargo`,
 > **156 de 156 (E14)**, medido el 2026-09-18. **Primera corrida académica: 3 de 7 (E15)**, el
@@ -37,7 +42,7 @@
 | UNAM | Federal | 70-I (PNT/portal propio) | ❌ Rejilla JS, sin filas | 0 | — |
 | UNAM | Federal | Sitio OAG | ✅ HTML plano (Drupal) | ~60 | No (fecha en nombre de archivo) |
 | UJAT | Estatal (Tabasco) | Sitio institucional | ✅ HTML plano (tablas) | ~60 | **No, nada** |
-| UACAM | Estatal (Campeche) | Micrositio de transparencia | ⚠️ HTML plano, **catálogo caducado en 2016** | 27 propios entre ~82 enlaces | No — pero declara **fecha de corte** |
+| UACAM | Estatal (Campeche) | Micrositio de transparencia | ⚠️ HTML plano, **catálogo caducado en 2016** | 27 propios **(sin medir)** entre **87 enlaces únicos** (83 PDF + 4 visor, E23.3) | No — pero declara **fecha de corte** |
 
 **Lo único que falló técnicamente en todo el proyecto fue un formato 70-I.** Los cuatro sitios
 institucionales entregaron su catálogo sin ejecutar JavaScript.
@@ -67,6 +72,14 @@ lo confiesa en una sola línea al pie. Es el hallazgo más importante de las cua
 **Corrección respecto de la v2 de este documento:** decía "~9 históricos"; son **8**. Y decía
 "~30 vigentes"; son **31**, más 5 anexos que la v2 contaba aparte de forma inconsistente.
 
+> **Nota (2026-10-04) — el desglose suma 46 y los enlaces son 47.** 31 + 5 + 8 + 1 + 1 = **46**,
+> mientras M23b y E14.2 miden **47** enlaces a documento. La diferencia es **el huérfano de E1.5**,
+> que no está listado en ninguna rúbrica de esta tabla y por eso nunca entró al desglose.
+> Comprobado al escribir el oráculo de M44 (E23.4), cuadrando las 47 entradas una por una: el
+> `rjd` aparece **dos veces**, el vigente y el huérfano. Y el «45 de 45» de E11 era **47 menos los
+> 2 documentos que la heurística de v1 perdía** (`01` v2.4). **Las tres cifras son consistentes;
+> lo que faltaba era la explicación.**
+
 **Agrupación por materia** que hace el propio sitio: Estructura Orgánica · Órganos Colegiados ·
 Defensoría · Transparencia · Planeación/Presupuesto/Contratación · Personal Académico ·
 Programas Universitarios · Alumnado y Estudios · Políticas · Junta Directiva · Código y
@@ -88,6 +101,13 @@ Los ocho históricos declaran su fecha de cese en el propio texto del enlace:
 con tres registros (uno vigente, dos históricos) ordenables por fecha. Confirma que
 `doc_id` deba llevar la versión dentro (N7) y que reformar produzca un registro nuevo, no una
 sobrescritura.
+
+> **Nota (2026-10-04) — son siete los instrumentos con más de una publicación, no dos.** Medido al
+> escribir el oráculo de M44 (E23.4): `res` y `ripppa` con **tres** publicaciones cada uno; `rjd`,
+> `retra`, `repla`, `reddu` y `ra` con **dos**. Esta sección contaba instrumentos con dos
+> *históricos*, que es otra cosa: el `rjd` tiene su vigente y el huérfano de E1.5, y los demás un
+> vigente y un histórico. **La consecuencia para `doc_id` no cambia**; lo que cambia es el número
+> de grupos que el alias por hash tendrá que comparar.
 
 **Resultó ser la excepción, no la regla** — ver E4. Por eso `estado` es campo de primera
 clase en N2, y por eso su valor por defecto es `desconocido`, no `vigente`.
@@ -126,6 +146,15 @@ leg-univ-uam-res-VIGENTE-HASTA-04.11.2024.pdf
 `leg-` vs `legis-`, con y sin fecha de consolidación intercalada, separadores `.` y `-` para
 la misma fecha. **Consecuencia:** el `doc_slug` se extrae por el sufijo, nunca por patrón de
 ruta completa, y la ruta del archivo histórico **no es derivable** — hay que leerla del índice.
+
+> **Precisión medida (2026-10-04, M44) — el sufijo es el token anterior a la marca, no el
+> último.** En los archivos históricos el último token es **la fecha**:
+> `legis-univ-uam-res-VIGENTE-HASTA-16.03.2026.pdf` → el sufijo es `res`, no `16.03.2026`. La
+> heurística provisional de v1 —«lo que va tras el último guion»— capturaba la fecha, y de ahí
+> salen los slugs-fecha de E13.5 y E14.5. **La regla correcta:** el token anterior a
+> `VIGENTE-HASTA` o `ABROGADO`; para los anexos, el token anterior a `ANEXO`. **Y los anexos
+> tienen dos ortografías en el mismo lote:** `ANEXO1` y `ANEXO3C` pegados, `ANEXO-2`, `ANEXO-3A`
+> y `ANEXO-3B` con guion (E23.5). Es una **conclusión nueva, C28**.
 
 ### E1.4 · Las consolidaciones viejas siguen vivas en el servidor, pero desaparecen del índice
 
@@ -346,6 +375,8 @@ marco jurídico — señal aprovechable por el Localizador.
 | **C25** | **Un certificado válido con cadena incompleta hace perder documentos en un dominio institucional vivo** (E21.4). `consejo.unam.mx` sirve un comodín legítimo de Sectigo sin su intermedio: `--insecure` da `200`, la verificación estricta da cero documentos. Un segundo host (Hacienda) falla con la misma firma, sin diagnosticar | **Reabre la pregunta 4 de `05`**, que E12.3 cerró midiendo otro mecanismo (los `http` de la UJAT que redirigen solos). Por el criterio de E8.2 es **sólida como requisito** —un caso basta para obligar a manejarlo— y **muda sobre su frecuencia** (E6.22). Hay una salida que no relaja nada: aportar el intermedio leído de la extensión AIA del propio certificado |
 | **C26** | **La cortesía por host tiene dos huecos: el `robots.txt` no pasa por el limitador, y un alias de `www` duplica la cuota del mismo servidor** (E21.8) | El criterio 7 de `05` se cumple tal como está redactado, así que **no es un defecto de implementación**: lo que falla es que «host» no sea la unidad correcta para lo que D8 pretende. Medido en cinco corridas: 130–160 ms entre el `robots.txt` y el primer documento de cada host, y 275 ms entre las dos formas del Abogado General, que sirvió cinco documentos repartidos entre ambas |
 | **C27** | **Un documento puede tener texto extraíble en una parte y no en otra** (E22.7). El PNOP 2026 tiene texto en **153 de sus 215 páginas**: no es un escaneo ni un PDF limpio | **Refina C21 y mide por primera vez lo que E6.19 anticipaba.** El criterio de E12.5 —`pdfplumber` sobre las tres primeras páginas, umbral de 100 caracteres— clasificaría este PDF como «tiene texto» y la fase de OCR lo saltaría entero, perdiendo 62 páginas sin señalarlo. **La spec de extracción necesita un criterio por página, no por documento** |
+| **C28** | **El sufijo estable de un archivo es el token anterior a la marca, no el último** (E1.3, E23.5). En la UAM el último token es la fecha, y los anexos traen dos ortografías en el mismo lote | Refina C4. Es la causa raíz de los slugs-fecha de E13.5: la heurística «lo que va tras el último guion» captura la fecha y no el instrumento. **La regla correcta está implementada y medida contra 47 casos** (E23.4) |
+| **C29** | **Cambiar el algoritmo de `doc_slug` reescribe los mismos bytes bajo otro `grupo_alias`** (E23.6, E21.15). Medido dos veces: **14 documentos** de la UAM al corregir la heurística, y **5** de la UNAM entre un catálogo a mano y el índice del OAG | **No es un defecto del alias: es la consecuencia de que el slug sea parte de la identidad.** Y no lanza ningún error: la regla de no sobrescribir hace lo que debe y el corpus se infla en silencio. Obliga a un prerrequisito de procedimiento (`03`) y a una guardia en la base (`07`) |
 
 ---
 
@@ -366,7 +397,7 @@ marco jurídico — señal aprovechable por el Localizador.
 | E6.11 | ¿Cuántos índices más declaran fecha de corte? | Si C13 se repite, el Lector necesita esa comprobación **antes** que ninguna otra |
 | E6.12 | **El rate limit real, medido** | Los logs de `httpx` no lo miden (E11.7). Hace falta que `RateLimiter` emita su propia línea. Sin eso, el criterio 7 de `05` se firma a ojo |
 | E6.13 | **¿Cuántos sitios devuelven un `robots.txt` inesperado?** | 1 de 1 probado (E11.1). Si el patrón se repite, fail-open pasa de decisión prudente a requisito obvio; si la UAM es rara, conviene saberlo |
-| E6.14 | **Qué codificación declaran los otros índices** | La UAM es `iso-8859-1` (E11.3). Si UNAM, UJAT y UACAM son UTF-8, el Lector necesita detectar, no elegir un default |
+| ~~E6.14~~ | ~~Qué codificación declaran los otros índices~~ | **CERRADA (E20.2):** 4 de 5 en UTF-8, con la UAM como única excepción. El requisito de detectar sigue en pie: asumir UTF-8 acertaría cuatro de cinco y corrompería los títulos de la UAM en silencio |
 | E6.15 | **Comportamiento ante un `robots.txt` que sí prohíbe** | La corrida de la UAM nunca llegó a parsear uno. Ese camino solo está cubierto por tests, no por campo |
 | E6.16 | **Descargar los 4 documentos de Drive de la UACAM** | E10.2 los halló; nadie ha comprobado que el Descargador los mande a cola manual como `visor_de_terceros` en vivo. Es la validación de campo de C14 |
 | E6.17 | **¿Qué proporción de escaneos tienen las otras estatales?** | UJAT 23 %, UAM 0 % (C21). Con dos puntos no hay tendencia. Si las estatales rondan el 20 %, el OCR es infraestructura, no un parche |
@@ -382,6 +413,9 @@ marco jurídico — señal aprovechable por el Localizador.
 | E6.27 | **¿Qué se hace con una fuente que es una página y no un documento?** | Tres casos medidos (E21.12). El guardián solo acepta `%PDF-` y `PK\x03\x04`, así que una página que *es* la fuente no puede entrar al corpus, aunque respalde una afirmación citable. Decidir qué se archiva y cómo se fecha toca `05` |
 | E6.28 | **¿Cuántos documentos del corpus tienen texto parcial?** | 1 medido de 1 probado (E22.7, C27). El criterio por documento de E12.5 no los detecta, así que los 156 jurídicos y los académicos **no están clasificados por este criterio**. Decide si la fase de extracción necesita una pasada por página sobre todo el corpus |
 | E6.29 | **¿Se puede recuperar un documento que el sitio ya borró?** | G3 desapareció entre su registro en el catálogo y la corrida (E22.4). Un archivo web conservaría la URL original y la fecha de captura —que es lo que D5 pide— pero **no es un dominio institucional**, así que entraría con autenticidad degradada, como la Cuenta Anual que vive en el sitio del sindicato (E21.2). No está decidido si eso es aceptable |
+| E6.30 | **El oráculo de contenido de la UACAM: cuáles de sus 83 enlaces son normativa propia** | El «27» de E10 es estimación y **no se puede medir con grep** (E20.5). Sin ese oráculo, el criterio 4 de `03` y el 12 de `04` no son puntuables por nadie. Es trabajo humano de lectura, y sirve a las dos specs a la vez |
+| E6.31 | **Oráculo de `tipo_norma` y `estado` para la UAM** | `datos/oraculo-uam.tsv` cubre los slugs (E23.4) y nada más. Los 31 vigentes, 8 históricos y 1 abrogado del criterio 1 de `03` siguen sin hoja de respuestas, así que la clasificación del agente **no se podrá puntuar** cuando exista |
+| E6.32 | **¿Cuántos conteos más de este documento se hicieron con un grep sensible a mayúsculas?** | El de la UACAM subcontaba por eso (E23.3). UNAM-OAG y UJAT se recontaron y aguantan; **el resto no se ha revisado**, y es barato: basta repetirlos con `-i` |
 
 **Próxima medición recomendada: E6.10.** Es la más barata (una URL ya conocida) y la que más
 cambia: decide si el hallazgo de E10.1 es una rama histórica correctamente rotulada —molesta
@@ -465,6 +499,8 @@ ese criterio nuevo, el marcador honesto no es 4 de 4 sino **3 de 4**.
 | C7 · los contratos colectivos se publican | **Débil** | Dos de tres, y ambos son sindicatos grandes y consolidados |
 | C14 · visor de terceros | **Débil en frecuencia, sólida en existencia** | 4 documentos en 1 de 4 instituciones. Obliga a manejarlo; no dice que sea común |
 | **C1 · todos los sitios sirven HTML plano** | **Sigue siendo la más débil** | Cuatro casos ahora, no tres — mejor, pero todos hallables por búsqueda. Es exactamente la que más decisión sostiene (no pagar Playwright) |
+| C28 · el sufijo es el token anterior a la marca | **Sólida para la UAM, no generalizable** | Medido contra los 47 casos de una institución. **Dice cómo se derivan los slugs de la UAM**, no de ninguna otra: la UNAM usa prefijo numérico y la UJAT nada (C4) |
+| C29 · cambiar el slug duplica el corpus | **Sólida** | Es una propiedad de cómo está definido `grupo_alias`, no de los sitios medidos. Dos mediciones independientes y un mecanismo deducible del contrato (`01` N2) |
 
 **Léase con cuidado:** las conclusiones que dicen *"esto existe, manéjalo"* aguantan con un
 solo caso. Las que dicen *"esto es lo normal"* necesitan muchos más. C1 es del segundo tipo y
@@ -1038,12 +1074,19 @@ de escribir habría reconocido los 45 y no habría duplicado nada.
 mismo índice, no de una reconsolidación real. El caso que motivó la decisión —URLs nuevas para
 los mismos bytes— sigue sin medirse en campo.
 
-### E13.5 · Los slugs confirman en disco lo que E11.6 dijo en teoría
+### E13.5 · Los slugs confirman en disco lo que E11.6 dijo en teoría — **CERRADA (2026-10-03)**
 
 Entre los nombres aparecen `2026__2026-09-06.pdf`, `24.03.2025__2026-09-06.pdf` y
 `25.02.2026__2026-09-08.pdf`: **fechas usadas como nombre del instrumento**. Es la heurística
 provisional que E11.6 ya había señalado, ahora visible en el corpus. Confirma que estos nombres
 son desechables y que la base se rehace, no se migra (`01`, §Migración).
+
+> **Cerrada el 2026-10-03 por M45 (E23.4).** `lector/slug.py` reproduce los 47 slugs del oráculo
+> escrito a mano, sin excepciones: **ningún `doc_slug` de la UAM es ya una fecha**, y las tres
+> publicaciones del Reglamento de Estudios Superiores comparten `res`. El defecto era del Lector,
+> como E14.5 decía, y es del Lector el arreglo.
+> **Lo que queda abierto es su consecuencia, no el defecto:** al corregirse, **14 documentos de la
+> UAM cambian de `grupo_alias`** y los mismos bytes se escribirían otra vez (E23.6, C29).
 
 ### E13.6 · Qué cambia para la migración
 
@@ -1152,7 +1195,7 @@ directorio de la UAM, coinciden con los slugs de los dos históricos.
 medido en campo: los dos históricos que en E11.6 colisionaban ya no colisionan, y la corrida no
 perdió ninguno de los tres.
 
-### E14.5 · Siete slugs con forma de fecha en la UAM — E13.5 sigue abierta
+### E14.5 · Siete slugs con forma de fecha en la UAM — **son nueve (nota de 2026-10-03)**
 
 ```
 sqlite3 legisuni_v2.db "select encargo_id from descargas where encargo_id like 'uam:%' order by 1;" | grep -c "^uam:[0-9][0-9]\."
@@ -1169,6 +1212,23 @@ RES (E14.4). Es la heurística provisional que E11.6 señaló y E13.5 vio en dis
 migración no la tocó**: los slugs los produce el Lector de Índice, no el Descargador.
 **E13.5 sigue abierta y es del Lector.** El patrón cuenta solo los slugs que empiezan con dos
 dígitos y un punto; no cubre otras formas de fecha como el `2026__` que E13.5 también citó.
+
+> **Nota (2026-10-03) — la advertencia del párrafo anterior se cumplió: son nueve.** Al listar los
+> 47 `encargo_id` de la UAM sin filtro aparecen **dos `uam:2026`** además de los siete `DD.`:
+>
+> ```
+> sqlite3 -readonly legisuni_v2.db "select encargo_id from descargas where encargo_id like 'uam:%' order by 1;"
+> uam:2026:66959f9a43f1   ← el PDF consolidado
+> uam:2026:c24626739b6f   ← histórico del RIPPPA (…-julio-2025-ripppa-VIGENTE-HASTA-05-ENERO-2026)
+> ```
+>
+> Son el par con slug idéntico que C20 citaba sin decir qué eran: **no eran dos históricos, sino
+> el consolidado y un histórico.** Y el listado destapó **un segundo defecto que no estaba en
+> ninguna parte**: tres anexos con slug **posicional** (`uam:2`, `uam:3a`, `uam:3b`), que no
+> nombran un instrumento sino un fragmento.
+> **Total de documentos de la UAM que cambian de `doc_slug` al corregirlo: 14** — 9 con forma de
+> fecha y 5 anexos (los 3 posicionales más 2 que ganan el prefijo del instrumento del que
+> cuelgan). Ver E23.4 y E23.6. **E13.5 queda cerrada por M45.**
 
 ### E14.6 · Tres `.docx`
 
@@ -2076,6 +2136,21 @@ unam-70i    0
   universidades (E3.6), así que no todo enlace es un instrumento de la UNAM. La cifra comparable
   con E3 sigue sin medirse.
 - **UACAM: 81 contra «~82» de E10.** Ese sí era bueno.
+
+> **Corrección (2026-10-03, al construir M42) — eran 83.** El grep de arriba usa `\.pdf` **sin
+> `-i`**, y dos archivos del índice llevan la extensión en mayúsculas:
+> `circulares administrativas 2013.PDF` y `acuerdo 001.PDF`. Medido con `lector/classify.py`, que
+> recorta el `href` y compara sin distinguir mayúsculas: **87 enlaces únicos = 83 PDF + 4 de
+> visor** (E10.2). Ver E23.3.
+> **Alcance de la corrección: solo la UACAM.** UNAM-OAG se recontó el 2026-10-03 con `grep -oiE`
+> y con el parser, y los tres métodos dan **84**. La UJAT da **109** con el parser
+> insensible a mayúsculas, el mismo número que M23b: tampoco hay extensiones ocultas ahí.
+> **Consecuencia para el criterio 4 de `03`:** el «27 propios» se contará sobre **83**, y uno de
+> los dos recuperados, `acuerdo 001`, está en la rúbrica **h** (Acuerdos del Consejo
+> Universitario), así que es candidato a normativa propia.
+> **Es la tercera vez que un conteo queda corto**, tras C23 (UJAT, a ojo) y el «~60» de E3. Las
+> tres por razones distintas, y la lección es la misma: **contar sobre el documento parseado, no
+> sobre el HTML crudo.**
 - **El «27 propios» de la UACAM sigue sin medir, y no se puede medir con grep.** Separar su
   normativa de la ajena exige leer los títulos, que es justo lo que pone a prueba el criterio 4
   de `03`.
@@ -2837,6 +2912,124 @@ explica por qué «25 de 67» no mide lo que parece medir.
 > motivo. **Si el scrollback de la terminal todavía existe, conviene volcarlo a
 > `~/respaldo-acervo/` y anotarlo aquí: comprobarlo es más barato hoy que mañana.**
 
+---
+
+## E23 · El núcleo determinista del Lector, medido (2026-10-03)
+
+**Es la primera evidencia que no viene de mirar páginas ni de pedir documentos a servidores, sino
+de ejercitar el Lector de Índice contra las cinco fixtures.** Micro-tareas M41–M46 de
+`PLAN-MIGRACION.md`. Todo lo que sigue sale de los comandos que se muestran; no hubo red.
+
+### E23.1 · Qué se construyó
+
+| Módulo | Tarea | Qué cierra |
+|---|---|---|
+| `lector/reduce.py` | M41 | codificación detectada; pie conservado; `&nbsp;` intacto; `href` crudo |
+| `lector/classify.py` | M42 | `href` recortado **antes** de filtrar; visores reutilizando `visores.json` |
+| `lector/corte.py` | M43 | fecha de corte **con el agente desconectado** |
+| `lector/slug.py` | M45 | `doc_slug` por sufijo, prefijo numérico o título |
+| `lector/cuenta.py` | M46 | deduplicación y resta sobre URL normalizada (`01` N3) |
+
+**393 tests en verde.** `lector/identidad.py` **no existe**: sería un tercer sitio componiendo
+`entry_id`, después de `juridico/identificadores.py` y `descargador/urlnorm.py`.
+
+### E23.2 · Los conteos se reproducen desde `lector/`
+
+```
+reduce+classify+cuenta+slug+identificadores.entry_id sobre las 6 fixtures de UAM y UJAT
+156 156 47
+```
+
+**156 entradas, 156 `entry_id` únicos, 47 de la UAM**, los mismos que afirma
+`tests/test_extraccion_indices.py` y que midió E14.2 en campo. **El prototipo desechable
+(`cosecha.py`, `cosecha_uam.py`) ya no es la única fuente de esos números.**
+
+### E23.3 · Conteos por fixture, con el parser
+
+```
+fixture                      enlaces → candidatos → únicos
+uam-index.html                    62 →  47 →  47
+unam-oag__2026-10-01.html        199 →  84 →  84
+uacam__2026-10-01.html           146 →  89 →  87     (83 .pdf + 4 de visor)
+unam-70i__2026-10-01.html          ? →   0 →   0
+ujat-*.html (cinco)                ? → 109 → 109
+```
+
+- **La UACAM son 83 PDF, no 81** (corrección en E20.5): el grep de E20.5 no era `-i` y el índice
+  sirve dos `.PDF` en mayúsculas.
+- **89 candidatos y 87 únicos:** dos enlaces repetidos, que la deduplicación por URL normalizada
+  resuelve.
+- **Los 4 de visor son exactamente los de E10.2** —Formato ARCO, Ley de Transparencia, Ley de
+  Protección de Datos y los Lineamientos de la UAC—, reconocidos con
+  `descargador.guard.es_visor_de_terceros`, que lee `visores.json`: **una sola lista de patrones,
+  no dos.**
+- **El 70-I da cero candidatos**, con la rejilla congelada de E20.3.
+
+### E23.4 · El oráculo de la UAM: 47 slugs escritos a mano
+
+`datos/oraculo-uam.tsv` (M44) fija los 47 `doc_slug` correctos, leídos uno a uno del `href`. Es
+**el primer oráculo de contenido del proyecto**: hasta aquí el único era de conteos (47/109/156).
+
+```
+awk -F'\t' 'NR>1 {print ($2=="" ? $1 : $2)}' datos/oraculo-uam.tsv | sort | uniq -c | sort -rn
+      3 ripppa      3 res
+      2 rjd   2 retra   2 repla   2 reddu   2 ra
+      1 ... (los demás)
+```
+
+**`slug.py` reproduce las 47 filas sin excepciones ni ajustes al oráculo.** Y sobre las cinco
+fixtures de la UJAT, **cero slugs con residuos de percent-encoding** (`20de`, `c3-93`): el
+criterio 7 de `03` queda cumplido **en campo** y no solo sobre el caso sintético de E12.7.
+
+**Lo que esto NO prueba:** que los 47 slugs sean jurídicamente correctos. Eso lo garantiza la hoja
+de respuestas escrita a mano, no los tests: si una fila estuviera mal, la suite pasaría igual. Es
+el límite de cualquier oráculo, y conviene tenerlo escrito.
+
+### E23.5 · Tres hallazgos de construcción que no estaban en este documento
+
+**1 · El separador importa.** El texto reducido de la UACAM pegaba el fin de un elemento con el
+principio del siguiente:
+
+```
+…en la Universidad Autónoma de CampecheFecha de corte:\xa0Diciembre del 2016
+```
+
+Ese HTML no trae saltos de línea entre etiquetas y el de la UAM sí, de modo que el defecto solo
+aparece en una de las cinco fixtures. **La fecha de corte se detectó igual, por suerte y no por
+diseño:** el pegado quedó *antes* del patrón. Corregido en M42 uniendo los nodos con `\n`.
+
+**2 · Los anexos tienen dos ortografías en el mismo lote** (ver C28): `ANEXO1` y `ANEXO3C`
+pegados; `ANEXO-2`, `ANEXO-3A` y `ANEXO-3B` con guion.
+
+**3 · Siete instrumentos de la UAM tienen más de una publicación**, no dos (nota en E1.1).
+
+### E23.6 · Catorce documentos de la UAM cambian de `grupo_alias` — **C29**
+
+Al corregir los slugs, **14 de los 47 documentos de la UAM cambian de `doc_slug`**: los 9 con
+forma de fecha (E14.5) y los 5 anexos. Como `grupo_alias = f"{inst_id}:{doc_slug}"` (N10) y el
+alias por hash **solo compara dentro de un grupo**, los mismos bytes se escribirían otra vez con
+otra `etiqueta`, **sin que nada falle**: la regla de no sobrescribir jamás hace exactamente lo que
+debe.
+
+**Es el mismo mecanismo que E21.15 midió en la UNAM** —cinco documentos cosechados con slugs
+escritos a mano que no casarán con los `unam:n<N>` del Lector (E3.4)—, ahora con un segundo caso y
+un número. **Conclusión nueva C29.**
+
+**El remedio es de procedimiento y ya está escrito** (`03` §Prerrequisito, `07` §Guardia de slug):
+la primera corrida con Lector real se hace sobre `data/` vacío y base limpia, con respaldo previo
+fuera del repo. **Lo que no resuelve es unificar slugs entre fuentes distintas**, que sigue siendo
+E6.25.
+
+### E23.7 · Nota de método: el oráculo se escribió antes que el código que lo cumple
+
+`datos/oraculo-uam.tsv` (M44) se llenó a mano **antes** de escribir `slug.py` (M45), y la tarea
+decía expresamente que, si alguna de las 47 filas no cuadraba, **se detuviera y reportara en vez
+de ajustar el oráculo o añadir una excepción por fila**. No hizo falta: cuadraron las 47.
+
+Importa porque es la primera vez que el proyecto tiene una hoja de respuestas **anterior** al
+código evaluado. Los conteos 47/109/156 se escribieron al medir, y por eso no distinguen «el
+código acierta» de «el código define la respuesta».
+
 | Versión | Fecha | Cambio |
 |---|---|---|
 | v1 | — | Solo UAM y el fallo del 70-I de la UNAM. |
@@ -2858,3 +3051,4 @@ explica por qué «25 de 67» no mide lo que parece medir.
 | **v17** | **2026-10-02** | **Primera cosecha jurídica de la UNAM (E21): 22 de 26**, en cinco lotes (`a`, `b`, `b2`, `b3`, `c`) sobre los bloques A, B y C de `catalogo-fuentes.md`. Tercera universidad descargada y **primera cuyos encargos no salen de un índice**: 28 puertas, 26 pedidas, 13 hosts, `rate_limit_s` 1.0, 22 archivos para 21 documentos distintos (E21.1). **Tres dominios no institucionales**, uno de ellos sin justificación posible: la Cuenta Anual 2011 de la UNAM vive en el sitio de su sindicato, descargada con autenticidad degradada por D9 (E21.2). **Primer `robots.txt` legible del modo jurídico:** cinco hosts con `200` que permitieron, ninguno disparó el warning de M38; seis de trece sin `robots.txt` (E21.3). **Dos hosts caídos sin código de estado y reapertura de la pregunta 4 de `05`:** `consejo.unam.mx` sirve un comodín legítimo de Sectigo **sin el intermedio** —`--insecure` da `200`, reproducido desde otra red—, y Hacienda falla igual pero su documento sí responde fuera; aparece una tercera salida que no relaja nada, aportar el intermedio leído de la AIA, sin implementar ni decidir (E21.4). **Puertas múltiples en jurídico, primera vez en campo:** 26 intentos para 26 encargos, dos puertas de respaldo nunca pedidas, y una de ellas codificando una preferencia de D9 en vez de una alternativa (E21.5). `http_error` sin `http_status` no distingue TLS, DNS, conexión rechazada y `500`; por eso el fallo de Hacienda sigue sin causa conocida (E21.6). **Primera medición en campo de M39:** los fallos se repiten en las re-corridas y `descargas` sigue con 26 filas; idempotencia con un solo host pedido (E21.7). **La cortesía por host tiene dos huecos** —el `robots.txt` no pasa por el limitador y un alias de `www` duplica la cuota—, nueva conclusión **C26** (E21.8). **`urlnorm` con `%20` y `+` literales**, y el **primer documento del corpus que solo existe en `http`**, sin redirección: la regla de no promover el esquema tiene su primer caso (E21.9). **Identidad por hash:** un PDF sin año en el nombre resultó ser el PNOP 2026, identificado sin abrirlo, y dejó dos archivos idénticos en disco porque el alias no cruza `grupo_alias` (E21.10). **Un patrón de URL del catálogo estaba mal: primera evidencia medida a favor de D3**, con el mismo riesgo abierto y peor en la serie trimestral del bloque C (E21.11). **Tres fuentes del catálogo son páginas y el corpus no puede guardarlas**, con la mitad negativa del criterio 3 de `05` verificada en campo (E21.12). El reloj retrocede también en jurídico, lo que mantiene abierta E18.1 (E21.13). Hueco de 2.62 s sin explicar que no se repitió (E21.14). **El corpus se solapará con el índice del OAG y el alias no lo atrapará** (E21.15). **El denominador no es el corpus de la UNAM:** el catálogo tiene 59 URLs en nueve bloques y **quedan seis bloques sin tocar** (E21.16). Dos conclusiones nuevas (**C25, C26**) y seis deudas nuevas (**E6.22–E6.27**). |
 | **v18** | **2026-10-04** | **Segunda cosecha de la UNAM y primeras lecturas del corpus (E22): 13 de 15**, en cuatro lotes (`d`, `f`, `g`, `h`). Con E21 queda recorrido el catálogo completo: 41 encargos, 35 archivos, 34 documentos distintos, nueve lotes (E22.1). **C26 reproducida y ampliada:** un `301` entre hosts hace que el limitador contabilice la petición en el host equivocado; medido dos veces, con `web.planeacion` recibiendo tres peticiones en 0.66 s y su `robots.txt` dos veces en una corrida (E22.2). **`urlnorm` con query string, medido con una sonda deliberada**, el primer encargo del corpus declarado como instrumento y no como documento (E22.3). **Primer `url_muerta` del modo jurídico**, con la lectura de que cada convocatoria de becas se retira cuando sale la siguiente, lo que pondría la serie 2011–2026 fuera de línea (E22.4). **El estado 🔎 del catálogo no significa «existe»:** 37 ocurrencias contra 12 ✅, y G3 es el primer contraejemplo (E22.5). **Idempotencia con `hosts distintos pedidos: 0`**, la primera vez que no se emite ninguna petición (E22.6). **Un documento con texto parcial: 153 de 215 páginas**, que el criterio de E12.5 no detecta — conclusión nueva **C27** y deuda **E6.28** (E22.7). **Primeras lecturas del corpus, sin red:** los montos de las becas (una sola beca, $11,400 al año, en **nueve** pagos y no doce), cinco ejercicios de ingresos y costos del Sistema de Tiendas —**déficit en los cinco**, con el desglose *Autorizado · Ampliación · Ejercido*—, la proporción 88.97 / 11.03 confirmada al peso, y una caída de ~$100 M en becas entre 2022 y 2023 (E22.8). **Dos bloques del catálogo no producen corpus** porque lo que piden no son documentos; de paso, la página del INPC en INEGI llega sin cuerpo, primera rejilla vacía fuera del mundo universitario (E22.9). **25 de los 67 renglones del catálogo tienen al menos un documento**, y la cifra engaña porque conviven cinco naturalezas distintas en una sola columna de URL (E22.10). Dos conclusiones nuevas (**C27**, y **C26** ampliada) y dos deudas nuevas (**E6.28**, **E6.29**). |
 | **v19** | **2026-10-04** | **Nota de procedencia al pie de E21 y E22.** Los logs de las nueve corridas de la UNAM **no se guardaron en archivo**: los comandos no llevaban `tee`. Las dos entradas se redactaron sobre la salida de terminal pegada en la conversación —con sus fragmentos transcritos literales— y sobre consultas a `legisuni_v2.db`, así que **no son reconstruibles desde un log**, a diferencia de E15 y E19, cuyos logs sí viven en `~/respaldo-acervo/`. Lo verificable hoy son las filas de `descargas` e `intentos` con `encargo_id LIKE 'unam:%'`. Queda anotado que, si el scrollback de la terminal sobrevive, conviene volcarlo y corregir la nota. **Nota fechada en E6.8:** las cosechas de E21 y E22 **no** cierran esa deuda, porque salieron de un catálogo escrito a mano y no del índice del Abogado General, que sigue sin cosecharse (E21.16); **E6.8 sigue abierta en lo que pedía, recontar en vivo**. **Ninguna medición cambia, ninguna conclusión ni deuda nueva.** E1, E14.5 y E20.5 no se tocan: la conversación del Lector de Índice tiene correcciones medidas para esas tres y entran en la v20. |
+| **v20** | **2026-10-04** | **El núcleo determinista del Lector de Índice, construido y medido contra las cinco fixtures (E23).** Cinco módulos (`reduce`, `classify`, `corte`, `slug`, `cuenta`), 393 tests, y los conteos **156 · 156 · 47** reproducidos desde `lector/` y ya no solo desde el prototipo desechable (E23.2). **Primer oráculo de contenido del proyecto:** `datos/oraculo-uam.tsv`, 47 slugs escritos a mano **antes** del código que los cumple, y `slug.py` los reproduce sin excepciones (E23.4, E23.7). **Tres cifras corregidas con nota fechada:** la UACAM son **83** enlaces a PDF y no 81 —el grep de E20.5 no era `-i` y el índice sirve dos `.PDF`—, con alcance acotado porque UNAM-OAG (84) y UJAT (109) aguantan con los tres métodos (E20.5, E23.3); los slugs-fecha de la UAM son **nueve** y no siete, porque el glob de E14.5 solo veía la forma `DD.`, más **tres anexos con slug posicional** que nadie había contado (E14.5); y el desglose de E1 suma 46 porque **el huérfano de E1.5 no está en ninguna rúbrica**, lo que explica a la vez el 46, el 45 de E11 y el 47 medido (E1). **E13.5 queda cerrada por M45:** ningún `doc_slug` de la UAM es ya una fecha, y las tres publicaciones del Reglamento de Estudios Superiores comparten `res`. **E6.14 se marca cerrada** en su fila (la v16 ya lo decía en el texto). Dos conclusiones nuevas: **C28**, el sufijo estable es el token anterior a la marca y no el último —causa raíz de E13.5—, y **C29**, cambiar el algoritmo de `doc_slug` reescribe los mismos bytes bajo otro `grupo_alias`, medido en **14 documentos** de la UAM y **5** de la UNAM (E23.6, E21.15), sin que nada falle. Tres deudas nuevas (**E6.30–E6.32**). Además: siete instrumentos de la UAM tienen más de una publicación y no dos (E1.1), el sufijo de los anexos trae dos ortografías en el mismo lote (E1.3, E23.5), y el reductor pegaba elementos contiguos en la UACAM, de modo que la fecha de corte se detectaba **por suerte y no por diseño** (E23.5). **Ningún documento nuevo se descargó: E23 mide código contra fixtures, no contra servidores.** |
