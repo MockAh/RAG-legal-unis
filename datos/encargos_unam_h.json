@@ -1,0 +1,104 @@
+{
+  "lote_id": "catalogo-fuentes-h-e2175405",
+  "archivo_origen": "catalogo-fuentes.md",
+  "sha256_archivo": "e21754059e9134e24b7522fe6a306006fa9981a395dc16e9f94dc7cc0dc9a149",
+  "encargos": [
+    {
+      "encargo_id": "unam:manual-procedimientos-dgpu:34f354458f9d",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.abogadogeneral.unam.mx/sites/default/files/archivos/RepositorioCont/6_Dependencias/112_DireccionGeneraldelPatrimonioUniversitario/9_Manual_Procedimientos_DA.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#H3",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "manual-procedimientos-dgpu__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:manual-procedimientos-dgpu",
+      "creado_en": "2026-10-04T00:45:00"
+    },
+    {
+      "encargo_id": "unam:memoria-unam-2023-dgpu:f688686a712c",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.planeacion.unam.mx/Memoria/2023/PDF/11.5-DGPU.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#H4",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "memoria-unam-2023-dgpu__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:memoria-unam-2023-dgpu",
+      "creado_en": "2026-10-04T00:45:00"
+    }
+  ],
+  "no_obtenidos": [],
+  "_notas": [
+    {
+      "ref_catalogo": "H4",
+      "aviso": "va a www.planeacion.unam.mx, que esta medido que responde 301 hacia web.planeacion.unam.mx. Se espera exito con url_final en web.planeacion."
+    },
+    {
+      "ref_catalogo": "H6",
+      "aviso": "NO es un documento: el catalogo dice 'dentro de C4'. La cifra de ingresos del Sistema de Tiendas esta dentro de la Cuenta Anual, que ya esta en el corpus (2023, 2022, 2011). Lo que falta es leerla, no descargarla."
+    },
+    {
+      "ref_catalogo": "bloque I",
+      "aviso": "el bloque I no genera lote: sus tres renglones son un portal con rejilla JS, una herramienta sin esquema y una nota de prensa. Cero documentos descargables."
+    }
+  ],
+  "_no_declarados": [
+    {
+      "ref": "H1",
+      "url": "http://www.patrimonio.unam.mx/patrimonio/index.php?dr=norm&cont=tbl_lineamientos_comercio",
+      "por_que": "portal de la DGPU con query string, por http; requiere Lector de Indice"
+    },
+    {
+      "ref": "H2",
+      "url": "http://www.patrimonio.unam.mx/patrimonio/?dr=norm&cont=lineamientos_reapertura",
+      "por_que": "portal de la DGPU con query string, por http; requiere Lector de Indice"
+    },
+    {
+      "ref": "I1",
+      "url": "https://transparencia.unam.mx/obligaciones/",
+      "por_que": "rejilla JavaScript vacia (medido); solo navegador. Ya no declarado en el bloque C"
+    },
+    {
+      "ref": "I3",
+      "url": "https://www.gaceta.unam.mx/entrega-unam-la-cuenta-anual-2023-a-la-asf/",
+      "por_que": "nota de prensa en HTML, no documento. Puede enlazar la Cuenta Anual: eso si seria ficha"
+    }
+  ],
+  "_sin_url": [
+    {
+      "ref": "H5",
+      "documento": "Contratos de concesion y canon por puesto (CU / FC)",
+      "por_que": "sin URL; el catalogo lo marca 📨. Es el dato que falta para K1"
+    },
+    {
+      "ref": "H6",
+      "documento": "Ingresos del Sistema de Tiendas UNAM",
+      "por_que": "el catalogo dice 'dentro de C4': esta DENTRO de la Cuenta Anual, ya descargada (2023, 2022, 2011). No es un documento aparte: es una cifra que hay que leer"
+    },
+    {
+      "ref": "H7",
+      "documento": "Gasto del estudiante en campus",
+      "por_que": "sin URL; el catalogo lo marca como encuesta propia, es decir, dato que no existe y habria que generar"
+    },
+    {
+      "ref": "I2",
+      "documento": "Plataforma Nacional de Transparencia (solicitudes)",
+      "por_que": "el catalogo da 'plataformadetransparencia.org.mx' SIN esquema. No se declara (D3). Ademas es una herramienta, no un documento"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "lote_id": "catalogo-fuentes-g-e2175405",
+  "archivo_origen": "catalogo-fuentes.md",
+  "sha256_archivo": "e21754059e9134e24b7522fe6a306006fa9981a395dc16e9f94dc7cc0dc9a149",
+  "encargos": [
+    {
+      "encargo_id": "unam:convocatoria-bdbra-2026-1:33c0d04d4070",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.becas.unam.mx/bodega/2025/09/BDBRA_2026-1-Conv.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#G3",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "convocatoria-bdbra-2026-1__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:convocatoria-bdbra-2026-1",
+      "creado_en": "2026-10-04T00:40:00"
+    },
+    {
+      "encargo_id": "unam:convocatoria-bdbra-2026-2:6c1f18501520",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.becarios.unam.mx/Portal2018/wp-content/uploads/2026/03/Convocatoria-BDBRA-2026-2.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#G4",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "convocatoria-bdbra-2026-2__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:convocatoria-bdbra-2026-2",
+      "creado_en": "2026-10-04T00:40:00"
+    },
+    {
+      "encargo_id": "unam:faq-beca-fortalecimiento-2024-2025:97630694df4d",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.becarios.unam.mx/Portal2018/wp-content/uploads/2024/09/Preguntas-Frecuentes-AE-2024-2025.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#G5",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "faq-beca-fortalecimiento-2024-2025__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:faq-beca-fortalecimiento-2024-2025",
+      "creado_en": "2026-10-04T00:40:00"
+    }
+  ],
+  "no_obtenidos": [],
+  "_notas": [
+    {
+      "ref_catalogo": "G3/G4",
+      "aviso": "misma serie, DOS hosts: la convocatoria 2026-1 vive en becas.unam.mx y la 2026-2 en becarios.unam.mx. Cuarto caso medido de 'misma serie, hosts distintos'."
+    },
+    {
+      "ref_catalogo": "G3/G4/G5",
+      "aviso": "estos tres documentos son los que resuelven la discrepancia K4 del catalogo: la bitacora registra BDBRA en 3,000 por semestre y las convocatorias dicen 2,500; y 'Fortalecimiento' aparece como 950 mensuales en un sitio y 5,700 por semestre en otro. Al leerlos se cierra."
+    },
+    {
+      "ref_catalogo": "G1",
+      "aviso": "es el mismo documento que A7, ya en el corpus. No se declara: volveria a pedirse con otro grupo_alias y duplicaria el archivo, como paso con el PNOP sin ano."
+    }
+  ],
+  "_ya_en_corpus": [
+    {
+      "ref": "G1",
+      "documento": "Reglamento General de Becas 2024",
+      "por_que": "= A7, ya descargado como unam:reglamento-general-becas"
+    }
+  ],
+  "_no_declarados": [
+    {
+      "ref": "G2",
+      "url": null,
+      "por_que": "= A8, Lineamientos de becas presupuestales 2022: sin URL del documento (solo la pagina que lo refiere). Ver ruta del bloque A"
+    },
+    {
+      "ref": "G6",
+      "url": null,
+      "por_que": "Padron de beneficiarios por entidad y modalidad: INTEGRA / Transparencia obligacion XLIII. Sin URL; el catalogo lo marca 📨"
+    },
+    {
+      "ref": "G7",
+      "url": null,
+      "por_que": "Reglas de Operacion 2026 de Becas para el Bienestar (Jovenes Escribiendo el Futuro), DOF. Sin URL; el catalogo dice 'solo prensa'. NO es de la UNAM: es federal"
+    },
+    {
+      "ref": "G8",
+      "url": null,
+      "por_que": "Convocatorias DGOAE de anos previos: el catalogo solo da el host becarios.unam.mx, sin ruta. Requiere Lector de Indice"
+    }
+  ]
+}

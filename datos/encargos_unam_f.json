@@ -1,0 +1,128 @@
+{
+  "lote_id": "catalogo-fuentes-f-e2175405",
+  "archivo_origen": "catalogo-fuentes.md",
+  "sha256_archivo": "e21754059e9134e24b7522fe6a306006fa9981a395dc16e9f94dc7cc0dc9a149",
+  "encargos": [
+    {
+      "encargo_id": "unam:cct-aapaunam-2025-2027:54d8890bdf42",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.personal.unam.mx/Docs/Contratos/aapaunam-2025_2027.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#F2",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "cct-aapaunam-2025-2027__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:cct-aapaunam-2025-2027",
+      "creado_en": "2026-10-04T00:35:00"
+    },
+    {
+      "encargo_id": "unam:cct-stunam-2020-2022:3493c6a55bf8",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.personal.unam.mx/Docs/Contratos/stunam_2020_2022.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#F3",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "cct-stunam-2020-2022__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:cct-stunam-2020-2022",
+      "creado_en": "2026-10-04T00:35:00"
+    },
+    {
+      "encargo_id": "unam:dgapa-depto-personal:be28b10c6615",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://dgapa.unam.mx/index.php/reconocimientos/pun?view=article&id=268&catid=109",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#F10",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "dgapa-depto-personal__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:dgapa-depto-personal",
+      "creado_en": "2026-10-04T00:35:00"
+    }
+  ],
+  "no_obtenidos": [],
+  "_notas": [
+    {
+      "ref_catalogo": "F10",
+      "aviso": "SONDA DELIBERADA, no se espera que entregue documento. Es la primera URL del corpus con query string: mide que urlnorm no la altere en campo. Esperado: no_es_pdf con http_status 200 y el query intacto en url_final."
+    },
+    {
+      "ref_catalogo": "F3",
+      "aviso": "el catalogo dice 'CCT STUNAM 2020-2022 (y sucesivos)'. Los sucesivos NO estan en el catalogo: el contrato es bienal, asi que faltan al menos 2022-2024 y 2024-2026."
+    },
+    {
+      "ref_catalogo": "F5",
+      "aviso": "URL sin esquema en el catalogo. No se declara por D3. Confirmarla es tarea de la conversacion paralela."
+    }
+  ],
+  "_no_declarados": [
+    {
+      "ref": "F1",
+      "url": "http://www.personal.unam.mx/laborales/cctAapaunam.jsp",
+      "por_que": "indice historico de contratos colectivos 1997-2027; requiere Lector de Indice. Va por http"
+    },
+    {
+      "ref": "F5",
+      "url": "ses.unam.mx/proyectos/salarios/",
+      "por_que": "el catalogo la da SIN esquema. Anadir https:// seria construir parte de la direccion (D3): no se declara"
+    },
+    {
+      "ref": "F6",
+      "url": "https://www.personal.unam.mx/disi/nominaInst.jsp",
+      "por_que": "pagina de la DGPe, no documento"
+    },
+    {
+      "ref": "F7",
+      "url": "https://www.personal.unam.mx/disi/funciones.jsp",
+      "por_que": "pagina de la DGPe, no documento"
+    },
+    {
+      "ref": "F8",
+      "url": "http://webnom.dgp.unam.mx/sistemasDGP.html",
+      "por_que": "pagina de la DGP, no documento. Va por http"
+    },
+    {
+      "ref": "F9",
+      "url": "https://pagina.fciencias.unam.mx/institucion/personal/organizacion/depto-personal-academico",
+      "por_que": "pagina de la FC, no documento. Host nuevo: pagina.fciencias, no www.fciencias"
+    },
+    {
+      "ref": "F11",
+      "url": "https://www.sa.unam.mx/obligaciones-transparencia",
+      "por_que": "portal de obligaciones de la Secretaria Administrativa; requiere Lector de Indice"
+    }
+  ],
+  "_sin_url": [
+    {
+      "ref": "F4",
+      "documento": "Tabulador academico vigente feb-2026 (tabacafeb2026.pdf)",
+      "por_que": "aportado por el usuario; ya existe fuera del corpus"
+    },
+    {
+      "ref": "F12",
+      "documento": "Estimulos PRIDE / PEPASIG / SNII (reglas y montos), 2011-",
+      "por_que": "sin URL en el catalogo; el renglon mas importante del bloque"
+    }
+  ]
+}

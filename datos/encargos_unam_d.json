@@ -1,0 +1,182 @@
+{
+  "lote_id": "catalogo-fuentes-d-e2175405",
+  "archivo_origen": "catalogo-fuentes.md",
+  "sha256_archivo": "e21754059e9134e24b7522fe6a306006fa9981a395dc16e9f94dc7cc0dc9a149",
+  "encargos": [
+    {
+      "encargo_id": "unam:agenda-estadistica-2026-cortes-y-fuentes:a7f537db4274",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://web.planeacion.unam.mx/Agenda/2026/xls/201.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#D1-2026c",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "agenda-estadistica-2026-cortes-y-fuentes__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:agenda-estadistica-2026-cortes-y-fuentes",
+      "creado_en": "2026-10-04T00:15:00"
+    },
+    {
+      "encargo_id": "unam:agenda-estadistica-2025:e8b0b8bdaac6",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://web.planeacion.unam.mx/Agenda/2025/pdf/AgendaUNAM2025.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#D1-2025",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "agenda-estadistica-2025__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:agenda-estadistica-2025",
+      "creado_en": "2026-10-04T00:15:00"
+    },
+    {
+      "encargo_id": "unam:agenda-estadistica-2020:2f09b6680089",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://web.planeacion.unam.mx/Agenda/2020/pdf/Agenda2020.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#D1-2020",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "agenda-estadistica-2020__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:agenda-estadistica-2020",
+      "creado_en": "2026-10-04T00:15:00"
+    },
+    {
+      "encargo_id": "unam:memoria-unam-2024-fc:a8741eee2314",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.planeacion.unam.mx/Memoria/2024/PDF/4.3-FCres.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#D3-2024",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "memoria-unam-2024-fc__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:memoria-unam-2024-fc",
+      "creado_en": "2026-10-04T00:15:00"
+    },
+    {
+      "encargo_id": "unam:informe-direccion-fc-2024-2025:8ba6bb02694a",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://web.planeacion.unam.mx/informes/PDF/FC-2024-2025.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#D4-2024",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "informe-direccion-fc-2024-2025__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:informe-direccion-fc-2024-2025",
+      "creado_en": "2026-10-04T00:15:00"
+    },
+    {
+      "encargo_id": "unam:informe-direccion-fc-2023-2024:0a0823d85b20",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://www.fciencias.unam.mx/sites/default/files/Docs/informes-direccion/INFORME-DIRECCION-FC-2023-2024.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#D4-2023",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "informe-direccion-fc-2023-2024__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:informe-direccion-fc-2023-2024",
+      "creado_en": "2026-10-04T00:15:00"
+    },
+    {
+      "encargo_id": "unam:estadisticas-personal-academico-dgapa-2012:afe0b0273c1a",
+      "modo": "juridico",
+      "solicitante": "unam",
+      "puertas": [
+        {
+          "url": "https://dgapa.unam.mx/images/estadistica/anuario_estadisticas_dgapa_2012.pdf",
+          "tipo": "enlace_indice",
+          "url_base": null,
+          "evidencia": "catalogo-fuentes.md#D5-2012",
+          "construida": false
+        }
+      ],
+      "cajon": "norm/unam",
+      "etiqueta": "estadisticas-personal-academico-dgapa-2012__2026-10-04",
+      "cruzar_vestibulos": false,
+      "grupo_alias": "unam:estadisticas-personal-academico-dgapa-2012",
+      "creado_en": "2026-10-04T00:15:00"
+    }
+  ],
+  "no_obtenidos": [],
+  "_notas": [
+    {
+      "ref_catalogo": "D1-2026c",
+      "aviso": "no es la Agenda 2026 completa: es su pagina de cortes y fuentes (201.pdf). El catalogo no da URL del PDF completo de 2026."
+    },
+    {
+      "ref_catalogo": "D1",
+      "aviso": "el catalogo dice que la Agenda publica XLSX. El guardian acepta PK\\x03\\x04 y escribiria un .xlsx con extension .docx (05, seccion del guardian, riesgo aceptado). Ninguno de los 7 declarados es xlsx."
+    },
+    {
+      "ref_catalogo": "D4-2024",
+      "aviso": "el informe 2024-2025 vive en web.planeacion, no en el sitio de la FC; el 2023-2024 si. Dos hosts para la misma serie."
+    }
+  ],
+  "_no_declarados": [
+    {
+      "ref": "D1-2026",
+      "url": "https://web.planeacion.unam.mx/Agenda/2026/",
+      "por_que": "indice de la Agenda 2026; el PDF completo no se da"
+    },
+    {
+      "ref": "D1-2013",
+      "url": "https://www.planeacion.unam.mx/Agenda/2013/disco/",
+      "por_que": "indice de directorio ('disco') de la Agenda 2013"
+    },
+    {
+      "ref": "D2",
+      "url": "https://www.estadistica.unam.mx/series_inst/index.php",
+      "por_que": "portal de Series Estadisticas; requiere Lector de Indice"
+    },
+    {
+      "ref": "D3-idx",
+      "url": "https://www.planeacion.unam.mx/direccion-de-sistemas-de-informacion-estadistica/memoria-unam/",
+      "por_que": "indice de Memoria UNAM 2007-2024"
+    },
+    {
+      "ref": "D4-idx",
+      "url": "https://www.fciencias.unam.mx/institucion/acerca-de/informes",
+      "por_que": "indice de informes de la FC 2010-2025"
+    }
+  ]
+}
