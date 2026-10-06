@@ -1,8 +1,8 @@
 """M47a: medición del despacho de `doc_slug` sobre los 109 enlaces de la UJAT.
 
 Solo lee fixtures del disco: sin red y sin base. No modifica `slug.py`; la rama
-que produjo cada slug se reconstruye desde fuera con las funciones privadas del
-módulo y se comprueba contra `doc_slug`.
+que produjo cada slug se reconstruye desde fuera recorriendo `_DESPACHO` (M47b)
+y se comprueba contra `doc_slug`.
 
 Uso:
     .venv/bin/python scripts/medir_slugs_ujat.py | tee ~/respaldo-acervo/m47a-slugs-ujat.tsv
@@ -13,18 +13,15 @@ La tabla TSV sale por stdout; el resumen de conteos, por stderr.
 import sys
 from collections import defaultdict
 from pathlib import Path
-from urllib.parse import unquote
 
-from legisuni.descargador.paths import sanear
 from legisuni.descargador.urlnorm import normalizar
 from legisuni.lector import classify, cuenta, reduce
 from legisuni.lector.slug import (
-    _PREFIJO_NUMERICO,
-    _carpeta,
+    _DESPACHO,
     _es_fecha,
     _nombre_archivo,
-    _quitar_fechas,
-    _sufijo_de_archivo,
+    _por_titulo,
+    _recortar,
     doc_slug,
 )
 
@@ -58,25 +55,17 @@ def _enlaces_unicos() -> list[tuple[reduce.Enlace, str]]:
     return unicos
 
 
-def _slug_por_titulo(titulo: str) -> str:
-    return sanear(_quitar_fechas(unquote(titulo)))
+def _slug_por_titulo(href: str, titulo: str) -> str:
+    return _recortar(_por_titulo(href, titulo) or "sin-nombre")
 
 
 def _rama(href: str, titulo: str) -> tuple[str, str]:
-    """Reproduce la cascada de `doc_slug` desde fuera y dice qué rama ganó."""
-    nombre = _nombre_archivo(href)
-    if nombre and nombre == _carpeta(href):
-        return "consolidado", "consolidado"
-    if nombre and not _PREFIJO_NUMERICO.match(nombre):
-        sufijo = _sufijo_de_archivo(nombre)
-        if sufijo:
-            slug = sanear(sufijo)
-            if not _es_fecha(slug):
-                return "sufijo_archivo", slug
-    prefijo = _PREFIJO_NUMERICO.match(nombre)
-    if prefijo:
-        return "prefijo_numerico", sanear(f"n{int(prefijo.group(1))}")
-    return "titulo", _slug_por_titulo(titulo)
+    """Recorre el despacho de `doc_slug` desde fuera y dice qué estrategia ganó."""
+    for estrategia in [*_DESPACHO.get(_INST_ID, []), _por_titulo]:
+        slug = estrategia(href, titulo)
+        if slug and not _es_fecha(slug):
+            return estrategia.__name__.lstrip("_"), _recortar(slug)
+    return "ninguna", "sin-nombre"
 
 
 def _celda(valor: str) -> str:
@@ -104,7 +93,7 @@ def main() -> int:
                 "titulo": titulo,
                 "doc_slug": slug,
                 "rama": rama,
-                "slug_por_titulo": _slug_por_titulo(titulo),
+                "slug_por_titulo": _slug_por_titulo(enlace.href, titulo),
                 "es_fecha": str(_es_fecha(slug)),
             }
         )

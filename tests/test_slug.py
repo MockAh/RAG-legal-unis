@@ -45,8 +45,8 @@ def test_repeticiones_y_sin_fechas():
 
 
 def test_percent_encoding():
-    assert doc_slug("x/leg-Acuerdo%20de%20Genero.pdf", "t", "ujat") == "acuerdo-de-genero"
-    assert doc_slug("x/manual-ACTUALIZACI%C3%93N.pdf", "t", "ujat") == "actualizacion"
+    assert doc_slug("x/leg-Acuerdo%20de%20Genero.pdf", "t", "uam") == "acuerdo-de-genero"
+    assert doc_slug("x/manual-ACTUALIZACI%C3%93N.pdf", "t", "uam") == "actualizacion"
 
 
 def test_prefijo_numerico_unam():
