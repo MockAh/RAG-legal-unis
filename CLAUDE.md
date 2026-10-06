@@ -29,9 +29,12 @@
 - No digas "todos los tests pasan": pega la línea final de pytest.
 
 ## Prohibido sin permiso explícito
-- Ejecutar `scripts/cosecha.py` o `scripts/lote.py` sin `--dry-run`.
-  Hacen peticiones reales a servidores universitarios.
-- Tocar `data/`, `legisuni.db` o `fixtures/`.
+- Ejecutar `scripts/cosechar_indice.py` sin `--solo-extraer`, o `scripts/lote.py`
+  sin `--dry-run`. Hacen peticiones reales a servidores universitarios.
+  La primera corrida real del Lector exige además `data/` vacío y base limpia:
+  los doc_slug cambiaron en M47b y 122 documentos cambian de grupo.
+  Ver `docs/03` §Prerrequisito.
+- Tocar `data/`, `legisuni_v2.db`, `legisuni.db` o `fixtures/`.
 - `git push`, `git reset --hard`, `git checkout` de archivos con cambios.
 - Instalar dependencias nuevas.
 
