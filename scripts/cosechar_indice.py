@@ -1,94 +1,28 @@
-"""Script de un solo uso: corrida real del Descargador sobre el índice de una institución.
+"""Cosecha de un índice institucional guardado: extrae con `lector/` y descarga (M47c).
 
+Sustituye a `cosecha.py` y `cosecha_uam.py`; sirve para cualquier institución.
 No forma parte del paquete `legisuni` — vive en `scripts/` y no se importa desde ahí.
+
+Con `--solo-extraer` solo imprime conteos: no toca red ni base.
 """
 
 import logging
-import re
 from collections import Counter
-from datetime import datetime
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import urlsplit
 
 import typer
-from selectolax.parser import HTMLParser
 
 from legisuni.config import Settings
-from legisuni.contracts import CatalogEntry
-from legisuni.descargador import paths
 from legisuni.descargador.descargar import descargar, ya_descargado
 from legisuni.descargador.fetch import Fetcher, construir_cliente
 from legisuni.descargador.ratelimit import RateLimiter
 from legisuni.descargador.robots import RobotsCache
 from legisuni.descargador.store import Store
-from legisuni.juridico import identificadores, traduccion
+from legisuni.juridico import cosecha, traduccion
+from legisuni.lector import slug
 
 logger = logging.getLogger(__name__)
-
-_EXTENSIONES = (".pdf", ".docx")
-_LARGO_MAX_SLUG = 60
-
-
-def entradas_desde_html(ruta_html: Path, url_indice: str, inst_id: str) -> list[CatalogEntry]:
-    arbol = HTMLParser(_leer_html(ruta_html))
-    entradas: list[CatalogEntry] = []
-    vistos: set[str] = set()
-
-    for enlace in arbol.css("a[href]"):
-        href = enlace.attributes.get("href")
-        if href is None or not href.strip().lower().endswith(_EXTENSIONES):
-            continue
-
-        titulo = enlace.text(strip=True)
-        doc_slug = _doc_slug_desde_href(href)
-        entry_id = identificadores.entry_id(inst_id, doc_slug, href, url_indice)
-        if entry_id in vistos:
-            continue
-        vistos.add(entry_id)
-
-        entradas.append(
-            CatalogEntry(
-                entry_id=entry_id,
-                inst_id=inst_id,
-                titulo=titulo,
-                tipo_norma="otro",  # clasificar es tarea del Lector de Índice (spec 03), no de este script
-                url_documento=href,  # crudo, sin normalizar (D5)
-                estado="desconocido",
-                origen="sitio_institucional",
-                url_indice=url_indice,
-                extraido_en=datetime.now(),
-            )
-        )
-
-    return entradas
-
-
-def _leer_html(ruta_html: Path) -> str:
-    crudo = ruta_html.read_bytes()
-    # el HTML declara su charset (a menudo iso-8859-1); no asumimos utf-8
-    coincidencia = re.search(rb'charset=["\']?([\w-]+)', crudo, re.IGNORECASE)
-    codificacion = coincidencia.group(1).decode("ascii") if coincidencia else "utf-8"
-    return crudo.decode(codificacion)
-
-
-def _doc_slug_desde_href(href: str) -> str:
-    # sin patrón de sufijo por institución: slug largo del nombre de archivo, y punto
-    nombre_archivo = unquote(Path(urlsplit(href).path).stem)
-    return paths.sanear(nombre_archivo)[:_LARGO_MAX_SLUG]
-
-
-def _entradas_desde_paginas(
-    htmls: list[Path], urls_indice: list[str], inst_id: str
-) -> list[CatalogEntry]:
-    entradas: list[CatalogEntry] = []
-    vistos: set[str] = set()
-    for ruta_html, url_indice in zip(htmls, urls_indice, strict=True):
-        for entrada in entradas_desde_html(ruta_html, url_indice, inst_id):
-            if entrada.entry_id in vistos:
-                continue
-            vistos.add(entrada.entry_id)
-            entradas.append(entrada)
-    return entradas
 
 
 def main(
@@ -98,7 +32,9 @@ def main(
     ),
     inst_id: str = typer.Option(..., "--inst-id"),
     limite: int | None = typer.Option(None, "--limite", help="Procesar solo las primeras N entradas"),
-    dry_run: bool = typer.Option(False, "--dry-run", help="Solo muestra qué haría, no descarga nada"),
+    solo_extraer: bool = typer.Option(
+        False, "--solo-extraer", help="Solo imprime los conteos de la extracción; no toca red ni base"
+    ),
 ) -> None:
     logging.basicConfig(
         level=logging.INFO,
@@ -111,19 +47,25 @@ def main(
     if len(url_indice) != len(html):
         raise typer.BadParameter("--url-indice debe repetirse una vez, o una vez por cada --html")
 
-    entradas = _entradas_desde_paginas(html, url_indice, inst_id)
+    entradas = cosecha.entradas_desde_paginas(inst_id, list(zip(html, url_indice, strict=True)))
+
+    if solo_extraer:
+        por_pagina = Counter(e.url_indice for e in entradas)
+        typer.echo(f"[solo-extraer] {inst_id}: no se pide nada ni se escribe en la base")
+        for ruta, url in zip(html, url_indice, strict=True):
+            typer.echo(f"  {ruta}  <-  {url}: {por_pagina[url]} entradas nuevas")
+        typer.echo(f"entradas: {len(entradas)}")
+        typer.echo(f"entry_id distintos: {len({e.entry_id for e in entradas})}")
+        typer.echo(f"href con salto de línea final: {sum(e.url_documento.endswith(chr(10)) for e in entradas)}")
+        return  # antes de construir Settings: ni .env, ni cliente, ni base
+
     if limite is not None:
         entradas = entradas[:limite]
 
     encargos = [
-        traduccion.traducir(entrada, _doc_slug_desde_href(entrada.url_documento)) for entrada in entradas
+        traduccion.traducir(entrada, slug.doc_slug(entrada.url_documento, entrada.titulo, inst_id))
+        for entrada in entradas
     ]
-
-    if dry_run:
-        typer.echo(f"[dry-run] {len(entradas)} entradas encontradas, no se pide nada:")
-        for entrada, encargo in zip(entradas, encargos, strict=True):
-            typer.echo(f"  {encargo.encargo_id}  {encargo.cajon}/{encargo.etiqueta}  <-  {entrada.url_documento}")
-        return
 
     settings = Settings()
     limitador = RateLimiter(settings.rate_limit_s)
@@ -140,6 +82,7 @@ def main(
         for entrada, encargo in zip(entradas, encargos, strict=True):
             logger.info("pidiendo %s (%s)", encargo.encargo_id, entrada.url_documento)
             omitido = ya_descargado(store, encargo.encargo_id) is not None
+            # una omisión no escribe (M35): la regla vive dentro de descargar()
             resultado = descargar(encargo, fetcher, robots, settings, store=store)
             # E18.1 de docs/08: una puerta con robots_prohibido no llega a pedirse
             hosts_pedidos.update(

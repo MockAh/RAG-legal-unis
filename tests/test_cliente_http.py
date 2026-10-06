@@ -33,8 +33,7 @@ _FIXTURES = _RAIZ / "fixtures"
 
 sys.path.insert(0, str(_RAIZ / "scripts"))
 
-import cosecha  # noqa: E402
-import cosecha_uam  # noqa: E402
+import cosechar_indice  # noqa: E402
 import lote  # noqa: E402
 
 _USER_AGENT = "LegisUni-test/9.9 (+https://example.org)"
@@ -95,22 +94,27 @@ def _espiar(
     monkeypatch.setattr(modulo, nombre, fabrica)
 
 
+def _sin_simulacro(modulo: object) -> dict:
+    # lote conserva --dry-run; cosechar_indice lo llama --solo-extraer (M47c)
+    return {"solo_extraer": False} if modulo is cosechar_indice else {"dry_run": False}
+
+
 _UJAT = dict(
     html=[_FIXTURES / "ujat-15763.html"],
     url_indice=["https://www.ujat.mx/abogado/15763"],
     inst_id="ujat",
 )
 _UAM = dict(
-    html=_FIXTURES / "uam-index.html",
-    url_indice="https://www.uam.mx/legislacion/index.html",
+    html=[_FIXTURES / "uam-index.html"],
+    url_indice=["https://www.uam.mx/legislacion/index.html"],
     inst_id="uam",
 )
 
 
 @pytest.mark.parametrize(
     ("modulo", "argumentos"),
-    [(cosecha, _UJAT), (cosecha_uam, _UAM)],
-    ids=["cosecha", "cosecha_uam"],
+    [(cosechar_indice, _UJAT), (cosechar_indice, _UAM)],
+    ids=["cosechar_indice-ujat", "cosechar_indice-uam"],
 )
 def test_main_de_los_scripts_cablea_un_solo_cliente(
     modulo: object,
@@ -119,7 +123,7 @@ def test_main_de_los_scripts_cablea_un_solo_cliente(
     monkeypatch: pytest.MonkeyPatch,
     httpx_mock: HTTPXMock,  # sin respuestas registradas: cualquier petición real falla el test
 ) -> None:
-    """El --dry-run termina antes de construir nada; esto corre el cableado real con --limite 0."""
+    """El --solo-extraer termina antes de construir nada; esto corre el cableado real con --limite 0."""
     monkeypatch.setenv("LEGISUNI_USER_AGENT", _USER_AGENT)
     monkeypatch.setenv("LEGISUNI_DB_PATH", str(tmp_path / "prueba.db"))
     monkeypatch.setenv("LEGISUNI_DATA_ROOT", str(tmp_path / "data"))
@@ -127,7 +131,7 @@ def test_main_de_los_scripts_cablea_un_solo_cliente(
     _espiar(monkeypatch, modulo, "Fetcher", capturas)
     _espiar(monkeypatch, modulo, "RobotsCache", capturas)
 
-    modulo.main(limite=0, dry_run=False, **argumentos)
+    modulo.main(limite=0, solo_extraer=False, **argumentos)
 
     receptores = {"fetcher": capturas["Fetcher"], "robots": capturas["RobotsCache"]}
     clientes = {nombre: _cliente_de(receptor) for nombre, receptor in receptores.items()}
@@ -215,9 +219,14 @@ def _lote_de_un_encargo(tmp_path: Path) -> dict:
     return dict(encargos_json=ruta, limite=None)
 
 
-@pytest.mark.parametrize("modulo", [cosecha, cosecha_uam, lote], ids=["cosecha", "cosecha_uam", "lote"])
+@pytest.mark.parametrize(
+    ("modulo", "indice"),
+    [(cosechar_indice, _UJAT), (cosechar_indice, _UAM), (lote, None)],
+    ids=["cosechar_indice-ujat", "cosechar_indice-uam", "lote"],
+)
 def test_resumen_no_cuenta_los_omitidos_como_exitosas(
     modulo: object,
+    indice: dict | None,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -231,12 +240,12 @@ def test_resumen_no_cuenta_los_omitidos_como_exitosas(
     if modulo is lote:
         argumentos = _lote_de_un_encargo(tmp_path)
     else:
-        argumentos = {**(_UJAT if modulo is cosecha else _UAM), "limite": 1}
+        argumentos = {**indice, "limite": 1}
 
-    modulo.main(dry_run=False, **argumentos)
+    modulo.main(**_sin_simulacro(modulo), **argumentos)
     primera = capsys.readouterr().out
     peticiones_primera = len(httpx_mock.get_requests())
-    modulo.main(dry_run=False, **argumentos)
+    modulo.main(**_sin_simulacro(modulo), **argumentos)
     segunda = capsys.readouterr().out
 
     assert "total: 1\nexitosas: 1\nomitidos: 0\n" in primera
@@ -250,9 +259,14 @@ def test_resumen_no_cuenta_los_omitidos_como_exitosas(
 # E18.1 de docs/08 (43 s para 47 peticiones a un host) no es medible.
 
 
-@pytest.mark.parametrize("modulo", [cosecha, cosecha_uam, lote], ids=["cosecha", "cosecha_uam", "lote"])
+@pytest.mark.parametrize(
+    ("modulo", "indice"),
+    [(cosechar_indice, _UJAT), (cosechar_indice, _UAM), (lote, None)],
+    ids=["cosechar_indice-ujat", "cosechar_indice-uam", "lote"],
+)
 def test_resumen_registra_parametros_de_la_corrida(
     modulo: object,
+    indice: dict | None,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -266,11 +280,11 @@ def test_resumen_registra_parametros_de_la_corrida(
     if modulo is lote:
         argumentos = _lote_de_un_encargo(tmp_path)
     else:
-        argumentos = {**(_UJAT if modulo is cosecha else _UAM), "limite": 1}
+        argumentos = {**indice, "limite": 1}
 
-    modulo.main(dry_run=False, **argumentos)
+    modulo.main(**_sin_simulacro(modulo), **argumentos)
     primera = capsys.readouterr().out
-    modulo.main(dry_run=False, **argumentos)
+    modulo.main(**_sin_simulacro(modulo), **argumentos)
     segunda = capsys.readouterr().out
 
     parametros = f"rate_limit_s: 0.0\nuser_agent: {_USER_AGENT}\n"
@@ -291,9 +305,14 @@ def _filas(db_path: Path) -> tuple[list[tuple], list[tuple]]:
     return descargas, documentos
 
 
-@pytest.mark.parametrize("modulo", [cosecha, cosecha_uam, lote], ids=["cosecha", "cosecha_uam", "lote"])
+@pytest.mark.parametrize(
+    ("modulo", "indice"),
+    [(cosechar_indice, _UJAT), (cosechar_indice, _UAM), (lote, None)],
+    ids=["cosechar_indice-ujat", "cosechar_indice-uam", "lote"],
+)
 def test_omision_no_pisa_la_fila_registrada(
     modulo: object,
+    indice: dict | None,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     httpx_mock: HTTPXMock,
@@ -307,19 +326,24 @@ def test_omision_no_pisa_la_fila_registrada(
     if modulo is lote:
         argumentos = _lote_de_un_encargo(tmp_path)
     else:
-        argumentos = {**(_UJAT if modulo is cosecha else _UAM), "limite": 1}
+        argumentos = {**indice, "limite": 1}
 
-    modulo.main(dry_run=False, **argumentos)
+    modulo.main(**_sin_simulacro(modulo), **argumentos)
     tras_primera = _filas(db_path)
-    modulo.main(dry_run=False, **argumentos)
+    modulo.main(**_sin_simulacro(modulo), **argumentos)
 
     assert len(tras_primera[0]) == 1
     assert _filas(db_path) == tras_primera
 
 
-@pytest.mark.parametrize("modulo", [cosecha, cosecha_uam, lote], ids=["cosecha", "cosecha_uam", "lote"])
+@pytest.mark.parametrize(
+    ("modulo", "indice"),
+    [(cosechar_indice, _UJAT), (cosechar_indice, _UAM), (lote, None)],
+    ids=["cosechar_indice-ujat", "cosechar_indice-uam", "lote"],
+)
 def test_los_scripts_ya_no_escriben_en_documentos(
     modulo: object,
+    indice: dict | None,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     httpx_mock: HTTPXMock,
@@ -334,9 +358,9 @@ def test_los_scripts_ya_no_escriben_en_documentos(
     if modulo is lote:
         argumentos = _lote_de_un_encargo(tmp_path)
     else:
-        argumentos = {**(_UJAT if modulo is cosecha else _UAM), "limite": 1}
+        argumentos = {**indice, "limite": 1}
 
-    modulo.main(dry_run=False, **argumentos)
+    modulo.main(**_sin_simulacro(modulo), **argumentos)
 
     descargas, documentos = _filas(db_path)
     assert len(descargas) == 1
@@ -347,9 +371,14 @@ def test_los_scripts_ya_no_escriben_en_documentos(
 # borrado, la segunda corrida vuelve a pedirlo y no lo cuenta como omitido.
 
 
-@pytest.mark.parametrize("modulo", [cosecha, cosecha_uam, lote], ids=["cosecha", "cosecha_uam", "lote"])
+@pytest.mark.parametrize(
+    ("modulo", "indice"),
+    [(cosechar_indice, _UJAT), (cosechar_indice, _UAM), (lote, None)],
+    ids=["cosechar_indice-ujat", "cosechar_indice-uam", "lote"],
+)
 def test_archivo_borrado_no_cuenta_como_omitido(
     modulo: object,
+    indice: dict | None,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -363,15 +392,15 @@ def test_archivo_borrado_no_cuenta_como_omitido(
     if modulo is lote:
         argumentos = _lote_de_un_encargo(tmp_path)
     else:
-        argumentos = {**(_UJAT if modulo is cosecha else _UAM), "limite": 1}
+        argumentos = {**indice, "limite": 1}
 
-    modulo.main(dry_run=False, **argumentos)
+    modulo.main(**_sin_simulacro(modulo), **argumentos)
     capsys.readouterr()
     archivos = [p for p in (tmp_path / "data").rglob("*") if p.is_file()]
     assert len(archivos) == 1
     archivos[0].unlink()  # solo el test borra: simula un disco que perdió el archivo
     peticiones_primera = len(httpx_mock.get_requests())
-    modulo.main(dry_run=False, **argumentos)
+    modulo.main(**_sin_simulacro(modulo), **argumentos)
     segunda = capsys.readouterr().out
 
     assert "total: 1\nexitosas: 1\nomitidos: 0\n" in segunda
