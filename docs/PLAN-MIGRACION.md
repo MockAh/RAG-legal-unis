@@ -148,7 +148,12 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   de funcionar y M24 volvería a descargar los 156 en cada corrida.
   Alternativa a decidir en M23: mudar también la lectura a `descargas`.
 - Verificación: `--dry-run` → UAM 47, UJAT 109.
-- Commit: `M23: cosecha arma Encargos y no pierde enlaces`
+- ~~Commit: `M23: cosecha arma Encargos y no pierde enlaces`~~ · **ese commit
+  no existe.** Comprobado el 2026-10-07: `git log --format='%s' | grep -E
+  "^M23"` devuelve solo M23a, M23b, M23c y M23d. **M23 no tuvo commit
+  propio:** sus dos entregables están tachados arriba (M23a/M23b) y el primero
+  lo cerró M23c. La entrada se conserva porque registra el aviso de M21 y la
+  alternativa que M23c decidió.
 
 ## M23c · main() de cosecha.py y cosecha_uam.py contra Encargo
 - Decisión tomada (aviso de M21 arriba): se escribe en **ambas** tablas,
@@ -161,7 +166,7 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   muestra `encargo_id`, `cajon/etiqueta` y la URL — así las 156 entradas
   pasan por la validación de M18 (criterio 17 de `docs/05`) antes de M24,
   sin tocar la red. Sigue terminando antes de construir el `Fetcher`.
-- Commit: `M23c: main() de cosecha.py y cosecha_uam.py contra Encargo`
+- Commit: `M23c: main() de cosecha.py y cosecha_uam.py contra Encargo (dry-run UAM falla hasta M23d)`
 
 ## M23d · _doc_slug_desde_href sanea en todas sus ramas
 - Causa del fallo dejado pendiente por M23c: `_doc_slug_desde_href` de
@@ -204,6 +209,20 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   fija `tests/test_extraccion_indices.py`.
 - UAM + UJAT: 47 + 109 = 156/156, dos `entry_id` distintos para el RES.
 - Si no da 156, no se sigue a M25.
+- **Nota (2026-10-06, M47c): los dos comandos de arriba ya no se pueden
+  ejecutar.** `scripts/cosecha.py` y `scripts/cosecha_uam.py` están borrados;
+  los sustituye `scripts/cosechar_indice.py`, con `--inst-id`, `--html` y
+  `--url-indice` como antes, y `--solo-extraer` en lugar de `--dry-run`. Los
+  comandos de arriba se conservan tal cual porque **describen la corrida de
+  E14**, que se hizo con ellos.
+- **Y re-correr hoy el equivalente NO reproduce E14.** Los `doc_slug`
+  cambiaron en M47b: **103 de los 109 de la UJAT** y **14 de los 47 de la
+  UAM**. Los conteos siguen siendo 47 · 109 · 156, pero los `encargo_id` son
+  otros, y sobre la base viva eso escribe archivos nuevos en vez de omitir
+  (`docs/03` §Prerrequisito, E24.5 de `docs/08`). **La corrida real del Lector
+  exige `data/` vacío y base limpia**, con respaldo previo fuera del repo. La
+  guardia está en `CLAUDE.md`.
+
 ## M25 · Cliente HTTP único
 - Referencia: `docs/07` §Cliente HTTP único y su criterio 15; cierra CD-05-2
   de `docs/05`.
@@ -233,7 +252,9 @@ Referencia: `docs/05` criterios 11–18, `docs/01` §Migración.
   2. `Fetcher` sigue mandando `User-Agent` y `timeout` en cada petición,
      redundantes con los del cliente.
 - Verificación: `--dry-run` → UAM 47, UJAT 109. El `--dry-run` no ejercita
-  el cableado; lo cubre el test de `main`.
+  el cableado; lo cubre el test de `main`. *(Desde M47c la bandera es
+  `--solo-extraer` y el script es `scripts/cosechar_indice.py`;
+  `tests/test_cliente_http.py` se repuntó sin tocar ninguna aserción.)*
 - Commit: `M25: cliente HTTP único`
 
 ## M26 · Bucle de puertas (`puertas.py`)
@@ -1047,3 +1068,236 @@ Dos deudas, ambas medidas.
   (La estimación previa de «9 académicos» olvidaba los 3 del Bloque A.)
 - `docs/05`: sin cambios; la regla 5 ya dice esto.
 - Commit: `M40: la idempotencia comprueba el archivo en disco`
+
+## M41–M46 · El núcleo determinista del Lector · **sin registrar aquí**
+> **Hueco conocido, no una omisión silenciosa.** Las seis micro-tareas que
+> construyeron `lector/` —`reduce.py` (M41), `classify.py` (M42), `corte.py`
+> (M43), el oráculo `datos/oraculo-uam.tsv` (M44), `slug.py` (M45) y
+> `cuenta.py` (M46)— **no tienen entrada en este plan**.
+>
+> **Lo medido de ellas sí está escrito**, en dos sitios: los conteos y los
+> hallazgos de construcción, en **E23 de `docs/08`** (156 · 156 · 47
+> reproducidos desde `lector/`, los 47 slugs del oráculo, 393 tests); los
+> módulos y qué cierra cada uno, en **`docs/03` §El Oficio** y §Absorción.
+>
+> **Lo que falta es justo lo que distingue una entrada de este plan de un
+> resumen:** la decisión tomada, las alternativas descartadas con su razón,
+> los tests nuevos uno por uno y el hash del commit. Eso no está en ningún
+> documento del proyecto y **no se reconstruye sin leer los commits**; por eso
+> no se rellena desde aquí.
+>
+> **Para llenarlo:** `git log --oneline` entre el commit de M40 y `9594d55`
+> (M47a). Hasta entonces, el plan salta de M40 a M47a a propósito.
+
+## M47a · El despacho de `doc_slug` no existía — medición · **la pedí como otra cosa**
+- **Motivo: la tarea se partió sola.** M47 se pidió como una sola
+  micro-tarea —mover el cableado a `lector/`, reproducir los conteos y borrar
+  los dos scripts de cosecha—. El diagnóstico previo encontró que el defecto
+  estaba en otro sitio y **se detuvo sin escribir código**: cero archivos
+  tocados, cero commits. M47a es esa medición; M47b el arreglo; M47c el
+  cableado que se pidió.
+- **Qué se encontró leyendo `slug.py`:** `doc_slug(href, titulo, inst_id)`
+  **recibe `inst_id` y no lo usa** (el renglón lo declaraba: «se acepta por
+  contrato de la interfaz»). Decide con una cascada de intentos sobre el
+  nombre de archivo —consolidado → sufijo → prefijo numérico → título— y gana
+  el primero que da resultado. **La forma del nombre elige el mecanismo, no
+  la institución.** No hay ningún `if inst_id == …`; la rama de la UNAM es
+  una regex (`^(\d+)-(?=[^\W\d_])`) que cualquier institución puede
+  disparar.
+- **Script commiteado, no de scratchpad.** `scripts/medir_slugs_ujat.py`
+  recorre las cinco fixtures de la UJAT con sus `--url-indice` reales,
+  encadena `reduce` → `classify` → `cuenta.deduplicar`, y por cada uno de los
+  109 emite `href`, nombre de archivo, título, slug, **qué rama lo produjo** y
+  el slug que daría el título. La rama se reconstruye por fuera con las
+  privadas y el script **se detiene si el slug reconstruido no coincide** con
+  `doc_slug`: cuadró en los 109. Salida volcada a
+  `~/respaldo-acervo/m47a-slugs-ujat.tsv` (110 renglones, 7 columnas). Es la
+  corrección de método de E21 y E22, cuyos logs no se guardaron.
+- **Medido — ramas sobre los 109 de la UJAT:** 45 por sufijo de archivo
+  (mecanismo de la UAM), 56 por título, 8 por prefijo numérico (mecanismo de
+  la UNAM). De los 56 por título, 46 tenían nombre sin guion y 10 llegaron
+  porque su sufijo era una fecha.
+- **Medido — dos defectos, en dos ramas distintas:**
+  - **101 slugs distintos para 109 documentos**, en 3 grupos: `ujat` ×7 (sus
+    siete archivos terminan en `-UJAT`), `certificacion` ×2, `tabasco` ×2.
+    Todos por la rama del sufijo.
+  - **8 slugs que son fecha o posición**, todos por la rama del prefijo:
+    `n210817` y `n60417` son fechas DDMMAA que esquivaban `_es_fecha`
+    **gracias a la `n`** que CD-03-5 puso para que el slug no pareciera una
+    fecha; `n1 n2 n3 n5 n6 n8` son números de posición en una lista
+    (`docs/01` §Identificadores: «jamás posicional»).
+- **La medición que decidió el arreglo: los 109 títulos normalizados dan 109
+  slugs distintos.** Por eso la UJAT **no necesita oráculo escrito a mano**,
+  al contrario que la UAM.
+- **Corrección de la propia medición, dentro de la tarea:** un conteo
+  preliminar dio «63 por la regla del último token». Era
+  `_sufijo_de_archivo` distinto de `None` **sin descontar** los sufijos-fecha
+  ni los prefijos. **El correcto es 45.** Mismo patrón de E19: el primer
+  resumen no sobrevive al contraste con los datos.
+- **Por qué nada de esto rompía un test:** `entry_id =
+  inst_id:doc_slug:url_id`, y `url_id` hace únicos los identificadores **por
+  construcción**. Los 156 de E14 eran únicos con estos slugs puestos. Ningún
+  test de unicidad distingue **dos publicaciones del mismo instrumento**
+  compartiendo slug —correcto, `res` ×3— de **dos instrumentos distintos**
+  compartiéndolo —no—.
+- No se tocó `slug.py`. Evidencia completa en **E24 de `docs/08`**; el defecto
+  y su arreglo, en `docs/03` §El Oficio, cableado y §Estabilidad.
+- Commit: `M47a: medicion del despacho de doc_slug sobre los 109 de la UJAT` (`9594d55`)
+
+## M47b · Despacho por institución
+- Referencia: `docs/01` N2 («intentar el mecanismo del sitio; si no hay,
+  fallback al título normalizado») y C4 de `docs/08`. **El código nunca
+  cumplió esa regla**; M47b lo acerca al contrato, no al revés. **Ningún
+  contrato cambia.**
+- **Tabla de despacho, explícita por `inst_id`:** `uam` → consolidado →
+  sufijo → título; `unam` → prefijo numérico → título; `ujat` → título;
+  `uacam` → título; **cualquier otra** → **título**. La firma de `doc_slug`
+  no cambia.
+- **Por qué título por defecto, y no una cascada.** Es el único default que
+  **no hereda por accidente**: con cascada, cada institución nueva adopta el
+  mecanismo de aquella a la que se parezcan sus archivos, que es exactamente
+  el fallo de M47a. **El costo queda escrito en el docstring: cada
+  institución nueva necesita medición para ganar su mecanismo.**
+- **Regla anti-fecha en toda rama, y una decisión que hubo que tomar.** La
+  tarea pedía comprobar `_es_fecha` sobre el número del prefijo **antes** de
+  anteponer la `n`. **Tal cual, tumbaba los 70 prefijos de la UNAM**, porque
+  `_es_fecha("29")` es `True`: `_SOLO_NUMEROS` acepta cualquier cadena de
+  dígitos. El asistente se detuvo y preguntó en vez de elegir.
+  - **Adoptada (A):** un prefijo de **6 u 8 dígitos** que sea fecha válida
+    (DDMMAA, AAMMDD, DDMMAAAA, AAAAMMDD) se descarta y el documento va por
+    título.
+  - **Descartada (B):** dejarlo y anotar el hueco de la UNAM como deuda. La
+    asimetría decide: el fallo de A es que un prefijo legítimo de 6 dígitos
+    caiga a título, que es el respaldo conservador; el fallo de B es una
+    fecha haciendo de nombre de instrumento.
+  - **Honestidad sobre A: protege un caso con cero mediciones.** Los dos
+    casos reales son de la UJAT, que el despacho ya manda a título; en la
+    UNAM medida, cuyo prefijo más largo tiene 3 dígitos, **no mueve nada**.
+    Es endurecimiento preventivo, y así está anotado en CD-03-5.
+  - Comprobado a mano: `210817-Algo.pdf` y `060417-Algo.pdf` con `unam` van
+    por título; `29-Algo.pdf` sigue dando `n29`.
+- **No arreglado, anotado (CD-03-5):** `060417-` da `n60417`, **pierde el
+  cero inicial**. No se sabe si el `int()` es intencional —haría que `07-` y
+  `7-` fueran el mismo documento— y con la regla A esos prefijos caen a
+  título de todos modos.
+- **Ancla vacía:** si el título es la rama elegida y viene vacío (C9), cae al
+  nombre de archivo completo saneado. El título pasó a ser la rama principal
+  en tres instituciones y necesitaba su propia red; es CD-03-6 invertida, e
+  introduce CD-03-8.
+- **Tope de longitud: 100, cortando en frontera de guion y sin guion final.**
+  - **Medido:** a 60 colisionaban dos lineamientos de la UJAT en
+    `lineamiento-para-el-diseno-y-reestructuracion-curricular-de`; el
+    **mínimo** sin colisiones era **63**.
+  - **Descartado el mínimo.** 63 está ajustado al borde exacto de dos
+    documentos de una captura concreta: el siguiente título parecido vuelve a
+    colisionar, esta vez en producción. El tope existe para **legibilidad**,
+    no para identidad —el límite duro es el sistema de archivos—, así que
+    conviene margen.
+  - **Efecto lateral medido, a favor:** el salto de 63 a 100 **dejó de mover
+    ocho documentos** que solo cambiaban por el recorte: la UNAM pasó de 7
+    cambios a 5 y la UACAM de 15 a 9.
+  - **El desempate nunca sale de la URL** (`docs/03` §Estabilidad): las URLs
+    mueren en bloque.
+- **Medido tras el arreglo** (`~/respaldo-acervo/m47b-slugs-ujat.tsv`): UJAT
+  **109 slugs distintos**, `uniq -d` vacío, cero con forma de fecha, cero
+  posicionales, longitudes máximas 100 · 100 · 100. UAM: los **47** del
+  oráculo. UNAM: los **70** `n<N>` intactos. Suite: **393 passed**.
+- **Cuántos cambian de `grupo_alias`:** UJAT **103 de 109** contra los slugs
+  que están en campo (con el tope en 63 eran 101). Con los 14 de la UAM y los
+  5 de la UNAM de E21.15, **122 documentos en disco**. Entra en `docs/03`
+  §Prerrequisito y en E24.5 de `docs/08`.
+- **Dos defectos de la UACAM anteriores a esta tarea, que el default no
+  cubre** y que se anotan sin arreglar (CD-03-7, pregunta abierta 15 de
+  `docs/03`): `ejercicio` ×30, porque la regla que quita fechas del título
+  les arranca el año, que es su única identidad; y prefijos de lista
+  posicionales en los títulos (`b.5-`, `c.12-`). **Hoy no hay daño: la UACAM
+  nunca se ha cosechado. Gatillo: su primera corrida.**
+- **Criterio 11.** Ninguna aserción cambia. `tests/test_slug.py:47-49` se
+  repunta de `inst_id="ujat"` a `"uam"`: ese test prueba **percent-encoding**
+  (criterio 7 de `docs/03`, E12.7) y `"ujat"` era relleno; con el despacho,
+  ese caso ya no entra por la rama del sufijo. **El valor esperado no
+  cambió.**
+- Commit: `M47b: despacho por sitio en slug.py; titulo por defecto, prefijo-fecha descartado, tope 100` (`d4f4990`)
+
+## M47c · El cableado pasa por `lector/` y los scripts se borran
+- Es la tarea que se pidió como M47. Referencia: criterio 18 de `docs/03`
+  (absorción sin regresión) y §Absorción.
+- **Nuevos:** `legisuni/juridico/cosecha.py` (módulo) y
+  `scripts/cosechar_indice.py` (CLI), que sustituyen a los dos scripts y
+  sirven para cualquier institución. Encadenan `reduce.reducir` →
+  `classify.candidatos` → `cuenta.deduplicar` → `slug.doc_slug` →
+  `identificadores.entry_id`, con la `url_indice` **exacta** como base (M24).
+- **El cableado vive en `juridico/`, no en `lector/`**, porque es quien
+  compone el `entry_id` y `lector/` no debe componerlo (criterio 15 de
+  `docs/03`).
+- **`--solo-extraer`** sustituye a `--dry-run`: imprime conteos y **sale
+  antes de construir `Settings`**, así que no lee `.env` ni abre la base.
+- **Borrados:** `scripts/cosecha.py` y `scripts/cosecha_uam.py`.
+- **Medido con los scripts ya borrados:** UAM **47** entradas y 47 `entry_id`
+  distintos; UJAT **109** y 109, con los **4** `href` que terminan en salto
+  de línea; **156** `entry_id` únicos combinados. **393 passed.** Es la cuarta
+  medición del mismo conteo (M23b, E14.2, M46, M47c) y la primera desde el
+  paquete sin prototipo.
+- **Tres diferencias con los scripts viejos, ninguna de las cuales movió un
+  conteo aquí** (CD-03-10 de `docs/03`): la deduplicación pasa de `entry_id`
+  a **URL normalizada**; `classify` deja pasar los **visores de terceros** que
+  el filtro viejo descartaba (C14, aparecerá con la UACAM); y la codificación
+  se detecta mirando primero el `.headers`, que los scripts no miraban —ni la
+  UAM ni la UJAT tienen `.headers`, así que ambas caen al `<meta>`—.
+- **Un archivo fuera de lo pedido, con su razón.**
+  `tests/test_cliente_http.py` importaba los dos scripts (tests de M25, M33,
+  M34, M35, M36.1 y M40) y **el archivo entero dejaba de importar** al
+  borrarlos. Se repuntó a `cosechar_indice`, uno por la UJAT y otro por la
+  UAM: `solo_extraer=False` donde iba `dry_run=False`, y los argumentos de la
+  UAM pasan a listas. **Ninguna aserción cambia y el número de tests es el
+  mismo.** Los imports de la CLI van al principio del módulo para que el
+  espía de `Fetcher` y `RobotsCache` siga funcionando.
+- **Borrado el cuarto test de `tests/test_extraccion_indices.py`** (opción A
+  de tres): afirmaba los slugs viejos de los anexos de la UAM (`anexo1`,
+  `3a`, `3b`, `anexo3c`), prueba una función que desaparece, y sus valores son
+  los que M45 corrigió a `pavrg-*`. `tests/test_slug.py` los cubre
+  parametrizado sobre las 47 filas de `datos/oraculo-uam.tsv`. **Descartada
+  B** (repuntarlo con los valores nuevos): duplicaría el oráculo en un segundo
+  sitio.
+- **Test nuevo** que fija los 4 `href` con salto de línea, para que no se
+  pierdan en silencio otra vez. Por eso el archivo sigue con 4 tests y la
+  suite con 393.
+- **Medición de propina:** de las cinco páginas de la UJAT, **tres dan cero
+  candidatos** —0 de 60, 0 de 52 y 0 de 52 enlaces—, no cero por
+  deduplicación. Coincide con E12.1.
+- **No se ejecutó ninguna corrida real**, contra red ni contra base. Con los
+  slugs nuevos eso exige `data/` vacío y base limpia (M24, nota de
+  2026-10-06).
+- **Referencias colgantes reportadas, no arregladas:** catorce renglones de
+  este plan, cuatro de `docs/08` y dos de `docs/03` citan los scripts
+  borrados. Son historia y se quedan; las dos excepciones son la nota de M24 y
+  la viñeta de M25, que daban órdenes ejecutables.
+- **`CLAUDE.md` sí se corrigió el mismo día**, y era el riesgo real: su
+  guardia prohibía ejecutar `scripts/cosecha.py` sin `--dry-run` —un script
+  que ya no existe, de modo que **no protegía nada**— y nombraba
+  `legisuni.db` en vez de `legisuni_v2.db`, que es la base con las 156 filas
+  jurídicas, las académicas y las 41 de la UNAM. Ahora apunta a
+  `cosechar_indice.py` sin `--solo-extraer` y remite a `docs/03`
+  §Prerrequisito.
+- Commit: `M47c: cableado de la cosecha en juridico/cosecha.py sobre lector/; borra cosecha.py y cosecha_uam.py` (`f79cc0c`)
+- Commit: `CLAUDE.md: la guardia apunta a cosechar_indice.py y a legisuni_v2.db` (`5ba0a3b`)
+
+## Pendientes identificados, sin micro-tarea asignada
+*No son micro-tareas todavía: son lo que M47 dejó visto. Se numeran al
+asignarse.*
+
+- **Test de inspección de imports** (criterio 15 de `docs/03`): debe fallar si
+  `lector/` normaliza URLs o compone `entry_id` por su cuenta. Es la única
+  mitad que falta de ese criterio, y hoy la regla se cumple por costumbre, no
+  por prueba.
+- **Oráculos de contenido** (`tipo_norma`, `estado`, los instrumentos propios
+  de la UACAM): bloquean los criterios 2, 4 y 11 de `docs/03`. Es trabajo
+  humano de lectura, no de código. **La UJAT ya no necesita oráculo de
+  slugs** (M47a).
+- **El mecanismo de identidad de la UACAM** antes de su primera corrida
+  (CD-03-7).
+- **Decidir qué significa «pasa» con un componente estocástico** (pregunta 10
+  de `docs/03`) **y qué modelo.** Las dos van **antes** del primer test del
+  agente; son lo siguiente del bloque D.
+- **Las entradas de M41–M46**, que no están en este plan. Ver el bloque de
+  arriba: se recuperan de los commits, no de los documentos.
