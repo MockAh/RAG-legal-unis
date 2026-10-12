@@ -1,7 +1,7 @@
 # 08 · Evidencia de campo
 
 > Hallazgos **medidos**, no supuestos, obtenidos antes de escribir una línea de código.
-> Estado: vivo · **v20** · se amplía con cada universidad nueva que se explore.
+> Estado: vivo · **v21** · se amplía con cada universidad nueva que se explore.
 > Mediciones: UAM, UNAM-70I, UNAM-OAG, UJAT, **UACAM**.
 > **Medido en vivo el 2026-09-06: la UAM (E1) y la UACAM (E10).** Recontados con herramienta:
 > la **UJAT** en M23b (109 enlaces, sobre sus fixtures) y la **UNAM-OAG** en E20.5 (84 enlaces
@@ -9,6 +9,11 @@
 > no distinguía mayúsculas). **Sigue sin recontar:** cuántos de esos enlaces son
 > instrumentos de la UNAM (el «~60» de E3) y el «27 propios» de la UACAM (E10). Ninguno de los
 > dos sale de un grep; ver E20.5 y E23.3.
+> **v21 (2026-10-06):** el despacho de `doc_slug` por institución **no existía** (**E24**).
+> `doc_slug` recibía `inst_id` y no lo usaba: decidía por la forma del nombre de archivo, de modo
+> que la UJAT heredaba los mecanismos de la UAM y de la UNAM. **122 documentos del corpus en disco
+> cambian de `grupo_alias`** al arreglarlo. **Ningún documento nuevo se descargó:** E24, como E23,
+> mide código contra fixtures.
 > **v20 (2026-10-04):** el núcleo determinista del Lector de Índice se construyó y se midió contra
 > las cinco fixtures (**E23**). Con ello **E13.5 queda cerrada** y se corrigen tres cifras de este
 > documento. **Ningún documento nuevo se descargó:** E23 mide código contra fixtures, no contra
@@ -376,7 +381,9 @@ marco jurídico — señal aprovechable por el Localizador.
 | **C26** | **La cortesía por host tiene dos huecos: el `robots.txt` no pasa por el limitador, y un alias de `www` duplica la cuota del mismo servidor** (E21.8) | El criterio 7 de `05` se cumple tal como está redactado, así que **no es un defecto de implementación**: lo que falla es que «host» no sea la unidad correcta para lo que D8 pretende. Medido en cinco corridas: 130–160 ms entre el `robots.txt` y el primer documento de cada host, y 275 ms entre las dos formas del Abogado General, que sirvió cinco documentos repartidos entre ambas |
 | **C27** | **Un documento puede tener texto extraíble en una parte y no en otra** (E22.7). El PNOP 2026 tiene texto en **153 de sus 215 páginas**: no es un escaneo ni un PDF limpio | **Refina C21 y mide por primera vez lo que E6.19 anticipaba.** El criterio de E12.5 —`pdfplumber` sobre las tres primeras páginas, umbral de 100 caracteres— clasificaría este PDF como «tiene texto» y la fase de OCR lo saltaría entero, perdiendo 62 páginas sin señalarlo. **La spec de extracción necesita un criterio por página, no por documento** |
 | **C28** | **El sufijo estable de un archivo es el token anterior a la marca, no el último** (E1.3, E23.5). En la UAM el último token es la fecha, y los anexos traen dos ortografías en el mismo lote | Refina C4. Es la causa raíz de los slugs-fecha de E13.5: la heurística «lo que va tras el último guion» captura la fecha y no el instrumento. **La regla correcta está implementada y medida contra 47 casos** (E23.4) |
-| **C29** | **Cambiar el algoritmo de `doc_slug` reescribe los mismos bytes bajo otro `grupo_alias`** (E23.6, E21.15). Medido dos veces: **14 documentos** de la UAM al corregir la heurística, y **5** de la UNAM entre un catálogo a mano y el índice del OAG | **No es un defecto del alias: es la consecuencia de que el slug sea parte de la identidad.** Y no lanza ningún error: la regla de no sobrescribir hace lo que debe y el corpus se infla en silencio. Obliga a un prerrequisito de procedimiento (`03`) y a una guardia en la base (`07`) |
+| **C29** | **Cambiar el algoritmo de `doc_slug` reescribe los mismos bytes bajo otro `grupo_alias`** (E23.6, E21.15). Medido dos veces: **14 documentos** de la UAM al corregir la heurística, y **5** de la UNAM entre un catálogo a mano y el índice del OAG | **No es un defecto del alias: es la consecuencia de que el slug sea parte de la identidad.** Y no lanza ningún error: la regla de no sobrescribir hace lo que debe y el corpus se infla en silencio. Obliga a un prerrequisito de procedimiento (`03`) y a una guardia en la base (`07`). **Ampliada el 2026-10-06 (E24.5): con el despacho por institución son 122 documentos en disco** — UAM 14, UJAT 103, UNAM 5 |
+| **C30** | **Una cascada de heurísticas de identidad sin despacho por institución hace que una universidad herede el mecanismo de otra** (E24.1, E24.2). Medido en la UJAT: 45 de 109 slugs por el mecanismo de la UAM y 8 por el de la UNAM, con 11 documentos en 3 grupos repetidos y 8 slugs que son fecha o número de posición | **El mecanismo se elige por `inst_id`, nunca por la forma del nombre de archivo, y el default es el título** (`01` N2, C4). Un default por cascada hace que cada institución nueva adopte el mecanismo de aquella a la que se parezcan sus archivos. **Y el defecto es invisible a la unicidad de `entry_id`**, porque `url_id` la garantiza por construcción (E24.3) |
+| **C31** | **Quitar la fecha de un título funde documentos cuyo año es su única identidad** (E24.6). Medido en la UACAM: 30 documentos «Ejercicio AAAA» en un solo `doc_slug` | **La misma regla protege a una institución y rompe a otra.** En la UAM la fecha en el slug era ruido (E14.5); en la UACAM es el dato. Una regla de identidad no puede ser universal sin medir dónde se aplica. Es C20 en un tercer sitio, y esta vez **la causa es nuestra, no del sitio** |
 
 ---
 
@@ -416,6 +423,10 @@ marco jurídico — señal aprovechable por el Localizador.
 | E6.30 | **El oráculo de contenido de la UACAM: cuáles de sus 83 enlaces son normativa propia** | El «27» de E10 es estimación y **no se puede medir con grep** (E20.5). Sin ese oráculo, el criterio 4 de `03` y el 12 de `04` no son puntuables por nadie. Es trabajo humano de lectura, y sirve a las dos specs a la vez |
 | E6.31 | **Oráculo de `tipo_norma` y `estado` para la UAM** | `datos/oraculo-uam.tsv` cubre los slugs (E23.4) y nada más. Los 31 vigentes, 8 históricos y 1 abrogado del criterio 1 de `03` siguen sin hoja de respuestas, así que la clasificación del agente **no se podrá puntuar** cuando exista |
 | E6.32 | **¿Cuántos conteos más de este documento se hicieron con un grep sensible a mayúsculas?** | El de la UACAM subcontaba por eso (E23.3). UNAM-OAG y UJAT se recontaron y aguantan; **el resto no se ha revisado**, y es barato: basta repetirlos con `-i` |
+| E6.33 | **¿Cuántas instituciones tienen un mecanismo de identidad propio, y cuántas caen al título?** | Hoy: 2 de 4 con mecanismo (UAM, UNAM), 2 al título (UJAT, UACAM). Si la mayoría cae al título, el default es infraestructura y los dos mecanismos son la excepción; si cada sitio trae el suyo, cada universidad nueva cuesta una medición (C30, `03` §Estabilidad) |
+| E6.34 | **¿Cuántos títulos de otros índices llevan el año como única identidad?** | 1 institución de 4 (UACAM, 30 documentos, C31). Si el patrón se repite, `_quitar_fechas` necesita una excepción general y no una rama por sitio |
+| E6.35 | **¿El tope de 100 caracteres colisiona en algún índice real?** | Decidido por criterio, no medido como óptimo: a 60 colisionaban 2 lineamientos de la UJAT y el mínimo era 63 (E24.4). El tope recorta el nombre en disco, así que una colisión es dos documentos en un archivo (`03` CD-03-9) |
+| E6.36 | **¿`errors="replace"` en la decodificación oculta algún título corrupto?** | `reduce.py` reemplaza donde los scripts viejos lanzaban excepción. Es más robusto y más silencioso, que es la forma de C18: no lanza nada, solo produce basura. Se cierra contando los `\ufffd` tras decodificar las cinco fixtures (`03` CD-03-10) |
 
 **Próxima medición recomendada: E6.10.** Es la más barata (una URL ya conocida) y la que más
 cambia: decide si el hallazgo de E10.1 es una rama histórica correctamente rotulada —molesta
@@ -501,6 +512,8 @@ ese criterio nuevo, el marcador honesto no es 4 de 4 sino **3 de 4**.
 | **C1 · todos los sitios sirven HTML plano** | **Sigue siendo la más débil** | Cuatro casos ahora, no tres — mejor, pero todos hallables por búsqueda. Es exactamente la que más decisión sostiene (no pagar Playwright) |
 | C28 · el sufijo es el token anterior a la marca | **Sólida para la UAM, no generalizable** | Medido contra los 47 casos de una institución. **Dice cómo se derivan los slugs de la UAM**, no de ninguna otra: la UNAM usa prefijo numérico y la UJAT nada (C4) |
 | C29 · cambiar el slug duplica el corpus | **Sólida** | Es una propiedad de cómo está definido `grupo_alias`, no de los sitios medidos. Dos mediciones independientes y un mecanismo deducible del contrato (`01` N2) |
+| C30 · una cascada hereda mecanismos entre instituciones | **Sólida** | Es una propiedad de cómo estaba definida la cascada, no de los sitios: se reproduce en las tres instituciones con mecanismo medido, y el efecto se contó documento a documento sobre las fixtures |
+| C31 · quitar la fecha funde documentos | **Sólida como requisito** | Un caso basta para obligar a manejarlo, y el criterio vigente no lo detecta. **No** dice nada sobre su frecuencia, que es E6.34 |
 
 **Léase con cuidado:** las conclusiones que dicen *"esto existe, manéjalo"* aguantan con un
 solo caso. Las que dicen *"esto es lo normal"* necesitan muchos más. C1 es del segundo tipo y
@@ -1195,7 +1208,7 @@ directorio de la UAM, coinciden con los slugs de los dos históricos.
 medido en campo: los dos históricos que en E11.6 colisionaban ya no colisionan, y la corrida no
 perdió ninguno de los tres.
 
-### E14.5 · Siete slugs con forma de fecha en la UAM — **son nueve (nota de 2026-10-03)**
+### E14.5 · Nueve slugs con forma de fecha en la UAM, y tres posicionales — E13.5 cerrada en M45
 
 ```
 sqlite3 legisuni_v2.db "select encargo_id from descargas where encargo_id like 'uam:%' order by 1;" | grep -c "^uam:[0-9][0-9]\."
@@ -3020,6 +3033,10 @@ la primera corrida con Lector real se hace sobre `data/` vacío y base limpia, c
 fuera del repo. **Lo que no resuelve es unificar slugs entre fuentes distintas**, que sigue siendo
 E6.25.
 
+> **Ampliación (2026-10-06, E24.5):** con el despacho por institución el total sube a **122**
+> documentos en disco — UAM 14, UJAT 103, UNAM 5 —, más 14 entradas de índices que todavía no se
+> han cosechado y que por tanto cambian antes de su primer uso.
+
 ### E23.7 · Nota de método: el oráculo se escribió antes que el código que lo cumple
 
 `datos/oraculo-uam.tsv` (M44) se llenó a mano **antes** de escribir `slug.py` (M45), y la tarea
@@ -3029,6 +3046,179 @@ de ajustar el oráculo o añadir una excepción por fila**. No hizo falta: cuadr
 Importa porque es la primera vez que el proyecto tiene una hoja de respuestas **anterior** al
 código evaluado. Los conteos 47/109/156 se escribieron al medir, y por eso no distinguen «el
 código acierta» de «el código define la respuesta».
+
+---
+
+## E24 · El despacho de `doc_slug` no existía (2026-10-06)
+
+**No es una corrida contra servidores: es código ejercitado contra las fixtures**, como M23b y
+E20. Se registra aquí porque midió un defecto de identidad que ninguna corrida de campo habría
+mostrado, y porque **corrige el alcance de una afirmación de este documento**.
+
+**Fuente:** `scripts/medir_slugs_ujat.py` (commit `9594d55`), su salida en
+`~/respaldo-acervo/m47a-slugs-ujat.tsv`, la re-medición tras el arreglo en
+`~/respaldo-acervo/m47b-slugs-ujat.tsv`, y la suite del repositorio. **Esta vez el script está
+commiteado y la salida vive fuera del repo**, que es lo que faltó en E21 y E22.
+
+### E24.1 · `doc_slug` recibía `inst_id` y no lo usaba
+
+`doc_slug(href, titulo, inst_id)` decidía con una **cascada de intentos sobre el nombre de
+archivo** —consolidado → sufijo → prefijo numérico → título—, y ganaba el primero que diera
+resultado. El renglón que recibe `inst_id` decía que se aceptaba «por contrato de la interfaz».
+
+**Consecuencia: la forma del nombre de archivo decidía el mecanismo, no la institución.** Medido
+sobre los 109 enlaces únicos de la UJAT:
+
+| Rama que ganó | Enlaces | De quién es ese mecanismo |
+|---|---|---|
+| sufijo de archivo | **45** | UAM (E1.3) |
+| título | **56** | respaldo general (C4) |
+| prefijo numérico | **8** | UNAM (E3.4) |
+
+De los 56 por título, 46 tenían nombre sin guion y 10 llegaron porque su sufijo tenía forma de
+fecha. **La UJAT no tiene mecanismo propio** (C4 ya lo decía: «ninguna»), y aun así 53 de sus 109
+documentos se nombraban con las heurísticas de otras dos universidades.
+
+### E24.2 · Once documentos en tres grupos, y ocho slugs que son fecha o posición
+
+**101 slugs distintos para 109 documentos.** Los tres grupos repetidos salen todos de la rama del
+sufijo:
+
+- **`ujat` ×7** — reglamento de cuotas, reglamento de adquisiciones, lineamiento de dirección de
+  tesis de posgrado, tabulador de confianza, protocolo de hostigamiento y dos acuerdos rectorales.
+  Sus siete nombres de archivo terminan en `-UJAT`.
+- **`certificacion` ×2** — dos acuerdos distintos sobre facultad de certificación.
+- **`tabasco` ×2** — el Reglamento de Vinculación y el Modelo Institucional de Vinculación.
+
+Y por la rama del prefijo numérico, **ocho slugs que incumplen reglas duras ya escritas**:
+
+- **`n210817` y `n60417` son fechas DDMMAA.** Esquivaban la comprobación anti-fecha **gracias a la
+  `n`**, que se había puesto justamente para que el slug no *pareciera* una fecha. Protegía la
+  apariencia, no el hecho.
+- **`n1 n2 n3 n5 n6 n8` son números de posición en una lista.** `01` Parámetros,
+  §Identificadores: *«jamás posicional, tampoco el número de una lista»*.
+
+*De paso, una corrección de la propia medición:* un conteo preliminar dio «63 por la regla del
+último token». Era `_sufijo_de_archivo` distinto de `None` **sin descontar** los sufijos-fecha ni
+los prefijos. **El número correcto es 45.** Es el mismo patrón de E19: el primer resumen no
+sobrevive al contraste con los datos.
+
+### E24.3 · Por qué `url_id` lo escondió, y por qué ningún test lo veía
+
+El criterio 11 de `05` pasó con **156/156 identificadores únicos** (E14.2, E14.7) con estos slugs
+puestos. No hay contradicción: `entry_id = inst_id:doc_slug:url_id`, y **`url_id` hace únicos los
+identificadores por construcción**, aunque el segmento del medio sea basura.
+
+**La distinción que ningún test de unicidad ve:**
+
+- dos publicaciones **del mismo instrumento** compartiendo `doc_slug` es **correcto** — `res` y
+  `ripppa` ×3 en la UAM, `n29` ×2 en la UNAM;
+- **instrumentos distintos** compartiendo `doc_slug` **no lo es**, y es lo que pasaba con
+  `ujat` ×7.
+
+Las dos producen exactamente la misma señal en una consulta de `count(distinct encargo_id)`. **La
+diferencia solo la ve quien mire los slugs**, que es lo que nadie había hecho fuera de la UAM.
+
+**Es §A2 de `03` una capa más arriba:** allí `url_id` enmascaraba el defecto en la UAM; aquí
+enmascaraba que el defecto existía en otra institución *después* de haberlo arreglado en la
+primera.
+
+### E24.4 · El arreglo, y el tope de longitud
+
+`doc_slug` despacha ahora por `inst_id`: `uam` → consolidado → sufijo → título; `unam` → prefijo
+numérico → título; `ujat`, `uacam` y **cualquier otra** → título. Más tres reglas: toda rama
+descarta un slug con forma de fecha; un prefijo de 6 u 8 dígitos que sea fecha válida se descarta;
+y un ancla vacía cae al nombre de archivo saneado.
+
+**La medición que lo permitió: los 109 títulos normalizados de la UJAT dan 109 slugs distintos.**
+Por eso esa institución **no necesita oráculo escrito a mano**, al contrario que la UAM.
+
+**Resultado, medido:**
+
+| | Antes (E24.2) | Después |
+|---|---|---|
+| UJAT, slugs distintos | 101 de 109 | **109 de 109** |
+| UJAT, con forma de fecha | 2 (disfrazadas de `n`) | **0** |
+| UJAT, posicionales | 6 | **0** |
+| UAM, contra el oráculo | 47 de 47 | **47 de 47** |
+| UNAM, los `n<N>` | 70 | **70** |
+| Suite | 393 | **393** |
+
+**El tope de longitud del slug pasó de 60 a 100.** A 60 colisionaban dos lineamientos de la UJAT
+en `lineamiento-para-el-diseno-y-reestructuracion-curricular-de`; el **mínimo** sin colisiones era
+**63**. Se descartó el mínimo por frágil —está ajustado al borde exacto de dos documentos de una
+captura concreta— y **el salto a 100 dejó de mover ocho documentos** que solo cambiaban por el
+recorte: los cambios de la UNAM bajaron de 7 a 5 y los de la UACAM de 15 a 9. **El desempate nunca
+sale de la URL**, que es regla de `03` §Estabilidad.
+
+### E24.5 · Cuántos documentos cambian de `grupo_alias`
+
+`grupo_alias = f"{inst_id}:{doc_slug}"` (`01` N10), y el alias por hash **solo compara dentro de
+un grupo** (`01` v2.7, N2 §Segundo límite). Un cambio de slug es, por tanto, un cambio de grupo:
+los mismos bytes se vuelven a escribir con otra etiqueta. **Es C24 por otra puerta.**
+
+| Institución | Cambian de grupo | ¿Hay algo en disco? |
+|---|---|---|
+| UAM | **14** (9 fecha + 5 anexos, E14.5 corregida) | **Sí**, 47 archivos |
+| UJAT | **103 de 109** | **Sí**, 109 archivos |
+| UNAM, catálogo a mano | **5** (E21.15) | **Sí**, 22 archivos |
+| | **122** | |
+| UNAM-OAG, índice | 5 de 84 | No, nunca cosechado |
+| UACAM, índice | 9 de 89 | No, nunca cosechada |
+
+**Las dos últimas filas no suman**, y es deliberado: esos índices nunca se han cosechado, así que
+no hay nada con lo que colisionar y cambian **antes de su primer uso**. Los 5 de la UNAM-OAG
+**no son** los 5 de E21.15: aquellos son documentos ya descargados a mano desde ese dominio;
+estos, entradas del índice que cambian de slug.
+
+**Consecuencia operativa:** la primera corrida del Lector se hace sobre `data/` vacío y base
+limpia, con respaldo previo fuera del repo. Deja de ser prudencia (`03` §Prerrequisito).
+
+### E24.6 · Un defecto de la UACAM que estaba desde antes y que el default no cubre
+
+Al medir el efecto del arreglo sobre las otras fixtures aparecieron **dos defectos de la UACAM
+anteriores a este cambio** —no son una regresión— que el default de título **no resuelve**:
+
+1. **`ejercicio` ×30.** Sus títulos son «Ejercicio 2010», «Ejercicio 2011»… y la regla que quita
+   fechas del título les arranca el año, que es **su única identidad**. Treinta documentos
+   distintos quedan en un `doc_slug` y en un `grupo_alias`.
+2. **Prefijos de lista en los títulos.** `b.5-`, `c.12-`, `g.4-` entran al slug, y son
+   posicionales.
+
+**Lo primero es una conclusión nueva (C31):** la regla que protege a la UAM de los slugs-fecha
+rompe a la UACAM, porque en un caso la fecha es ruido y en el otro es la identidad.
+
+**Hoy no hay daño:** la UACAM nunca se ha cosechado. **Gatillo: su primera corrida.** Anotado en
+`03` como CD-03-7 y pregunta abierta 15.
+
+### E24.7 · El cableado, y el único denominador que se movió
+
+Con el despacho fijo, el cableado se movió a `juridico/cosecha.py` y `scripts/cosechar_indice.py`,
+y `scripts/cosecha.py` y `scripts/cosecha_uam.py` se borraron. **Medido con los scripts ya
+borrados:** UAM 47 · UJAT 109 · **156 `entry_id` únicos combinados**, 393 tests en verde. Es la
+cuarta medición del mismo conteo (M23b, E14.2, M46, M47c) y la primera desde el paquete sin
+prototipo.
+
+**Tres diferencias con los scripts viejos, ninguna de las cuales movió un conteo aquí:** la
+deduplicación pasa de `entry_id` a URL normalizada; `classify` deja pasar los visores de terceros
+que el filtro viejo descartaba (C14, aparecerá con la UACAM); y la codificación se detecta
+mirando primero el `.headers`, que los scripts no miraban.
+
+**Medición de propina:** de las cinco páginas de la UJAT, **tres dan cero candidatos** —0 de 60,
+0 de 52 y 0 de 52 enlaces—, no cero por deduplicación. Coincide con E12.1: solo dos páginas tienen
+documentos.
+
+### E24.8 · Nota de método — medir antes de escribir
+
+La tarea se pidió como «mover el cableado y borrar los scripts». **El asistente midió antes de
+escribir, encontró que el defecto estaba en otro sitio y se detuvo** sin tocar el repositorio. La
+tarea tal como se pidió habría cerrado el bloque C sobre 103 slugs que no nombran instrumentos, y
+lo habría hecho **con los 156 identificadores únicos como prueba de que todo estaba bien**.
+
+Es el contrapunto exacto de los logs sin `tee` de E21 y E22. **Lo que separa un caso del otro no
+es el cuidado: es si la medición existe antes de la conclusión.**
+
+---
 
 | Versión | Fecha | Cambio |
 |---|---|---|
@@ -3052,3 +3242,4 @@ código acierta» de «el código define la respuesta».
 | **v18** | **2026-10-04** | **Segunda cosecha de la UNAM y primeras lecturas del corpus (E22): 13 de 15**, en cuatro lotes (`d`, `f`, `g`, `h`). Con E21 queda recorrido el catálogo completo: 41 encargos, 35 archivos, 34 documentos distintos, nueve lotes (E22.1). **C26 reproducida y ampliada:** un `301` entre hosts hace que el limitador contabilice la petición en el host equivocado; medido dos veces, con `web.planeacion` recibiendo tres peticiones en 0.66 s y su `robots.txt` dos veces en una corrida (E22.2). **`urlnorm` con query string, medido con una sonda deliberada**, el primer encargo del corpus declarado como instrumento y no como documento (E22.3). **Primer `url_muerta` del modo jurídico**, con la lectura de que cada convocatoria de becas se retira cuando sale la siguiente, lo que pondría la serie 2011–2026 fuera de línea (E22.4). **El estado 🔎 del catálogo no significa «existe»:** 37 ocurrencias contra 12 ✅, y G3 es el primer contraejemplo (E22.5). **Idempotencia con `hosts distintos pedidos: 0`**, la primera vez que no se emite ninguna petición (E22.6). **Un documento con texto parcial: 153 de 215 páginas**, que el criterio de E12.5 no detecta — conclusión nueva **C27** y deuda **E6.28** (E22.7). **Primeras lecturas del corpus, sin red:** los montos de las becas (una sola beca, $11,400 al año, en **nueve** pagos y no doce), cinco ejercicios de ingresos y costos del Sistema de Tiendas —**déficit en los cinco**, con el desglose *Autorizado · Ampliación · Ejercido*—, la proporción 88.97 / 11.03 confirmada al peso, y una caída de ~$100 M en becas entre 2022 y 2023 (E22.8). **Dos bloques del catálogo no producen corpus** porque lo que piden no son documentos; de paso, la página del INPC en INEGI llega sin cuerpo, primera rejilla vacía fuera del mundo universitario (E22.9). **25 de los 67 renglones del catálogo tienen al menos un documento**, y la cifra engaña porque conviven cinco naturalezas distintas en una sola columna de URL (E22.10). Dos conclusiones nuevas (**C27**, y **C26** ampliada) y dos deudas nuevas (**E6.28**, **E6.29**). |
 | **v19** | **2026-10-04** | **Nota de procedencia al pie de E21 y E22.** Los logs de las nueve corridas de la UNAM **no se guardaron en archivo**: los comandos no llevaban `tee`. Las dos entradas se redactaron sobre la salida de terminal pegada en la conversación —con sus fragmentos transcritos literales— y sobre consultas a `legisuni_v2.db`, así que **no son reconstruibles desde un log**, a diferencia de E15 y E19, cuyos logs sí viven en `~/respaldo-acervo/`. Lo verificable hoy son las filas de `descargas` e `intentos` con `encargo_id LIKE 'unam:%'`. Queda anotado que, si el scrollback de la terminal sobrevive, conviene volcarlo y corregir la nota. **Nota fechada en E6.8:** las cosechas de E21 y E22 **no** cierran esa deuda, porque salieron de un catálogo escrito a mano y no del índice del Abogado General, que sigue sin cosecharse (E21.16); **E6.8 sigue abierta en lo que pedía, recontar en vivo**. **Ninguna medición cambia, ninguna conclusión ni deuda nueva.** E1, E14.5 y E20.5 no se tocan: la conversación del Lector de Índice tiene correcciones medidas para esas tres y entran en la v20. |
 | **v20** | **2026-10-04** | **El núcleo determinista del Lector de Índice, construido y medido contra las cinco fixtures (E23).** Cinco módulos (`reduce`, `classify`, `corte`, `slug`, `cuenta`), 393 tests, y los conteos **156 · 156 · 47** reproducidos desde `lector/` y ya no solo desde el prototipo desechable (E23.2). **Primer oráculo de contenido del proyecto:** `datos/oraculo-uam.tsv`, 47 slugs escritos a mano **antes** del código que los cumple, y `slug.py` los reproduce sin excepciones (E23.4, E23.7). **Tres cifras corregidas con nota fechada:** la UACAM son **83** enlaces a PDF y no 81 —el grep de E20.5 no era `-i` y el índice sirve dos `.PDF`—, con alcance acotado porque UNAM-OAG (84) y UJAT (109) aguantan con los tres métodos (E20.5, E23.3); los slugs-fecha de la UAM son **nueve** y no siete, porque el glob de E14.5 solo veía la forma `DD.`, más **tres anexos con slug posicional** que nadie había contado (E14.5); y el desglose de E1 suma 46 porque **el huérfano de E1.5 no está en ninguna rúbrica**, lo que explica a la vez el 46, el 45 de E11 y el 47 medido (E1). **E13.5 queda cerrada por M45:** ningún `doc_slug` de la UAM es ya una fecha, y las tres publicaciones del Reglamento de Estudios Superiores comparten `res`. **E6.14 se marca cerrada** en su fila (la v16 ya lo decía en el texto). Dos conclusiones nuevas: **C28**, el sufijo estable es el token anterior a la marca y no el último —causa raíz de E13.5—, y **C29**, cambiar el algoritmo de `doc_slug` reescribe los mismos bytes bajo otro `grupo_alias`, medido en **14 documentos** de la UAM y **5** de la UNAM (E23.6, E21.15), sin que nada falle. Tres deudas nuevas (**E6.30–E6.32**). Además: siete instrumentos de la UAM tienen más de una publicación y no dos (E1.1), el sufijo de los anexos trae dos ortografías en el mismo lote (E1.3, E23.5), y el reductor pegaba elementos contiguos en la UACAM, de modo que la fecha de corte se detectaba **por suerte y no por diseño** (E23.5). **Ningún documento nuevo se descargó: E23 mide código contra fixtures, no contra servidores.** |
+| **v21** | **2026-10-06** | **El despacho de `doc_slug` no existía (E24).** Micro-tareas M47a–M47c; como E23, mide código contra las fixtures y **no descargó ningún documento nuevo**. `doc_slug(href, titulo, inst_id)` **recibía `inst_id` y no lo usaba**: decidía con una cascada sobre el nombre de archivo, de modo que **la forma del archivo elegía el mecanismo, no la institución**. Medido sobre los 109 enlaces de la UJAT: **45 slugs por el mecanismo de la UAM** (sufijo), **8 por el de la UNAM** (prefijo numérico) y 56 por título, en una institución que C4 ya declaraba sin mecanismo propio (E24.1). El efecto: **101 slugs distintos para 109 documentos**, con **11 documentos en 3 grupos repetidos** (`ujat` ×7, `certificacion` ×2, `tabasco` ×2) y **8 slugs que son fecha o número de posición** —dos fechas `DDMMAA` que esquivaban la comprobación anti-fecha gracias a la `n` que debía evitarlas, y seis posiciones de lista, contra `01` §Identificadores (E24.2). **`url_id` lo escondía:** los 156 identificadores de E14 eran únicos **por construcción**, y ningún test de unicidad distingue dos publicaciones del mismo instrumento —correcto— de dos instrumentos distintos —no—; es §A2 de `03` una capa más arriba (E24.3). **Arreglado con despacho por `inst_id`** y título por defecto, apoyado en que **los 109 títulos de la UJAT dan 109 slugs distintos**, de modo que esa institución no necesita oráculo; **tope de longitud de 60 a 100**, descartando el mínimo de 63 por frágil (E24.4). **122 documentos del corpus en disco cambian de `grupo_alias`** —UAM 14, UJAT 103, UNAM 5—, lo que vuelve obligatorio el `data/` vacío y amplía **C29** (E24.5). Aparecen **dos defectos previos de la UACAM** que el default no cubre: `ejercicio` ×30, porque la regla anti-fecha le arranca el año que es su identidad, y prefijos de lista posicionales en los títulos; sin daño hoy porque nunca se ha cosechado (E24.6). El cableado pasa a `juridico/cosecha.py` y `scripts/cosechar_indice.py`, y los dos scripts de cosecha se borran, con **47 · 109 · 156** reproducidos desde el paquete sin prototipo (E24.7). **Nota de método:** la tarea se pidió como «mover el cableado y borrar los scripts», y medir antes de escribir evitó cerrar el bloque sobre 103 slugs que no nombran instrumentos, con los 156 identificadores únicos como falsa prueba (E24.8). Dos conclusiones nuevas (**C30**, **C31**) y cuatro deudas nuevas (**E6.33–E6.36**). **Corrección editorial:** el encabezado de **E14.5** decía «Siete slugs…» con una nota debajo que decía nueve; ahora dice **«Nueve slugs con forma de fecha en la UAM, y tres posicionales — E13.5 cerrada en M45»**. **Ninguna medición de la v20 cambia de valor.** |
