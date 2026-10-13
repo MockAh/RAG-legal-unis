@@ -1,0 +1,529 @@
+{
+  "entradas": [
+    {
+      "href": "https://drive.google.com/file/d/1tPqmiMK9NdaWDUBdXA9MQ75pybSf_s1U/view?usp=sharing",
+      "titulo": "Formato ARCO",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "https://drive.google.com/file/d/1e8WoNMjWX7qwIxpZIVYkHQGcXBarfzVK/view?usp=sharing",
+      "titulo": "Ley de Transparencia",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Lineamientos%20de%20Transparencia%20UAC.pdf",
+      "titulo": "Lineamientos de Transparencia UAC",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "https://drive.google.com/file/d/1MP4dy38-hr1K5iVhsgBTovp2_RKsjbAl/view?usp=sharing",
+      "titulo": "Ley de Protección de Datos Personales",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "https://drive.google.com/file/d/1Co0Xhrw-Q4ebJ_MYV-xYubHAocXdF629/view?usp=sharing",
+      "titulo": "Lineamientos de Protección de Datos Personales UAC",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/a/constitucion%2029012016.pdf",
+      "titulo": "a.1 Constitución Política de los Estados Unidos Mexicanos",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/a/constitucion_politica_campeche%20oct-15.pdf",
+      "titulo": "a.2 Constitución Política del Estado de Campeche",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/a/constitucion_politica_campeche_especial.pdf",
+      "titulo": "a.3 Constitución Política del Estado de Campeche Edición Especial",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/b/ley%20general%20de%20Educacion.pdf",
+      "titulo": "b.1 Ley General de Educación",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/b/ley_de_educacion_del_estado_de_campeche%20vigente.pdf",
+      "titulo": "b.2 Ley Estatal de Educación",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/3%20Ley%20Constitutiva%20b.pdf",
+      "titulo": "b.3 Ley Constitutiva",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/4%20Ley%20Organica%20b.pdf",
+      "titulo": "b.4 Ley Orgánica",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/b/Ley-de-Transparencia-y-Acceso-a-la-Informacion-Publica-del-Estado-de-Campeche%20vigente%20agosto%2015.pdf",
+      "titulo": "b.5 Ley de Transparencia y Acceso a la información Pública del Estado de Campeche",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/b/Ley-de-Proteccion-de-Datos-Personales-del-Estado-de-Campeche-y-sus-Municipios%20vigente%202015.pdf",
+      "titulo": "b.6 Ley de Protección de datos Personales",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/b/Ley%20General%20de%20Transparencia%20y%20Acceso%20a%20la%20Informacion%20Publica.pdf",
+      "titulo": "b.7 Ley General de Transparencia y Acceso a la Información Pública.",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/b/ley_de_archivos_del_estado_de_campeche.pdf",
+      "titulo": "b.8 Ley de Archivos del Estado de Campeche.",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/b/LineamientosGenerales.pdf",
+      "titulo": "b.9 Lineamientos Generales de Archivos",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/01%20Reglamento%20del%20Consejo%20Universitario%20c.pdf",
+      "titulo": "c.1 Reglamento del Consejo Universitario",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/02%20Reglamento%20de%20Consejos%20Tecnicos%20c.pdf",
+      "titulo": "c.2 Reglamento de Consejos Técnicos",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/03%20Reglamento%20del%20Tribunal%20de%20Honor%20c.pdf",
+      "titulo": "c.3 Reglamento del Tribunal de Honor",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/04%20Reglamento%20de%20Planeacion%20c.pdf",
+      "titulo": "c.4 Reglamento de Planeación",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/05%20Reglamento%20de%20Extension%20y%20Vinculacion%20Social%20Universitaria%20c.pdf",
+      "titulo": "c.5 Reglamento de Vinculación y Extensión Social Universitaria",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/06%20Reglamento%20de%20Viaticos%20c.pdf",
+      "titulo": "c.6 Reglamento de Víaticos",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/07%20Reglamento%20de%20Baja%20y%20Destino%20Final%20de%20Bienes%20Muebles%20c.pdf",
+      "titulo": "c.7 Reglamento de Baja y Destino Final de Bienes Muebles",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/08%20Reglamento%20de%20Entrega%20Recepcion%20c.pdf",
+      "titulo": "c.8 Reglamento de Entrega Recepción",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/09%20Reglamento%20de%20Incorporacion%20c.pdf",
+      "titulo": "c.9 Reglamento de Incorporación",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/10%20Reglamento%20de%20la%20Politica%20Editorial%20y%20de%20Publicaciones%20c.pdf",
+      "titulo": "c.10 Reglamento de la Política Editorial y de Publicaciones",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Reglamento%20General%20de%20los%20Alumnos%20de%20la%20UAC.pdf",
+      "titulo": "c.11 Reglamento General de los Alumnos de la Universidad Autónoma de Campeche",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/c/MANUAL%20INTEGRACION%20Y%20FUNCIONAMIENTO%20MISMAS%20DE%20LA%20UAC.pdf",
+      "titulo": "c.12 Manual Para La Integración y Funcionamiento del Comité De Adquisiciones, Arrendamientos y Servicios Relacionados con las Mismas de la Uac.",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/c/MANUAL%20PARA%20LA%20INTEGRACION%20Y%20FUNCIONAMIENTO%20MISMAS%20DE%20LA%20UAC.pdf",
+      "titulo": "c.13 Manual para la Integración y Funcionamiento del Comité de Obras y Servicios Relacionados con las Mismas de la Uac.",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/c/Reglasde%20Operacion%20de%20la%20Comision%20de%20Vigilancia.pdf",
+      "titulo": "c.14 Reglas de Operación de la Comisión de Vigilancia del Fondo de Prestaciones Sociales",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/d/circulares%202012.pdf",
+      "titulo": "d.1 Circulares administrativas del 2012",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/d/circulares%20administrativas%202013.PDF",
+      "titulo": "d.2 Circulares administrativas 2013",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/d/circulares%20administrativas%202014.pdf",
+      "titulo": "d.3 Circulares administrativas 2014",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/d/circulares%20administrativas%202015.pdf",
+      "titulo": "d.4 Circulares administrativas 2015",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Correccion%20de%20Datos%20Personales%20e.pdf",
+      "titulo": "e.1 Corrección de Datos Personales",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Formatos%20Facultad%20de%20Humanidades%20e.pdf",
+      "titulo": "e.2 Formatos Facultad de Humanidades",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Recurso%20de%20Revision%20e.pdf",
+      "titulo": "e.3 Recurso de Revisión",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Acceso%20a%20la%20Informacion%20e.pdf",
+      "titulo": "e.4 Solicitud de Acceso a la Información",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Analisis%20Clinicos%20e.pdf",
+      "titulo": "e.5 Solicitud de Análisis Clínicos",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Servicio%20de%20la%20Sala%20Guillermo%20Gonzalez%20Galera%20e.pdf",
+      "titulo": "e.6 Solicitud de Servicio de la Sala Guillermo González Galera",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Servicio%20de%20la%20Sala%20Justo%20Sierra%20Mendez%20e.pdf",
+      "titulo": "e.7 Solicitud de Servicio de la Sala Justo Sierra Méndez",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Servicio%20de%20Sonorizacion%20e.pdf",
+      "titulo": "e.8 Solicitud de Servicio de Sonorización",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Servicio%20de%20Textos%20y%20Logotipos%20e.pdf",
+      "titulo": "e.9 Solicitud de Servicio de Textos y Logotipos",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Solicitud%20de%20Servicio%20del%20Aula%20Magna%20e.pdf",
+      "titulo": "e.10 Solicitud de Servicio del Aula Magna",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/IV-c/Contrato%20de%20prestacion%20de%20servicios%20laboratorio%20de%20ensaye%20c.3.pdf",
+      "titulo": "Ejercicio 2010",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/IV-c/Contrato%20de%20prestacion%20de%20servicios%20LEM%20(2011).pdf",
+      "titulo": "Ejercicio 2011",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/IV-c/Contratos%20de%20prestacion%20de%20servicios%20c.3.pdf",
+      "titulo": "Ejercicio 2010",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/IV-c/Contrato%20de%20prestacion%20de%20servicios%20(2011).pdf",
+      "titulo": "Ejercicio 2011",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/IV-c/Contrato%20de%20prestacion%20de%20servicios%20(2012).pdf",
+      "titulo": "Ejercicio 2012",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/IV-c/contratos%20de%20prestacion%20de%20servicios%202013.pdf",
+      "titulo": "Ejercicio 2013",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/IV-c/contratos%20de%20prestacion%20de%20servicios%202014.pdf",
+      "titulo": "Ejercicio 2014",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/IV-c/CONTRATOS%202015%20(1).pdf",
+      "titulo": "Ejercicio 2015",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/IV-c/Contratos%20Interinstitucionales%20c.2.pdf",
+      "titulo": "Ejercicio 2010",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/IV-c/Contratos%20Interinstitucionales%20(2011)%20ANEXO%202.pdf",
+      "titulo": "Ejercicio 2011",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/IV-c/ContratosInterinstitucionales(2012).pdf",
+      "titulo": "Ejercicio 2012",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/IV-c/Contratos%20Interinstitucionales%20(2013).pdf",
+      "titulo": "Ejercicio 2013",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Contratos%20Interinstitucionales%20(2014).pdf",
+      "titulo": "Ejercicio 2014",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/CONTRATOS-INTERINSTITUCIONAL-2015%20(2).pdf",
+      "titulo": "Ejercicios 2015",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios Becas PROMEP (2010).pdf",
+      "titulo": "Ejercicio 2010",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios Beca PROMEP (2011).pdf",
+      "titulo": "Ejercicio 2011",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios Beca PROMEP (2012).pdf",
+      "titulo": "Ejercicio 2012",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios Beca PROMEP (2013).pdf",
+      "titulo": "Ejercicio 2013",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios%20Beca%20PROMEP%20(2014).pdf",
+      "titulo": "Ejercicio 2014",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/CONVENIO-BECA-PROMEP-2015.pdf",
+      "titulo": "Ejercicio 2015",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios Becas (2010).pdf",
+      "titulo": "ejercicio 2010",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios Beca (2011).pdf",
+      "titulo": "ejercicio 2011",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios Beca (2012).pdf",
+      "titulo": "ejercicio 2012",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios Beca (2013).pdf",
+      "titulo": "ejercicio 2013",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios%20Beca%20(2014).pdf",
+      "titulo": "Ejercicio 2014",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/CONVENIO-BECA-2015%20(1).pdf",
+      "titulo": "Ejercicio 2015",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios Institucionales (2011).pdf",
+      "titulo": "Ejercicio 2011",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios%20Institucionales%20(2012).pdf",
+      "titulo": "Ejercicio 2012",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/Convenios Institucionales (2013).pdf",
+      "titulo": "Ejercicio 2013",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/CONVENIOS%20INSTITUCIONALE%202014.pdf",
+      "titulo": "Ejercicio 2014",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/f/CONVENIOS-INTERINSTITUCIONALES-2015%20(2).pdf",
+      "titulo": "Ejercicio 2015",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/Lineamiento%20para%20la%20revision%20de%20supervivencia%20g.pdf",
+      "titulo": "g.1 Lineamiento para la revisión de supervivencia",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/g/Lineamientos%20de%20datos%20personales%20UAC.pdf",
+      "titulo": "g.3 Lineamientos para la protección de datos personales de la UACAM",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/g/LINEAMIENTOS-APOYO-ENTES-PUBLICOS-PUBLICAR-LA-INFORMACION-A-QUE-SE-REFIERE-EL-ARTICULO-5-DE-LA-LEY.pdf",
+      "titulo": "g.4 Lineamientos de apoyo para que los Entes Públicos den cumplimiento a la Obligación de Publicar la Información a que se refiere el Articulo 5 de la Ley.",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/g/LINEAMIENTOSDEOBRAUAC.pdf",
+      "titulo": "g.5 Lineamientos en Materia de Obra Pública y Servicios Relacionados con las mismas de la Universidad Autónoma de Campeche",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/g/LINEAMIENTOS%20DE%20ADQUISICIONESUAC.pdf",
+      "titulo": "g.6 Lineamientos en Materia de Adquisiciones, Arrendamientos y Servicios Relacionados con Bienes Muebles de la Universidad Autónoma de Campeche.",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/h/acuerdo%20001.PDF",
+      "titulo": "h.1 Acuerdo de Reserva 01-2010",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/h/ACUERDO%20002.pdf",
+      "titulo": "h.2 Acuerdo de Reserva 02-2010",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/h/acuerdo%20de%20reserva%2001-2013.pdf",
+      "titulo": "h.3 Acerdo de Reserva 01-2013",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/h/Acuerdo%20Lineamientos%20proceso%20electoral.pdf",
+      "titulo": "h.4 Acuerdo Lineamientos proceso electoral",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/h/Lineamientos%20proceso%20electoral%20consejo%20universitario.pdf",
+      "titulo": "h.5 Lineamientos proceso electoral consejo universitario",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    },
+    {
+      "href": "http://etzna.uacam.mx/transparencia/X/h/Acuerdo%20Consejo%20Universitario%20con%20respecto%20a%20la%20Veda%20Electoral.pdf",
+      "titulo": "h.6 Acuerdo que establece la prohibición de realizar actos distintos a los académicos durante el proceso electoral Ordinario 2014-2015 en la Universidad Autónoma de Campeche",
+      "tipo_norma": "otro",
+      "titulo_derivado": false
+    }
+  ],
+  "descartados": [],
+  "agotado": false,
+  "notas": null
+}
