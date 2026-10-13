@@ -11,6 +11,7 @@ from legisuni.contracts import (
     Encargo,
     IntentoPuerta,
     Puerta,
+    SourceCandidate,
     TipoNorma,
 )
 from legisuni.descargador import guard
@@ -221,3 +222,68 @@ def test_guard_motivos_validos_contiene_los_diez_motivos() -> None:
         "url_muerta", "demasiado_grande", "visor_de_terceros",
         "vestibulo_sin_pdf", "muro_de_pago", "puertas_agotadas",
     }
+
+
+def test_catalog_entry_minima_titulo_derivado_false_por_defecto() -> None:
+    entrada = _catalog_entry_minima()
+    assert entrada.titulo_derivado is False
+
+
+def test_catalog_entry_acepta_titulo_derivado_true() -> None:
+    entrada = _catalog_entry_minima(titulo_derivado=True)
+    assert entrada.titulo_derivado is True
+
+
+def _source_candidate_minima(**overrides) -> SourceCandidate:
+    datos = dict(
+        inst_id="uam",
+        url="https://www.uam.mx/legislacion/",
+        origen="sitio_institucional",
+        titulo_pagina="Legislación UAM",
+        dominio="www.uam.mx",
+        es_dominio_institucional=True,
+        confianza="alta",
+        razon="la página lista la Ley Orgánica y los reglamentos",
+        descubierta_en=datetime(2026, 1, 1),
+        evidencia_url="https://www.uam.mx/",
+    )
+    datos.update(overrides)
+    return SourceCandidate(**datos)
+
+
+def test_source_candidate_se_construye_con_los_campos_de_n1() -> None:
+    # N1 no declara defaults: todos sus campos son obligatorios.
+    candidata = _source_candidate_minima()
+    assert candidata.confianza == "alta"
+    assert candidata.origen == "sitio_institucional"
+
+
+def test_source_candidate_sin_evidencia_url_lanza_validation_error() -> None:
+    datos = _source_candidate_minima().model_dump()
+    del datos["evidencia_url"]
+    with pytest.raises(ValidationError):
+        SourceCandidate(**datos)
+
+
+def test_source_candidate_confianza_fuera_de_vocabulario_lanza_validation_error() -> None:
+    with pytest.raises(ValidationError):
+        _source_candidate_minima(confianza="total")
+
+
+# Listas escritas a mano a propósito, copiadas de docs/01 v2.7: un campo que
+# desaparezca del código o de N1/N2 tiene que hacer ruido aquí.
+def test_campos_de_catalog_entry_coinciden_con_n2() -> None:
+    assert list(CatalogEntry.model_fields) == [
+        "entry_id", "inst_id", "titulo", "tipo_norma", "url_documento",
+        "formato_declarado", "estado", "vigente_hasta", "fecha_publicacion",
+        "fecha_ultima_reforma", "categoria_indice", "origen", "url_indice",
+        "titulo_derivado", "extraido_en",
+    ]
+
+
+def test_campos_de_source_candidate_coinciden_con_n1() -> None:
+    assert list(SourceCandidate.model_fields) == [
+        "inst_id", "url", "origen", "titulo_pagina", "dominio",
+        "es_dominio_institucional", "confianza", "razon", "descubierta_en",
+        "evidencia_url",
+    ]

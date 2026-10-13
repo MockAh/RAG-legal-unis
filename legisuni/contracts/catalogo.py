@@ -19,4 +19,5 @@ class CatalogEntry(BaseModel):
     categoria_indice: str | None = None
     origen: OrigenFuente
     url_indice: str
+    titulo_derivado: bool = False
     extraido_en: datetime
