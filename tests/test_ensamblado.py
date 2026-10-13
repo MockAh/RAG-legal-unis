@@ -1,6 +1,5 @@
 """M49: el ensamblado de un Catalog de una página, con un agente maniquí (criterio 17 de 03)."""
 
-from collections.abc import Sequence
 from datetime import date, datetime
 from pathlib import Path
 
@@ -15,21 +14,11 @@ from legisuni.lector.corte import buscar_corte
 from legisuni.lector.cuenta import deduplicar
 from legisuni.lector.models import Agente, SalidaInvalida, parsear_salida
 from legisuni.lector.reduce import Enlace, reducir
+from maniqui import AGENTE, AgenteManiqui
 
 FIX = Path(__file__).resolve().parent.parent / "fixtures"
-AGENTE = Path(__file__).resolve().parent / "fixtures" / "agente"
 AHORA = datetime(2026, 10, 1, 12, 0)
 UMBRAL = 18
-
-
-class AgenteManiqui:
-    """Devuelve, crudo, el JSON de `tests/fixtures/agente/<caso>.json`. Cada caso es un archivo."""
-
-    def __init__(self, caso: str) -> None:
-        self._ruta = AGENTE / f"{caso}.json"
-
-    def __call__(self, enlaces: Sequence[Enlace]) -> str:
-        return self._ruta.read_text(encoding="utf-8")
 
 
 def _fuente(inst_id: str, url: str) -> SourceCandidate:
