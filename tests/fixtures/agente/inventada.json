@@ -1,0 +1,10 @@
+{
+  "entradas": [
+    {"href": "docs/ley-organica.pdf", "titulo": "Ley Orgánica", "tipo_norma": "ley_organica"},
+    {"href": "docs/reglamento-de-becas.pdf", "titulo": "Reglamento de Becas", "tipo_norma": "reglamento"},
+    {"href": "docs/estatuto-general.pdf", "titulo": "Estatuto General", "tipo_norma": "estatuto"}
+  ],
+  "descartados": [],
+  "agotado": false,
+  "notas": null
+}

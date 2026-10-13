@@ -15,11 +15,51 @@ from collections.abc import Sequence
 from datetime import datetime
 
 from legisuni.contracts import Catalog, CatalogEntry, SourceCandidate
+from legisuni.descargador.urlnorm import normalizar
 from legisuni.juridico import identificadores
 from legisuni.lector import cuenta, slug
 from legisuni.lector.corte import Corte, esta_caducado
-from legisuni.lector.models import SalidaInvalida, parsear_salida
+from legisuni.lector.models import EntradaAgente, SalidaInvalida, parsear_salida
 from legisuni.lector.reduce import Enlace
+
+
+def _filtrar_entradas(
+    entradas: Sequence[EntradaAgente], enlaces: Sequence[Enlace], url_indice: str
+) -> tuple[list[EntradaAgente], list[str], list[str]]:
+    """(admitidas, hrefs inventados, hrefs repetidos), todo sobre URL normalizada.
+
+    Inventada: su dirección no estaba en la tabla que recibió el agente (D3). Se
+    descarta sin marcar `fallo_lector`: una inventada entre cuarenta buenas no tira
+    el catálogo. Repetida: misma dirección que una entrada anterior; gana la primera,
+    como en `cuenta.deduplicar` (03 §Identidad, regla 5).
+    """
+    tabla = {normalizar(e.href, url_indice) for e in enlaces}
+    admitidas: list[EntradaAgente] = []
+    inventadas: list[str] = []
+    repetidas: list[str] = []
+    ya_admitidas: set[str] = set()
+    for entrada in entradas:
+        clave = normalizar(entrada.href, url_indice)
+        if clave not in tabla:
+            inventadas.append(entrada.href)
+        elif clave in ya_admitidas:
+            repetidas.append(entrada.href)
+        else:
+            ya_admitidas.add(clave)
+            admitidas.append(entrada)
+    return admitidas, inventadas, repetidas
+
+
+def _notas(del_agente: str | None, inventadas: list[str], repetidas: list[str]) -> str | None:
+    """Las notas del agente, más lo que el código descartó, con el href tal como se emitió."""
+    partes = [del_agente] if del_agente else []
+    if inventadas:
+        lista = ", ".join(repr(h) for h in inventadas)
+        partes.append(f"entradas fuera de la tabla de enlaces, descartadas (D3): {len(inventadas)} — {lista}")
+    if repetidas:
+        lista = ", ".join(repr(h) for h in repetidas)
+        partes.append(f"entradas repetidas, descartadas (gana la primera): {len(repetidas)} — {lista}")
+    return "\n".join(partes) if partes else None
 
 
 def ensamblar(
@@ -69,8 +109,10 @@ def ensamblar(
             fallo_lector="salida_invalida",
         )
 
+    admitidas, inventadas, repetidas = _filtrar_entradas(salida.entradas, enlaces, url_indice)
+
     entries = []
-    for entrada in salida.entradas:
+    for entrada in admitidas:
         doc_slug = slug.doc_slug(entrada.href, entrada.titulo, inst_id)
         datos = entrada.model_dump(exclude={"href"})
         entries.append(
@@ -86,13 +128,13 @@ def ensamblar(
         )
 
     vistos, sin_cuenta, incompleta = cuenta.contabilidad(
-        enlaces, [e.href for e in salida.entradas], salida.descartados, url_indice
+        enlaces, [e.href for e in admitidas], salida.descartados, url_indice
     )
     return Catalog(
         **comun,
         entries=entries,
         lector_agotado=salida.agotado,
-        notas=salida.notas,
+        notas=_notas(salida.notas, inventadas, repetidas),
         enlaces_vistos=vistos,
         enlaces_descartados=salida.descartados,
         enlaces_sin_cuenta=sin_cuenta,

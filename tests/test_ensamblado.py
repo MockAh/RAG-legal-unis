@@ -190,3 +190,62 @@ def test_parseo_de_salida_limpia() -> None:
     salida = parsear_salida((AGENTE / "agotado.json").read_text(encoding="utf-8"))
     assert salida.agotado is True
     assert salida.entradas == []
+
+
+# --- M49b: la guardia de D3 y las entradas repetidas ---
+
+_TABLA = [
+    Enlace("Ley Orgánica", "docs/ley-organica.pdf"),
+    Enlace("Estatuto General", "docs/estatuto-general.pdf"),
+]
+
+
+def _con_maniqui(caso: str, enlaces: list[Enlace]) -> Catalog:
+    return ensamblar(UAM, enlaces, None, AgenteManiqui(caso)(enlaces), AHORA, UMBRAL)
+
+
+def test_entrada_inventada_se_descarta_sin_fallo_lector() -> None:
+    catalogo = _con_maniqui("inventada", _TABLA)
+    assert "docs/reglamento-de-becas.pdf" not in [e.url_documento for e in catalogo.entries]
+    assert catalogo.notas is not None
+    assert "'docs/reglamento-de-becas.pdf'" in catalogo.notas
+    assert catalogo.fallo_lector is None
+    assert catalogo.enlaces_descartados == []
+
+
+def test_las_legitimas_junto_a_una_inventada_sobreviven() -> None:
+    catalogo = _con_maniqui("inventada", _TABLA)
+    assert [e.url_documento for e in catalogo.entries] == [
+        "docs/ley-organica.pdf",
+        "docs/estatuto-general.pdf",
+    ]
+
+
+def test_legitima_con_otra_ortografia_no_se_descarta() -> None:
+    catalogo = _con_maniqui("ortografia", [Enlace("Acuerdos rectorales 2", "docs/acuerdos%20rect%202.pdf")])
+    assert [e.url_documento for e in catalogo.entries] == ["docs/acuerdos rect 2.pdf"]
+    assert catalogo.notas is None
+
+
+def test_mismo_href_dos_veces_da_una_entrada_la_primera() -> None:
+    catalogo = _con_maniqui("repetida", _TABLA)
+    assert [e.titulo for e in catalogo.entries] == ["Ley Orgánica", "Estatuto General"]
+    assert len({e.entry_id for e in catalogo.entries}) == 2
+    assert catalogo.notas is not None
+    assert "repetidas" in catalogo.notas
+    assert "'docs/ley-organica.pdf'" in catalogo.notas
+    assert "fuera de la tabla" not in catalogo.notas
+
+
+def test_dos_ortografias_del_mismo_documento_dan_una_entrada() -> None:
+    catalogo = _con_maniqui("dos_ortografias", [Enlace("Acuerdos rectorales 2", "docs/acuerdos%20rect%202.pdf")])
+    assert [e.url_documento for e in catalogo.entries] == ["docs/acuerdos%20rect%202.pdf"]
+    assert catalogo.notas is not None
+    assert "'docs/acuerdos rect 2.pdf'" in catalogo.notas
+
+
+def test_la_inventada_no_convierte_nada_en_faltante() -> None:
+    catalogo = _con_maniqui("inventada", _TABLA)
+    assert catalogo.enlaces_vistos == 2
+    assert catalogo.enlaces_sin_cuenta == []
+    assert catalogo.lectura_incompleta is False

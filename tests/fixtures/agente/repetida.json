@@ -1,0 +1,10 @@
+{
+  "entradas": [
+    {"href": "docs/ley-organica.pdf", "titulo": "Ley Orgánica", "tipo_norma": "ley_organica"},
+    {"href": "docs/estatuto-general.pdf", "titulo": "Estatuto General", "tipo_norma": "estatuto"},
+    {"href": "docs/ley-organica.pdf", "titulo": "Ley Orgánica (otra vez)", "tipo_norma": "ley_organica"}
+  ],
+  "descartados": [],
+  "agotado": false,
+  "notas": null
+}

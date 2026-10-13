@@ -1,0 +1,9 @@
+{
+  "entradas": [
+    {"href": "docs/acuerdos%20rect%202.pdf", "titulo": "Acuerdos rectorales 2", "tipo_norma": "acuerdo"},
+    {"href": "docs/acuerdos rect 2.pdf", "titulo": "Acuerdos rectorales 2 (con espacios)", "tipo_norma": "acuerdo"}
+  ],
+  "descartados": [],
+  "agotado": false,
+  "notas": null
+}
